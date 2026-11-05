@@ -1,0 +1,25 @@
+{
+    "name": "Auditoría de Campaña (vista previa)",
+    "image": "mcr.microsoft.com/devcontainers/php:1-8.3-bookworm",
+    "forwardPorts": [8000],
+    "portsAttributes": {
+        "8000": {
+            "label": "Aplicación",
+            "onAutoForward": "openPreview"
+        }
+    },
+    "postCreateCommand": "bash .devcontainer/setup.sh",
+    "postAttachCommand": "php artisan serve --host=0.0.0.0 --port=8000",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "bmewburn.vscode-intelephense-client",
+                "onecentlabs.laravel-blade",
+                "bradlc.vscode-tailwindcss"
+            ]
+        },
+        "codespaces": {
+            "openFiles": ["README.md"]
+        }
+    }
+}

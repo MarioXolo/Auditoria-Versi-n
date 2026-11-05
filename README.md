@@ -22,6 +22,18 @@ Portal web para controlar actividades y asistencia del personal de campaña. Fun
 
 Las fotos y evidencias se guardan en `storage/app/private` y solo se muestran a quien tiene permiso; no quedan públicas en internet.
 
+## Vista previa en GitHub Codespaces (sin servidor)
+
+1. En la página del repositorio, da clic en **Code → Codespaces → Create codespace on main**.
+2. Espera unos minutos: se instalan las dependencias y se cargan datos de prueba automáticamente.
+3. Cuando termine, se abre la aplicación (si no, ve a la pestaña **Ports** y abre el puerto **8000**).
+4. Entra con cualquiera de estos usuarios, contraseña `password`:
+   - Administrador: `admin@demo.test`
+   - Gerente: `gerente@demo.test`
+   - Encargado: `encargado.norte@demo.test`
+
+Si cierras el codespace y lo vuelves a abrir, el servidor arranca solo. Si no, en la terminal corre `php artisan serve --host=0.0.0.0 --port=8000`. Para no consumir tus horas gratis, detén el codespace cuando termines (**Codespaces → Stop**).
+
 ## Requisitos
 
 - PHP 8.2 o superior con extensiones `pdo_mysql`, `mbstring`, `openssl`, `fileinfo`, `gd` o `imagick`
