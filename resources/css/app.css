@@ -1,0 +1,69 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+@source '../../app/Enums/*.php';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+
+    --color-brand-50: #eef6f5;
+    --color-brand-100: #d5eae7;
+    --color-brand-500: #2f7f77;
+    --color-brand-600: #24675f;
+    --color-brand-700: #1d524c;
+    --color-brand-900: #10302c;
+}
+
+@layer components {
+    .card {
+        @apply rounded-xl border border-stone-200 bg-white shadow-sm;
+    }
+
+    .btn {
+        @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:opacity-50;
+    }
+
+    .btn-primary {
+        @apply bg-brand-600 text-white hover:bg-brand-700;
+    }
+
+    .btn-secondary {
+        @apply border border-stone-300 bg-white text-stone-700 hover:bg-stone-50;
+    }
+
+    .btn-danger {
+        @apply border border-rose-200 bg-white text-rose-700 hover:bg-rose-50;
+    }
+
+    .input {
+        @apply block w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm text-stone-900 shadow-sm placeholder:text-stone-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none;
+    }
+
+    .label {
+        @apply mb-1 block text-sm font-medium text-stone-700;
+    }
+
+    .badge {
+        @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium whitespace-nowrap;
+    }
+
+    .table-head {
+        @apply px-4 py-3 text-left text-xs font-semibold tracking-wide text-stone-500 uppercase;
+    }
+
+    .table-cell {
+        @apply px-4 py-3 text-sm text-stone-700;
+    }
+
+    .nav-link {
+        @apply flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-stone-300 hover:bg-white/10 hover:text-white;
+    }
+
+    .nav-link-active {
+        @apply bg-white/10 text-white;
+    }
+}
