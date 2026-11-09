@@ -54,6 +54,9 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    // Forzar APP_URL en todas las URLs generadas (útil detrás de proxies como Codespaces)
+    'force_url' => (bool) env('APP_FORCE_URL', false),
+
     /*
     |--------------------------------------------------------------------------
     | Application Timezone

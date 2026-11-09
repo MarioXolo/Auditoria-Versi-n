@@ -23,13 +23,13 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
-        // Vista previa en GitHub Codespaces: el proxy reenvía la petición como "localhost",
-        // así que forzamos la URL pública del puerto 8000 para que carguen estilos y formularios.
-        $codespace = env('CODESPACE_NAME');
-        $domain = env('GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN');
-        if ($codespace && $domain && ! $this->app->runningInConsole()) {
-            URL::forceRootUrl("https://{$codespace}-8000.{$domain}");
-            URL::forceScheme('https');
+        // Vista previa (p. ej. GitHub Codespaces): el proxy reenvía la petición como "localhost",
+        // así que con APP_FORCE_URL=true todas las URLs usan APP_URL.
+        if (config('app.force_url')) {
+            URL::forceRootUrl(config('app.url'));
+            if (str_starts_with(config('app.url'), 'https://')) {
+                URL::forceScheme('https');
+            }
         }
     }
 }

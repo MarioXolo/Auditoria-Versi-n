@@ -16,6 +16,8 @@ if [ ! -f .env ]; then
     php artisan key:generate --force
 fi
 
+bash .devcontainer/codespace-url.sh
+
 touch database/database.sqlite
 php artisan migrate:fresh --seed --force
 php artisan db:seed --class=DemoSeeder --force
