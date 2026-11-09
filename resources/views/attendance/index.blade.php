@@ -21,7 +21,7 @@
                     @csrf
                     <div>
                         <label for="photo-in" class="label">Foto de entrada *</label>
-                        <input id="photo-in" type="file" name="photo" accept="image/*" capture="user" required class="input file:mr-3 file:rounded-md file:border-0 file:bg-stone-100 file:px-3 file:py-1 file:text-sm">
+                        <x-file-input name="photo" id="photo-in" accept="image/*" capture="user" required button="Tomar foto" icon="camera" />
                     </div>
                     <div>
                         <label for="notes" class="label">Comentario (opcional)</label>
@@ -46,7 +46,7 @@
                             @csrf
                             <div>
                                 <label for="photo-out" class="label">Foto de salida (opcional)</label>
-                                <input id="photo-out" type="file" name="photo" accept="image/*" capture="user" class="input file:mr-3 file:rounded-md file:border-0 file:bg-stone-100 file:px-3 file:py-1 file:text-sm">
+                                <x-file-input name="photo" id="photo-out" accept="image/*" capture="user" button="Tomar foto" icon="camera" />
                             </div>
                             <button class="btn btn-primary w-full">Registrar salida</button>
                         </form>
