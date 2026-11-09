@@ -9,7 +9,6 @@ use App\Models\Attendance;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Carbon;
 
 /**
  * Datos de prueba para ver el sistema funcionando.
@@ -104,7 +103,7 @@ class DemoSeeder extends Seeder
         $updated = $created->copy()->addHours(rand(1, 48));
 
         if ($status === ActivityStatus::Completada) {
-            $completed = Carbon::createFromTimestamp(rand($created->timestamp, now()->subHour()->timestamp));
+            $completed = now()->setTimestamp(rand($created->timestamp, now()->subHour()->timestamp));
             $updated = $completed;
         }
 
