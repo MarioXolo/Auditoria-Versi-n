@@ -31,6 +31,7 @@ Las fotos y evidencias se guardan en `storage/app/private` y solo se muestran a 
    - Administrador: `admin@demo.test`
    - Gerente: `gerente@demo.test`
    - Encargado: `encargado.norte@demo.test`
+   - Empleado: `empleado.norte@demo.test`
 
 Si cierras el codespace y lo vuelves a abrir, el servidor arranca solo. Si no, en la terminal corre `php artisan serve --host=0.0.0.0 --port=8000`. Para no consumir tus horas gratis, detén el codespace cuando termines (**Codespaces → Stop**).
 
@@ -60,7 +61,7 @@ Para cargar datos de prueba (2 equipos, encargados, empleados, actividades y asi
 php artisan db:seed --class=DemoSeeder
 ```
 
-Usuarios demo: `gerente@demo.test`, `encargado.norte@demo.test`, `encargado.sur@demo.test`.
+Usuarios demo: `gerente@demo.test`, `encargado.norte@demo.test`, `encargado.sur@demo.test`, `empleado.norte@demo.test`, `empleado.sur@demo.test`.
 
 ## Instalación en el VPS con DirectAdmin
 

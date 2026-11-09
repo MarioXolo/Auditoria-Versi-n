@@ -33,7 +33,15 @@ class DemoSeeder extends Seeder
             $team = Team::create(['name' => $name, 'leader_id' => $leader->id]);
             $leader->update(['team_id' => $team->id]);
 
-            User::factory()->count(4)->create(['team_id' => $team->id]);
+            $slug = strtolower(str_replace('Equipo ', '', $name));
+
+            // Un empleado con correo fijo para poder entrar con ese rol
+            User::factory()->create([
+                'name' => 'Empleado '.str_replace('Equipo ', '', $name),
+                'email' => "empleado.{$slug}@demo.test",
+                'team_id' => $team->id,
+            ]);
+            User::factory()->count(3)->create(['team_id' => $team->id]);
 
             return $team;
         });
