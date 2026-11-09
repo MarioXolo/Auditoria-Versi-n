@@ -133,7 +133,7 @@ class AppSmokeTest extends TestCase
     {
         $this->actingAs($this->encargado)->post('/activities', [
             'title' => 'Con evidencia', 'assigned_to' => $this->empleado->id, 'priority' => 'media',
-            'status' => 'pendiente', 'evidence' => UploadedFile::fake()->image('foto.jpg'),
+            'status' => 'pendiente', 'evidence' => UploadedFile::fake()->create('foto.jpg', 200, 'image/jpeg'),
         ])->assertRedirect();
 
         $a = Activity::where('title', 'Con evidencia')->first();
@@ -144,9 +144,9 @@ class AppSmokeTest extends TestCase
 
     public function test_check_in_and_check_out(): void
     {
-        $this->actingAs($this->empleado)->post('/asistencia/entrada', ['photo' => UploadedFile::fake()->image('selfie.jpg')])
+        $this->actingAs($this->empleado)->post('/asistencia/entrada', ['photo' => UploadedFile::fake()->create('selfie.jpg', 200, 'image/jpeg')])
             ->assertSessionHasNoErrors();
-        $this->actingAs($this->empleado)->post('/asistencia/entrada', ['photo' => UploadedFile::fake()->image('selfie.jpg')])
+        $this->actingAs($this->empleado)->post('/asistencia/entrada', ['photo' => UploadedFile::fake()->create('selfie.jpg', 200, 'image/jpeg')])
             ->assertSessionHasErrors('photo');
         $this->actingAs($this->empleado)->post('/asistencia/salida')->assertSessionHasNoErrors();
 
