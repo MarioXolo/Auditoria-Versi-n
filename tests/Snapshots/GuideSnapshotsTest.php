@@ -28,7 +28,7 @@ class GuideSnapshotsTest extends TestCase
         $this->dir = base_path('docs/capturas-html');
         @mkdir($this->dir, 0775, true);
 
-        User::factory()->role('admin')->create(['name' => 'Mario Grajeda', 'email' => 'admin@demo.test']);
+        User::factory()->role('admin')->create(['name' => 'Administrador General', 'email' => 'admin@demo.test']);
         $this->seed(DemoSeeder::class);
 
         $admin = User::where('email', 'admin@demo.test')->first();

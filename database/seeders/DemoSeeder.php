@@ -9,6 +9,7 @@ use App\Models\Attendance;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
 
 /**
  * Datos de prueba para ver el sistema funcionando.
@@ -17,6 +18,24 @@ use Illuminate\Database\Seeder;
  */
 class DemoSeeder extends Seeder
 {
+    /** Nombres para los empleados demo (3 por equipo). */
+    private const PEOPLE = [
+        'Norte' => ['Lucía Hernández', 'Diego Ramírez', 'Fernanda Torres'],
+        'Sur' => ['Jorge Castillo', 'Ana Sofía Morales', 'Ricardo Vega'],
+    ];
+
+    /** Actividades típicas con su descripción. */
+    private const ACTIVITIES = [
+        'Recorrido por colonia asignada' => 'Visitar los domicilios de la colonia asignada y registrar comentarios de los vecinos.',
+        'Entrega de volantes' => 'Repartir volantes en cruceros y zonas comerciales del sector.',
+        'Reunión con líderes vecinales' => 'Reunión para conocer necesidades de la zona y acordar próximos pasos.',
+        'Registro de simpatizantes' => 'Capturar datos de contacto de simpatizantes con su autorización.',
+        'Colocación de lonas' => 'Colocar lonas en los puntos autorizados y tomar foto de cada una.',
+        'Reporte semanal de avance' => 'Entregar el resumen de actividades realizadas en la semana.',
+        'Visita a mercado municipal' => 'Recorrer los locales del mercado y platicar con los comerciantes.',
+        'Seguimiento de solicitudes ciudadanas' => 'Dar respuesta a las solicitudes recibidas en recorridos anteriores.',
+    ];
+
     public function run(): void
     {
         $gerente = User::factory()->role('gerente')->create([
@@ -24,77 +43,120 @@ class DemoSeeder extends Seeder
             'email' => 'gerente@demo.test',
         ]);
 
-        $teams = collect(['Equipo Norte', 'Equipo Sur'])->map(function (string $name) {
+        $teams = collect(['Norte', 'Sur'])->map(function (string $zone) {
+            $slug = strtolower($zone);
+
             $leader = User::factory()->role('encargado')->create([
-                'name' => 'Encargado '.str_replace('Equipo ', '', $name),
-                'email' => 'encargado.'.strtolower(str_replace('Equipo ', '', $name)).'@demo.test',
+                'name' => "Encargado {$zone}",
+                'email' => "encargado.{$slug}@demo.test",
             ]);
 
-            $team = Team::create(['name' => $name, 'leader_id' => $leader->id]);
+            $team = Team::create([
+                'name' => "Equipo {$zone}",
+                'description' => "Personal de campo de la zona {$slug}.",
+                'leader_id' => $leader->id,
+            ]);
             $leader->update(['team_id' => $team->id]);
-
-            $slug = strtolower(str_replace('Equipo ', '', $name));
 
             // Un empleado con correo fijo para poder entrar con ese rol
             User::factory()->create([
-                'name' => 'Empleado '.str_replace('Equipo ', '', $name),
+                'name' => "Empleado {$zone}",
                 'email' => "empleado.{$slug}@demo.test",
                 'team_id' => $team->id,
             ]);
-            User::factory()->count(3)->create(['team_id' => $team->id]);
+
+            foreach (self::PEOPLE[$zone] as $name) {
+                User::factory()->create([
+                    'name' => $name,
+                    'email' => $this->emailFor($name),
+                    'team_id' => $team->id,
+                ]);
+            }
 
             return $team;
         });
-
-        $titles = [
-            'Recorrido por colonia asignada',
-            'Entrega de volantes',
-            'Reunión con líderes vecinales',
-            'Registro de simpatizantes',
-            'Colocación de lonas',
-            'Reporte semanal de avance',
-            'Visita a mercado municipal',
-            'Seguimiento de solicitudes ciudadanas',
-        ];
 
         foreach ($teams as $team) {
             $members = $team->members()->where('role', 'empleado')->get();
 
             foreach ($members as $member) {
                 foreach (range(1, rand(3, 7)) as $i) {
-                    $status = fake()->randomElement(ActivityStatus::cases());
-                    $due = now()->addDays(rand(-10, 10));
-
-                    Activity::create([
-                        'title' => fake()->randomElement($titles),
-                        'description' => fake()->sentence(12),
-                        'assigned_to' => $member->id,
-                        'created_by' => fake()->randomElement([$team->leader_id, $gerente->id]),
-                        'team_id' => $team->id,
-                        'priority' => fake()->randomElement(Priority::cases())->value,
-                        'status' => $status->value,
-                        'due_date' => $due->toDateString(),
-                        'completed_at' => $status === ActivityStatus::Completada ? $due->copy()->subDay() : null,
-                    ]);
+                    $this->createActivity($member, $team, [$team->leader_id, $gerente->id]);
                 }
 
-                foreach (range(0, 6) as $daysAgo) {
-                    if (rand(1, 10) > 8) {
-                        continue; // simula faltas
-                    }
-                    $date = now()->subDays($daysAgo)->startOfDay();
-                    $in = $date->copy()->setTime(8, rand(30, 59));
-
-                    Attendance::create([
-                        'user_id' => $member->id,
-                        'work_date' => $date->toDateString(),
-                        'check_in_at' => $in,
-                        'check_out_at' => $daysAgo === 0 ? null : $in->copy()->addHours(rand(7, 9)),
-                    ]);
-                }
+                $this->createAttendance($member);
             }
         }
 
         $this->command?->info('Datos demo creados. Contraseña de todos los usuarios demo: password');
+    }
+
+    private function createActivity(User $member, Team $team, array $creators): void
+    {
+        $title = array_rand(self::ACTIVITIES);
+        $status = fake()->randomElement(ActivityStatus::cases());
+
+        // Creada en los últimos 20 días, en horario laboral
+        $created = now()->subDays(rand(1, 20))->setTime(rand(8, 17), rand(0, 59));
+        $due = $created->copy()->addDays(rand(2, 12))->startOfDay();
+
+        $completed = null;
+        $updated = $created->copy()->addHours(rand(1, 48));
+
+        if ($status === ActivityStatus::Completada) {
+            $completed = Carbon::createFromTimestamp(rand($created->timestamp, now()->subHour()->timestamp));
+            $updated = $completed;
+        }
+
+        if ($updated->isFuture()) {
+            $updated = now()->subMinutes(rand(5, 300));
+        }
+
+        $activity = new Activity([
+            'title' => $title,
+            'description' => self::ACTIVITIES[$title],
+            'assigned_to' => $member->id,
+            'created_by' => fake()->randomElement($creators),
+            'team_id' => $team->id,
+            'priority' => fake()->randomElement(Priority::cases())->value,
+            'status' => $status->value,
+            'due_date' => $due->toDateString(),
+            'completed_at' => $completed,
+        ]);
+        $activity->created_at = $created;
+        $activity->updated_at = $updated;
+        $activity->save();
+    }
+
+    private function createAttendance(User $member): void
+    {
+        foreach (range(0, 6) as $daysAgo) {
+            $date = now()->subDays($daysAgo)->startOfDay();
+
+            if ($date->isSunday() || rand(1, 10) > 8) {
+                continue; // domingos y faltas
+            }
+
+            $in = $date->copy()->setTime(8, rand(30, 59));
+
+            if ($in->isFuture()) {
+                continue;
+            }
+
+            Attendance::create([
+                'user_id' => $member->id,
+                'work_date' => $date->toDateString(),
+                'check_in_at' => $in,
+                'check_out_at' => $daysAgo === 0 ? null : $in->copy()->addHours(rand(7, 9))->addMinutes(rand(0, 59)),
+            ]);
+        }
+    }
+
+    private function emailFor(string $name): string
+    {
+        $ascii = strtolower(\Illuminate\Support\Str::ascii($name));
+        $parts = explode(' ', $ascii);
+
+        return $parts[0].'.'.end($parts).'@demo.test';
     }
 }
