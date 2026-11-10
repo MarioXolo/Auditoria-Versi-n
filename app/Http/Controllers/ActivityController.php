@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\ActivityStatus;
 use App\Enums\Priority;
+use App\Enums\ValidationStatus;
 use App\Models\Activity;
 use App\Models\Team;
 use App\Models\User;
@@ -28,6 +29,9 @@ class ActivityController extends Controller
             ->when($request->filled('status'), function ($q) use ($request) {
                 if ($request->input('status') === 'vencida') {
                     return $q->overdue();
+                }
+                if ($request->input('status') === 'por_validar') {
+                    return $q->pendingValidation();
                 }
 
                 return $q->where('status', $request->input('status'));
@@ -75,7 +79,9 @@ class ActivityController extends Controller
             $data['evidence_path'] = $request->file('evidence')->store('evidencias', 'local');
         }
 
-        $data['completed_at'] = $data['status'] === ActivityStatus::Completada->value ? now() : null;
+        $completed = $data['status'] === ActivityStatus::Completada->value;
+        $data['completed_at'] = $completed ? now() : null;
+        $data['validation_status'] = $completed ? ValidationStatus::Pendiente->value : null;
 
         $activity = Activity::create($data);
 
@@ -85,7 +91,7 @@ class ActivityController extends Controller
     public function show(Activity $activity): View
     {
         $this->authorize('view', $activity);
-        $activity->load(['assignee', 'creator', 'team']);
+        $activity->load(['assignee', 'creator', 'team', 'validator']);
 
         return view('activities.show', ['activity' => $activity]);
     }
@@ -130,6 +136,40 @@ class ActivityController extends Controller
         $activity->save();
 
         return back()->with('status', 'Estado actualizado a "'.$activity->status->label().'".');
+    }
+
+    /** Validar o rechazar una actividad completada. */
+    public function review(Request $request, Activity $activity): RedirectResponse
+    {
+        $this->authorize('review', $activity);
+
+        $data = $request->validate([
+            'decision' => ['required', 'in:validar,rechazar'],
+            'validation_notes' => ['nullable', 'required_if:decision,rechazar', 'string', 'max:2000'],
+        ], [
+            'validation_notes.required_if' => 'Escribe el motivo del rechazo para que la persona sepa qué corregir.',
+        ], [
+            'validation_notes' => 'comentario',
+        ]);
+
+        $activity->validated_by = $request->user()->id;
+        $activity->validated_at = now();
+        $activity->validation_notes = $data['validation_notes'] ?? null;
+
+        if ($data['decision'] === 'validar') {
+            $activity->validation_status = ValidationStatus::Validada;
+            $message = 'Actividad validada.';
+        } else {
+            // Se regresa para corregir: vuelve a "en progreso"
+            $activity->validation_status = ValidationStatus::Rechazada;
+            $activity->status = ActivityStatus::EnProgreso;
+            $activity->completed_at = null;
+            $message = 'Actividad rechazada. Regresó a "En progreso" con tu comentario.';
+        }
+
+        $activity->save();
+
+        return back()->with('status', $message);
     }
 
     public function destroy(Activity $activity): RedirectResponse
@@ -194,12 +234,19 @@ class ActivityController extends Controller
         ]);
     }
 
+    /** Al completar, la actividad queda por validar; si deja de estar completada, se limpia la validación. */
     private function applyCompletion(Activity $activity, string $newStatus): void
     {
         if ($newStatus === ActivityStatus::Completada->value && $activity->status !== ActivityStatus::Completada) {
             $activity->completed_at = now();
+            $activity->validation_status = ValidationStatus::Pendiente;
+            $activity->validated_by = null;
+            $activity->validated_at = null;
         } elseif ($newStatus !== ActivityStatus::Completada->value) {
             $activity->completed_at = null;
+            if ($activity->validation_status !== ValidationStatus::Rechazada) {
+                $activity->validation_status = null;
+            }
         }
     }
 

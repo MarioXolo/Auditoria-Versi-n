@@ -36,6 +36,7 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::resource('activities', ActivityController::class);
     Route::patch('/activities/{activity}/status', [ActivityController::class, 'updateStatus'])->name('activities.status');
     Route::get('/activities/{activity}/evidence', [ActivityController::class, 'evidence'])->name('activities.evidence');
+    Route::post('/activities/{activity}/validacion', [ActivityController::class, 'review'])->name('activities.review');
 
     // Asistencia
     Route::get('/asistencia', [AttendanceController::class, 'index'])->name('attendance.index');

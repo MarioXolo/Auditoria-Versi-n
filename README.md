@@ -8,7 +8,7 @@ Portal web para controlar actividades y asistencia del personal de campaña. Fun
 |---|---|
 | **Administrador** | Todo: es el único que crea, edita y desactiva usuarios. |
 | **Gerente** | Todo lo demás: ve todas las actividades y la asistencia, asigna a encargados y empleados, administra equipos, consulta la lista de usuarios y usa el dashboard de auditoría. No crea ni edita usuarios. |
-| **Encargado** | Solo crea y asigna actividades a los empleados de su equipo. Ve únicamente las actividades que él asignó y las que le asignaron a él; no ve las de otros encargados ni la asistencia del equipo. |
+| **Encargado** | Solo crea y asigna actividades a los empleados de su equipo. Ve únicamente las actividades que él asignó y las que le asignaron a él, y no ve las de otros encargados. Ve la asistencia y las fotos de entrada de su equipo. |
 | **Empleado** | Solo ve las actividades asignadas a él, aunque comparta equipo con otros. Registra su entrada y salida. |
 
 ## Módulos de esta versión
@@ -16,6 +16,7 @@ Portal web para controlar actividades y asistencia del personal de campaña. Fun
 - **Inicio de sesión** con bloqueo tras 5 intentos fallidos por minuto. Los usuarios desactivados no pueden entrar.
 - **Usuarios y equipos** (solo administrador). Cada equipo tiene un encargado.
 - **Actividades**: título, descripción, persona asignada, equipo, prioridad, fecha límite, estado, evidencia (foto o PDF) y notas. Filtros por estado, persona, equipo y vencidas.
+- **Validación de actividades**: al marcarse como completada, la actividad queda "Por validar". Quien la asignó, un gerente o el administrador la valida o la rechaza con un motivo; si se rechaza, regresa a "En progreso". Nadie valida una actividad asignada a sí mismo.
 - **Asistencia**: entrada con foto obligatoria tomada desde la cámara y salida con foto opcional. Encargados, gerentes y administradores ven quién registró y quién no, por día.
 - **Dashboard** (administrador y gerente): indicadores del periodo, cumplimiento por persona, quién tiene más actividades asignadas, desempeño de encargados, personal sin entrada hoy y movimientos recientes.
 - **Mi perfil**: cada usuario cambia su contraseña.

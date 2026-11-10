@@ -24,6 +24,7 @@
                 <option value="{{ $value }}" @selected(request('status') === $value)>{{ $label }}</option>
             @endforeach
             <option value="vencida" @selected(request('status') === 'vencida')>Vencidas</option>
+            <option value="por_validar" @selected(request('status') === 'por_validar')>Por validar</option>
         </select>
         @if ($people->isNotEmpty())
             <select name="assigned_to" class="input">
@@ -61,6 +62,9 @@
                         <span @class(['font-semibold text-rose-600' => $activity->isOverdue()])>Vence {{ $activity->due_date->format('d/m/Y') }}</span>
                     @endif
                     <span class="badge {{ $activity->priority->badge() }}">{{ $activity->priority->label() }}</span>
+                    @if ($activity->validation_status)
+                        <span class="badge {{ $activity->validation_status->badge() }}">{{ $activity->validation_status->label() }}</span>
+                    @endif
                 </div>
             </a>
         @empty
@@ -111,6 +115,9 @@
                             @else
                                 <span class="badge {{ $activity->status->badge() }}">{{ $activity->status->label() }}</span>
                             @endcan
+                            @if ($activity->validation_status)
+                                <span class="badge mt-1 {{ $activity->validation_status->badge() }}">{{ $activity->validation_status->label() }}</span>
+                            @endif
                         </td>
                     </tr>
                 @empty

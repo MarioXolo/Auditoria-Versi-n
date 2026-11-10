@@ -215,12 +215,15 @@ class AppSmokeTest extends TestCase
         $this->assertNotNull($att->check_out_at);
         $this->actingAs($this->empleado)->get("/asistencia/{$att->id}/foto/entrada")->assertOk();
         $this->actingAs($this->gerente)->get("/asistencia/{$att->id}/foto/entrada")->assertOk();
-        $this->actingAs($this->encargado)->get("/asistencia/{$att->id}/foto/entrada")->assertForbidden();
+        $this->actingAs($this->encargado)->get("/asistencia/{$att->id}/foto/entrada")->assertOk();
         $this->actingAs($this->otroEmpleado)->get("/asistencia/{$att->id}/foto/entrada")->assertForbidden();
 
-        // Solo administradores y gerentes ven la asistencia del personal
-        $this->actingAs($this->encargado)->get('/asistencia')->assertOk()->assertDontSee('Asistencia del personal');
+        // Encargados ven la asistencia de su equipo; otro encargado no ve las fotos de este equipo
+        $this->actingAs($this->encargado)->get('/asistencia')->assertOk()->assertSee('Asistencia del personal')->assertSee($this->empleado->name);
         $this->actingAs($this->gerente)->get('/asistencia')->assertOk()->assertSee('Asistencia del personal');
+        $otroEncargado = User::factory()->role('encargado')->create();
+        $this->actingAs($otroEncargado)->get("/asistencia/{$att->id}/foto/entrada")->assertForbidden();
+        $this->actingAs($this->empleado)->get('/asistencia')->assertOk()->assertDontSee('Asistencia del personal');
     }
 
     public function test_admin_manages_users_and_teams(): void

@@ -65,7 +65,7 @@
     {{-- KPI principales con meta y semáforo --}}
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         @foreach ([
-            ['key' => 'cumplimiento', 'label' => 'Cumplimiento', 'hint' => $kpi['completed'].' de '.($kpi['total'] - $kpi['cancelled']).' actividades completadas'],
+            ['key' => 'cumplimiento', 'label' => 'Cumplimiento', 'hint' => $kpi['completed'].' de '.($kpi['total'] - $kpi['cancelled']).' completadas · '.$kpi['validadas'].' ya validadas'],
             ['key' => 'a_tiempo', 'label' => 'Entrega a tiempo', 'hint' => 'de las completadas, antes de su fecha límite'],
             ['key' => 'asistencia', 'label' => 'Asistencia', 'hint' => $kpi['present'].' de '.$kpi['expected'].' jornadas esperadas'],
             ['key' => 'puntualidad', 'label' => 'Puntualidad', 'hint' => $kpi['late'].' retardos (entrada después de '.config('auditoria.hora_entrada').' + '.config('auditoria.tolerancia_minutos').' min)'],
@@ -96,7 +96,7 @@
     {{-- KPI de volumen --}}
     <div class="mt-4 grid grid-cols-2 gap-4 xl:grid-cols-4">
         @foreach ([
-            ['label' => 'Actividades', 'value' => $kpi['total'], 'sub' => $kpi['open'].' abiertas · '.$kpi['cancelled'].' canceladas', 'delta' => $deltaHtml($delta['total'], ''), 'link' => route('activities.index')],
+            ['label' => 'Actividades', 'value' => $kpi['total'], 'sub' => $kpi['open'].' abiertas · '.$kpi['por_validar'].' por validar · '.$kpi['validadas'].' validadas', 'delta' => $deltaHtml($delta['total'], ''), 'link' => route('activities.index')],
             ['label' => 'Vencidas', 'value' => $kpi['overdue'], 'sub' => 'pendientes con fecha límite pasada', 'delta' => $deltaHtml($delta['overdue'], '', true), 'link' => route('activities.index', ['status' => 'vencida']), 'alert' => $kpi['overdue'] > 0],
             ['label' => 'Tiempo de cierre', 'value' => $fmt($kpi['dias_cierre'], ' días'), 'sub' => 'promedio de creación a completado', 'delta' => $deltaHtml($delta['dias_cierre'], 'días', true)],
             ['label' => 'Horas por jornada', 'value' => $fmt($kpi['horas'], ' h'), 'sub' => 'promedio entre entrada y salida', 'delta' => $deltaHtml($delta['horas'], 'h')],

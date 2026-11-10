@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Enums\ActivityStatus;
 use App\Enums\Priority;
+use App\Enums\ValidationStatus;
 use App\Models\Activity;
 use App\Models\Attendance;
 use App\Models\Team;
@@ -97,7 +98,7 @@ class DemoSeeder extends Seeder
         $title = array_rand(self::ACTIVITIES);
         $status = fake()->randomElement(ActivityStatus::cases());
 
-        // Creada en los últimos 20 días, en horario laboral
+        // Creada en los últimos 45 días, en horario laboral
         $created = now()->subDays(rand(1, 45))->setTime(rand(8, 17), rand(0, 59));
         $due = $created->copy()->addDays(rand(2, 12))->startOfDay();
 
@@ -113,16 +114,39 @@ class DemoSeeder extends Seeder
             $updated = now()->subMinutes(rand(5, 300));
         }
 
+        $creator = fake()->randomElement($creators);
+
+        // Validación: la mayoría de las completadas ya revisadas; algunas en progreso fueron rechazadas antes
+        $validation = ['validation_status' => null, 'validated_by' => null, 'validated_at' => null, 'validation_notes' => null];
+        if ($status === ActivityStatus::Completada) {
+            $reviewedAt = $completed->copy()->addHours(rand(2, 30));
+            $validation = rand(1, 100) <= 70 && $reviewedAt->isPast()
+                ? ['validation_status' => ValidationStatus::Validada->value, 'validated_by' => $creator, 'validated_at' => $reviewedAt, 'validation_notes' => null]
+                : ['validation_status' => ValidationStatus::Pendiente->value, 'validated_by' => null, 'validated_at' => null, 'validation_notes' => null];
+        } elseif ($status === ActivityStatus::EnProgreso && rand(1, 100) <= 20) {
+            $validation = [
+                'validation_status' => ValidationStatus::Rechazada->value,
+                'validated_by' => $creator,
+                'validated_at' => $updated,
+                'validation_notes' => fake()->randomElement([
+                    'Falta la foto de evidencia.',
+                    'El reporte está incompleto, agrega los domicilios visitados.',
+                    'Las lonas no están en los puntos autorizados.',
+                ]),
+            ];
+        }
+
         $activity = new Activity([
             'title' => $title,
             'description' => self::ACTIVITIES[$title],
             'assigned_to' => $member->id,
-            'created_by' => fake()->randomElement($creators),
+            'created_by' => $creator,
             'team_id' => $team->id,
             'priority' => fake()->randomElement(Priority::cases())->value,
             'status' => $status->value,
             'due_date' => $due->toDateString(),
             'completed_at' => $completed,
+            ...$validation,
         ]);
         $activity->created_at = $created;
         $activity->updated_at = $updated;

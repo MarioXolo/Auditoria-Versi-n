@@ -12,6 +12,9 @@
             @if ($activity->isOverdue())
                 <span class="badge bg-rose-600 text-white">Vencida</span>
             @endif
+            @if ($activity->validation_status)
+                <span class="badge {{ $activity->validation_status->badge() }}">{{ $activity->validation_status->label() }}</span>
+            @endif
         </div>
     </div>
     <div class="flex gap-2">
@@ -60,6 +63,57 @@
         </div>
 
         <aside class="space-y-6">
+            {{-- Validación de la actividad concluida --}}
+            <section @class([
+                'card p-5',
+                'border-violet-300 ring-2 ring-violet-100' => $activity->isPendingValidation(),
+            ])>
+                <h2 class="text-sm font-semibold text-stone-500 uppercase">Validación</h2>
+
+                @if ($activity->isPendingValidation())
+                    <p class="mt-2 text-sm">Se marcó como completada el {{ $activity->completed_at?->format('d/m/Y H:i') }} y espera que se confirme que realmente se concluyó.</p>
+
+                    @can('review', $activity)
+                        <form method="POST" action="{{ route('activities.review', $activity) }}" class="mt-4 space-y-3">
+                            @csrf
+                            <div>
+                                <label for="validation_notes" class="label">Comentario</label>
+                                <textarea id="validation_notes" name="validation_notes" rows="3" class="input" placeholder="Obligatorio si la rechazas: explica qué falta o qué corregir">{{ old('validation_notes') }}</textarea>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button name="decision" value="rechazar" class="btn btn-danger">Rechazar</button>
+                                <button name="decision" value="validar" class="btn btn-primary">Validar</button>
+                            </div>
+                            <p class="text-xs text-stone-500">Si la rechazas, regresa a "En progreso" con tu comentario.</p>
+                        </form>
+                    @else
+                        <p class="mt-3 rounded-lg bg-violet-50 px-3 py-2 text-xs text-violet-800">
+                            La valida {{ $activity->creator?->name }} (quien la asignó), un gerente o el administrador.
+                        </p>
+                    @endcan
+                @elseif ($activity->validation_status === \App\Enums\ValidationStatus::Validada)
+                    <div class="mt-3 flex items-start gap-3 rounded-lg bg-emerald-50 px-3 py-3">
+                        <svg class="mt-0.5 size-5 shrink-0 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                        <div class="text-sm">
+                            <p class="font-medium text-emerald-900">Validada por {{ $activity->validator?->name }}</p>
+                            <p class="text-xs text-emerald-800">{{ $activity->validated_at?->format('d/m/Y H:i') }}</p>
+                            @if ($activity->validation_notes)
+                                <p class="mt-2 whitespace-pre-line text-stone-700">{{ $activity->validation_notes }}</p>
+                            @endif
+                        </div>
+                    </div>
+                @elseif ($activity->validation_status === \App\Enums\ValidationStatus::Rechazada)
+                    <div class="mt-3 rounded-lg bg-rose-50 px-3 py-3 text-sm">
+                        <p class="font-medium text-rose-900">Rechazada por {{ $activity->validator?->name }}</p>
+                        <p class="text-xs text-rose-800">{{ $activity->validated_at?->format('d/m/Y H:i') }}</p>
+                        <p class="mt-2 whitespace-pre-line text-stone-700">{{ $activity->validation_notes }}</p>
+                        <p class="mt-2 text-xs text-stone-500">Al volver a marcarla como completada, quedará otra vez por validar.</p>
+                    </div>
+                @else
+                    <p class="mt-2 text-sm text-stone-500">Cuando la actividad se marque como completada, quedará pendiente de validación.</p>
+                @endif
+            </section>
+
             <dl class="card divide-y divide-stone-100 text-sm">
                 @foreach ([
                     'Asignada a' => $activity->assignee?->name,
