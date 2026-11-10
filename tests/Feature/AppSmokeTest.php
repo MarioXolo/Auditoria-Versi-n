@@ -99,7 +99,16 @@ class AppSmokeTest extends TestCase
             $this->actingAs($u)->get('/users')->assertForbidden();
             $this->actingAs($u)->get('/teams')->assertForbidden();
         }
-        $this->actingAs($this->gerente)->get('/users')->assertForbidden();
+        // Gerente: ve usuarios y administra equipos, pero no crea ni edita usuarios
+        $this->actingAs($this->gerente)->get('/users')->assertOk()->assertDontSee('Nuevo usuario');
+        $this->actingAs($this->gerente)->get('/users/create')->assertForbidden();
+        $this->actingAs($this->gerente)->get("/users/{$this->empleado->id}/edit")->assertForbidden();
+        $this->actingAs($this->gerente)->post('/users', ['name' => 'X', 'email' => 'x@x.mx', 'role' => 'admin', 'password' => 'secreto123', 'password_confirmation' => 'secreto123'])->assertForbidden();
+        $this->actingAs($this->gerente)->patch("/users/{$this->empleado->id}/toggle")->assertForbidden();
+        $this->actingAs($this->gerente)->get('/teams')->assertOk();
+        $this->actingAs($this->gerente)->post('/teams', ['name' => 'Centro'])->assertRedirect(route('teams.index'));
+        $this->assertDatabaseHas('teams', ['name' => 'Centro']);
+        $this->actingAs($this->gerente)->get("/teams/{$this->team->id}/edit")->assertOk();
         $this->actingAs($this->empleado)->get('/activities/create')->assertForbidden();
 
         // Empleado no ve actividades ajenas
@@ -182,8 +191,14 @@ class AppSmokeTest extends TestCase
 
         $att = Attendance::where('user_id', $this->empleado->id)->first();
         $this->assertNotNull($att->check_out_at);
-        $this->actingAs($this->encargado)->get("/asistencia/{$att->id}/foto/entrada")->assertOk();
+        $this->actingAs($this->empleado)->get("/asistencia/{$att->id}/foto/entrada")->assertOk();
+        $this->actingAs($this->gerente)->get("/asistencia/{$att->id}/foto/entrada")->assertOk();
+        $this->actingAs($this->encargado)->get("/asistencia/{$att->id}/foto/entrada")->assertForbidden();
         $this->actingAs($this->otroEmpleado)->get("/asistencia/{$att->id}/foto/entrada")->assertForbidden();
+
+        // Solo administradores y gerentes ven la asistencia del personal
+        $this->actingAs($this->encargado)->get('/asistencia')->assertOk()->assertDontSee('Asistencia del personal');
+        $this->actingAs($this->gerente)->get('/asistencia')->assertOk()->assertSee('Asistencia del personal');
     }
 
     public function test_admin_manages_users_and_teams(): void

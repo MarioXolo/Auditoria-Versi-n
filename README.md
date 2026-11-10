@@ -6,10 +6,10 @@ Portal web para controlar actividades y asistencia del personal de campaña. Fun
 
 | Rol | Qué puede hacer |
 |---|---|
-| **Administrador** | Todo: usuarios, equipos, actividades, asistencia y dashboard. |
-| **Gerente** | Ve todas las actividades, asigna a encargados y empleados, ve la asistencia de todos y el dashboard de auditoría. |
-| **Encargado** | Asigna y da seguimiento a las actividades de los empleados de su equipo y ve su asistencia. |
-| **Empleado** | Solo ve sus actividades. Registra su entrada y salida. |
+| **Administrador** | Todo: es el único que crea, edita y desactiva usuarios. |
+| **Gerente** | Todo lo demás: ve todas las actividades y la asistencia, asigna a encargados y empleados, administra equipos, consulta la lista de usuarios y usa el dashboard de auditoría. No crea ni edita usuarios. |
+| **Encargado** | Solo crea y asigna actividades a los empleados de su equipo. Ve únicamente las actividades que él asignó y las que le asignaron a él; no ve las de otros encargados ni la asistencia del equipo. |
+| **Empleado** | Solo ve las actividades asignadas a él, aunque comparta equipo con otros. Registra su entrada y salida. |
 
 ## Módulos de esta versión
 

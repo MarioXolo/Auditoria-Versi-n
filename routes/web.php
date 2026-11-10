@@ -49,10 +49,15 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/perfil', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/perfil/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
 
-    // Administración: solo administradores
-    Route::middleware('role:admin')->group(function () {
-        Route::resource('users', UserController::class)->except(['show', 'destroy']);
-        Route::patch('/users/{user}/toggle', [UserController::class, 'toggle'])->name('users.toggle');
+    // Administración y gerencia: equipos y consulta de usuarios
+    Route::middleware('role:admin,gerente')->group(function () {
+        Route::get('/users', [UserController::class, 'index'])->name('users.index');
         Route::resource('teams', TeamController::class)->except(['show']);
+    });
+
+    // Solo administradores: crear, editar y desactivar usuarios
+    Route::middleware('role:admin')->group(function () {
+        Route::resource('users', UserController::class)->except(['index', 'show', 'destroy']);
+        Route::patch('/users/{user}/toggle', [UserController::class, 'toggle'])->name('users.toggle');
     });
 });

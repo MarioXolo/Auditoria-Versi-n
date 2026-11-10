@@ -35,7 +35,8 @@ class AttendanceController extends Controller
         ];
 
         // Encargados, gerentes y administradores ven la asistencia de su gente
-        if ($user->canManageActivities()) {
+        // Solo administradores y gerentes ven la asistencia del personal
+        if ($user->seesEverything()) {
             $date = $request->filled('date')
                 ? Carbon::parse($request->input('date'))->startOfDay()
                 : today();
@@ -119,9 +120,7 @@ class AttendanceController extends Controller
     {
         $viewer = $request->user();
 
-        $allowed = $viewer->id === $attendance->user_id
-            || $viewer->seesEverything()
-            || ($viewer->isEncargado() && in_array($attendance->user_id, $viewer->teamMemberIds(), true));
+        $allowed = $viewer->id === $attendance->user_id || $viewer->seesEverything();
 
         abort_unless($allowed, 403);
 

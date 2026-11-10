@@ -7,7 +7,11 @@
         <h1 class="text-2xl font-semibold">Usuarios</h1>
         <p class="text-sm text-stone-500">{{ $users->total() }} registrados</p>
     </div>
-    <a href="{{ route('users.create') }}" class="btn btn-primary">Nuevo usuario</a>
+    @if (auth()->user()->isAdmin())
+        <a href="{{ route('users.create') }}" class="btn btn-primary">Nuevo usuario</a>
+    @else
+        <p class="text-sm text-stone-500">Solo el administrador puede crear o editar usuarios.</p>
+    @endif
 @endsection
 
 @section('content')
@@ -53,6 +57,7 @@
                             </span>
                         </td>
                         <td class="table-cell text-right whitespace-nowrap">
+                            @if (auth()->user()->isAdmin())
                             <a href="{{ route('users.edit', $user) }}" class="text-brand-600 hover:underline">Editar</a>
                             @unless ($user->is(auth()->user()))
                                 <form method="POST" action="{{ route('users.toggle', $user) }}" class="ml-3 inline">
@@ -61,6 +66,7 @@
                                     <button class="text-stone-500 hover:text-stone-900 hover:underline">{{ $user->active ? 'Desactivar' : 'Activar' }}</button>
                                 </form>
                             @endunless
+                            @endif
                         </td>
                     </tr>
                 @empty

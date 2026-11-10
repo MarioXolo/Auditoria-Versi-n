@@ -18,7 +18,7 @@
     }
     $nav[] = ['route' => 'activities.index', 'match' => 'activities.*', 'label' => 'Actividades', 'icon' => 'M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11'];
     $nav[] = ['route' => 'attendance.index', 'match' => 'attendance.*', 'label' => 'Asistencia', 'icon' => 'M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z'];
-    if ($me->isAdmin()) {
+    if ($me->seesEverything()) {
         $nav[] = ['route' => 'users.index', 'match' => 'users.*', 'label' => 'Usuarios', 'icon' => 'M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m22 0v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75M13 7a4 4 0 11-8 0 4 4 0 018 0z'];
         $nav[] = ['route' => 'teams.index', 'match' => 'teams.*', 'label' => 'Equipos', 'icon' => 'M3 7h18M3 12h18M3 17h18'];
     }

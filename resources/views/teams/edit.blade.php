@@ -24,12 +24,16 @@
             <section class="card overflow-hidden">
                 <div class="border-b border-stone-200 px-5 py-4">
                     <h2 class="font-semibold">Integrantes ({{ $team->members->count() }})</h2>
-                    <p class="text-xs text-stone-500">Se asignan desde la edición de cada usuario.</p>
+                    <p class="text-xs text-stone-500">El administrador los asigna desde la edición de cada usuario.</p>
                 </div>
                 <ul class="divide-y divide-stone-100">
                     @forelse ($team->members as $member)
                         <li class="flex justify-between px-5 py-2.5 text-sm">
-                            <a href="{{ route('users.edit', $member) }}" class="hover:text-brand-600">{{ $member->name }}</a>
+                            @if (auth()->user()->isAdmin())
+                                <a href="{{ route('users.edit', $member) }}" class="hover:text-brand-600">{{ $member->name }}</a>
+                            @else
+                                <span>{{ $member->name }}</span>
+                            @endif
                             <span class="text-xs text-stone-500">{{ $member->role->label() }}</span>
                         </li>
                     @empty
