@@ -96,6 +96,12 @@ class DashboardMetrics
         $end = $to->copy()->min(today())->startOfDay();
         $laborales = config('auditoria.dias_laborales');
 
+        // Hoy solo cuenta cuando ya pasó la hora de entrada más la tolerancia
+        [$h, $m] = array_map('intval', explode(':', config('auditoria.hora_entrada')));
+        if ($end->isToday() && now()->lt(today()->setTime($h, $m)->addMinutes(config('auditoria.tolerancia_minutos')))) {
+            $end->subDay();
+        }
+
         for ($d = $from->copy()->startOfDay(); $d->lte($end); $d->addDay()) {
             if (in_array($d->isoWeekday(), $laborales, true)) {
                 $days->push($d->copy());
@@ -558,7 +564,7 @@ class DashboardMetrics
         return [
             ['Cumplimiento', 'Completadas ÷ (asignadas − canceladas) × 100', "≥ {$m['cumplimiento']}%", 'Actividades creadas en el periodo'],
             ['Entrega a tiempo', 'Completadas en o antes de su fecha límite ÷ completadas × 100', "≥ {$m['a_tiempo']}%", 'Actividades completadas del periodo'],
-            ['Asistencia', 'Entradas registradas ÷ (personal activo × días laborales) × 100', "≥ {$m['asistencia']}%", 'Registros de asistencia en días laborales'],
+            ['Asistencia', "Entradas registradas ÷ (personal activo × días laborales) × 100. Hoy cuenta a partir de las {$hora} + {$tol} min", "≥ {$m['asistencia']}%", 'Registros de asistencia en días laborales'],
             ['Puntualidad', "Entradas hasta las {$hora} + {$tol} min ÷ entradas registradas × 100", "≥ {$m['puntualidad']}%", 'Hora de entrada de cada registro'],
             ['Vencidas', 'Pendientes o en progreso con fecha límite anterior a hoy', 'Lo más bajo posible', 'Actividades creadas en el periodo'],
             ['Tiempo de cierre', 'Promedio de días entre la creación y el completado', 'Tendencia a la baja', 'Actividades completadas del periodo'],

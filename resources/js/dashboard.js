@@ -47,8 +47,8 @@ const goalLine = (value, label) => ({
         ctx.stroke();
         ctx.fillStyle = C.rose;
         ctx.font = '600 10px Instrument Sans, sans-serif';
-        ctx.textAlign = 'right';
-        ctx.fillText(label, chartArea.right, y - 4);
+        ctx.textAlign = 'left';
+        ctx.fillText(label, chartArea.left + 4, y + 12);
         ctx.restore();
     },
 });
