@@ -109,6 +109,36 @@ class AppSmokeTest extends TestCase
         $this->actingAs($this->encargado)->get("/activities/{$ajena->id}")->assertForbidden();
     }
 
+    public function test_encargado_only_sees_activities_he_assigned(): void
+    {
+        $suya = $this->activityFor($this->empleado, $this->encargado);
+        // El gerente asigna directo a un empleado del equipo del encargado
+        $delGerente = $this->activityFor($this->empleado, $this->gerente);
+        $paraEncargado = $this->activityFor($this->encargado, $this->gerente);
+        $delGerente->update(['title' => 'Asignada por gerente']);
+        $suya->update(['title' => 'Asignada por encargado']);
+        $paraEncargado->update(['title' => 'Tarea del encargado']);
+
+        $this->actingAs($this->encargado)->get("/activities/{$suya->id}")->assertOk();
+        $this->actingAs($this->encargado)->get("/activities/{$paraEncargado->id}")->assertOk();
+        $this->actingAs($this->encargado)->get("/activities/{$delGerente->id}")->assertForbidden();
+
+        $this->actingAs($this->encargado)->get('/activities')
+            ->assertSee('Asignada por encargado')
+            ->assertSee('Tarea del encargado')
+            ->assertDontSee('Asignada por gerente');
+
+        // El empleado ve todas las suyas, sin importar quién las asignó
+        $this->actingAs($this->empleado)->get('/activities')
+            ->assertSee('Asignada por encargado')
+            ->assertSee('Asignada por gerente')
+            ->assertDontSee('Tarea del encargado');
+
+        // El encargado no edita lo que no asignó
+        $this->actingAs($this->encargado)->patch("/activities/{$delGerente->id}/status", ['status' => 'completada'])->assertForbidden();
+        $this->actingAs($this->encargado)->patch("/activities/{$suya->id}/status", ['status' => 'completada'])->assertRedirect();
+    }
+
     public function test_encargado_assigns_only_to_own_team(): void
     {
         $base = ['title' => 'Volanteo', 'priority' => 'alta', 'status' => 'pendiente'];

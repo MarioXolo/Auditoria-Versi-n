@@ -27,9 +27,10 @@ Route::middleware(['auth', 'active'])->group(function () {
     })->name('home');
 
     // Dashboard de auditoría
-    Route::get('/dashboard', DashboardController::class)
-        ->middleware('role:admin,gerente')
-        ->name('dashboard');
+    Route::middleware('role:admin,gerente')->group(function () {
+        Route::get('/dashboard', DashboardController::class)->name('dashboard');
+        Route::get('/dashboard/exportar', [DashboardController::class, 'export'])->name('dashboard.export');
+    });
 
     // Actividades (los permisos finos están en ActivityPolicy)
     Route::resource('activities', ActivityController::class);

@@ -59,20 +59,11 @@ class Activity extends Model
             return $query;
         }
 
+        // Encargados: solo las que ellos asignaron y las que les asignaron a ellos.
+        // Empleados: solo las suyas.
         if ($user->isEncargado()) {
-            $memberIds = $user->teamMemberIds();
-            $teamIds = $user->ledTeamIds();
-
-            return $query->where(function (Builder $q) use ($user, $memberIds, $teamIds) {
-                $q->where('assigned_to', $user->id)
-                    ->orWhere('created_by', $user->id);
-
-                if ($memberIds !== []) {
-                    $q->orWhereIn('assigned_to', $memberIds);
-                }
-                if ($teamIds !== []) {
-                    $q->orWhereIn('team_id', $teamIds);
-                }
+            return $query->where(function (Builder $q) use ($user) {
+                $q->where('created_by', $user->id)->orWhere('assigned_to', $user->id);
             });
         }
 

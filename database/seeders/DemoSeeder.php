@@ -136,7 +136,10 @@ class DemoSeeder extends Seeder
                 continue; // domingos y faltas
             }
 
-            $in = $date->copy()->setTime(8, rand(30, 59));
+            // 3 de cada 4 llegan a tiempo; el resto con retardo
+            $in = rand(1, 4) > 1
+                ? $date->copy()->setTime(8, 30)->addMinutes(rand(0, 38))
+                : $date->copy()->setTime(9, 12)->addMinutes(rand(0, 35));
 
             if ($in->isFuture()) {
                 continue;
