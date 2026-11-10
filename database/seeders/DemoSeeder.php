@@ -79,12 +79,14 @@ class DemoSeeder extends Seeder
             $members = $team->members()->where('role', 'empleado')->get();
 
             foreach ($members as $member) {
-                foreach (range(1, rand(3, 7)) as $i) {
+                foreach (range(1, rand(6, 12)) as $i) {
                     $this->createActivity($member, $team, [$team->leader_id, $gerente->id]);
                 }
 
                 $this->createAttendance($member);
             }
+
+            $this->createAttendance($team->leader);
         }
 
         $this->command?->info('Datos demo creados. Contraseña de todos los usuarios demo: password');
@@ -96,7 +98,7 @@ class DemoSeeder extends Seeder
         $status = fake()->randomElement(ActivityStatus::cases());
 
         // Creada en los últimos 20 días, en horario laboral
-        $created = now()->subDays(rand(1, 20))->setTime(rand(8, 17), rand(0, 59));
+        $created = now()->subDays(rand(1, 45))->setTime(rand(8, 17), rand(0, 59));
         $due = $created->copy()->addDays(rand(2, 12))->startOfDay();
 
         $completed = null;
@@ -129,15 +131,15 @@ class DemoSeeder extends Seeder
 
     private function createAttendance(User $member): void
     {
-        foreach (range(0, 6) as $daysAgo) {
+        foreach (range(0, 59) as $daysAgo) {
             $date = now()->subDays($daysAgo)->startOfDay();
 
-            if ($date->isSunday() || rand(1, 10) > 8) {
-                continue; // domingos y faltas
+            if ($date->isSunday() || rand(1, 100) > 93) {
+                continue; // domingos y faltas ocasionales
             }
 
-            // 3 de cada 4 llegan a tiempo; el resto con retardo
-            $in = rand(1, 4) > 1
+            // La mayoría llega a tiempo; algunos con retardo
+            $in = rand(1, 100) > 12
                 ? $date->copy()->setTime(8, 30)->addMinutes(rand(0, 38))
                 : $date->copy()->setTime(9, 12)->addMinutes(rand(0, 35));
 
