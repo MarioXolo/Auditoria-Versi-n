@@ -118,6 +118,28 @@ class AppSmokeTest extends TestCase
         $this->actingAs($this->encargado)->get("/activities/{$ajena->id}")->assertForbidden();
     }
 
+    public function test_teammates_do_not_see_each_others_activities(): void
+    {
+        $companero = User::factory()->create(['team_id' => $this->team->id]);
+        $mia = $this->activityFor($this->empleado, $this->encargado);
+        $deEl = $this->activityFor($companero, $this->encargado);
+        $mia->update(['title' => 'Actividad de Ana']);
+        $deEl->update(['title' => 'Actividad de Beto']);
+
+        $this->actingAs($this->empleado)->get('/activities')->assertSee('Actividad de Ana')->assertDontSee('Actividad de Beto');
+        $this->actingAs($this->empleado)->get("/activities/{$deEl->id}")->assertForbidden();
+
+        // Otro encargado no ve lo que asignó este encargado
+        $otroEncargado = User::factory()->role('encargado')->create();
+        $this->actingAs($otroEncargado)->get('/activities')->assertDontSee('Actividad de Ana');
+        $this->actingAs($otroEncargado)->get("/activities/{$mia->id}")->assertForbidden();
+
+        // Un encargado no puede asignar a empleados que no son de su equipo
+        $this->actingAs($otroEncargado)->post('/activities', [
+            'title' => 'X', 'assigned_to' => $this->empleado->id, 'priority' => 'media', 'status' => 'pendiente',
+        ])->assertSessionHasErrors('assigned_to');
+    }
+
     public function test_encargado_only_sees_activities_he_assigned(): void
     {
         $suya = $this->activityFor($this->empleado, $this->encargado);
