@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Activity extends Model
 {
     protected $fillable = [
+        'folio',
+        'folio_group',
+        'folio_seq',
         'activity_type_id',
         'community_id',
         'assigned_to',
@@ -43,21 +46,45 @@ class Activity extends Model
         ];
     }
 
-    /** Folio visible: ACT-0001. */
-    public static function formatCode(int $id): string
+    protected static function booted(): void
     {
-        return 'ACT-'.str_pad((string) $id, 4, '0', STR_PAD_LEFT);
+        // Folio por equipo, en secuencia: ID{número de equipo}.{0001…}. Una vez asignado no cambia.
+        static::creating(function (Activity $activity) {
+            if ($activity->folio) {
+                return;
+            }
+
+            $group = $activity->team_id ? (int) Team::whereKey($activity->team_id)->value('number') : 0;
+            $seq = self::nextSeq($group);
+
+            $activity->folio_group = $group;
+            $activity->folio_seq = $seq;
+            $activity->folio = self::formatCode($group, $seq);
+        });
     }
 
-    /** Folio que tendrá la siguiente actividad (solo para mostrarlo en el formulario). */
-    public static function nextCode(): string
+    /** Folio visible: ID1.0001 (equipo 1, actividad 1). Equipo 0 = sin equipo. */
+    public static function formatCode(int $group, int $seq): string
     {
-        return self::formatCode(((int) self::max('id')) + 1);
+        return 'ID'.$group.'.'.str_pad((string) $seq, 4, '0', STR_PAD_LEFT);
+    }
+
+    public static function nextSeq(int $group): int
+    {
+        return ((int) self::where('folio_group', $group)->max('folio_seq')) + 1;
+    }
+
+    /** Folio que tendrá la siguiente actividad del equipo (solo para mostrarlo en el formulario). */
+    public static function nextCode(?int $group): string
+    {
+        $group ??= 0;
+
+        return self::formatCode($group, self::nextSeq($group));
     }
 
     public function getCodeAttribute(): string
     {
-        return self::formatCode((int) $this->id);
+        return (string) $this->folio;
     }
 
     /** Nombre corto para títulos: «Tipo · Comunidad». */

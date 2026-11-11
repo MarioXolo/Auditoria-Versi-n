@@ -10,6 +10,8 @@ return new class extends Migration
     {
         Schema::create('teams', function (Blueprint $table) {
             $table->id();
+            // Número del equipo (1 a 30): prefijo del folio de sus actividades, ej. ID3.0001
+            $table->unsignedTinyInteger('number')->unique();
             $table->string('name');
             $table->text('description')->nullable();
             // Encargado responsable del equipo

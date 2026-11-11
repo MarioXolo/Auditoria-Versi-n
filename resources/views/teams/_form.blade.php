@@ -1,6 +1,13 @@
 @csrf
 <div class="grid gap-5">
     <div>
+        <span class="label">Número de equipo</span>
+        <p class="flex items-center gap-3">
+            <span class="badge bg-brand-50 font-mono text-base text-brand-700">ID{{ $team->number ?? '—' }}</span>
+            <span class="text-xs text-slate-500">Se asigna solo. Las actividades del equipo llevan el folio ID{{ $team->number }}.0001, ID{{ $team->number }}.0002…</span>
+        </p>
+    </div>
+    <div>
         <label for="name" class="label">Nombre *</label>
         <input id="name" name="name" value="{{ old('name', $team->name) }}" required class="input">
     </div>

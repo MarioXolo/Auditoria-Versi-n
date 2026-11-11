@@ -9,38 +9,48 @@
     <div class="sm:col-span-2">
         <label for="code" class="label">ID</label>
         <div class="flex items-center gap-3">
-            <input id="code" value="{{ $code }}" readonly tabindex="-1"
+            <input id="code" value="{{ $code ?? '—' }}" readonly tabindex="-1" data-folio
                    class="input w-40 cursor-default bg-slate-100 font-mono font-semibold tracking-wide text-slate-700">
-            <span class="text-xs text-slate-500">{{ $activity->exists ? 'Folio de la actividad.' : 'Se asigna automáticamente al guardar.' }}</span>
+            <span class="text-xs text-slate-500" data-folio-hint>
+                @if ($activity->exists)
+                    Folio de la actividad.
+                @elseif ($code)
+                    Folio del equipo; se confirma al guardar.
+                @else
+                    Elige a quién se asigna para ver el folio de su equipo.
+                @endif
+            </span>
         </div>
     </div>
 
     {{-- 2. Tipo de actividad --}}
     <div>
         <label for="activity_type_id" class="label">Tipo de actividad *</label>
-        <select id="activity_type_id" name="activity_type_id" required class="input">
+        <select id="activity_type_id" name="activity_type_id" required class="input" data-other="activity_type_new">
             <option value="">Selecciona un tipo</option>
             @foreach ($types as $type)
-                <option value="{{ $type->id }}" @selected((int) old('activity_type_id', $activity->activity_type_id) === $type->id)>{{ $type->name }}</option>
+                <option value="{{ $type->id }}" @selected((string) old('activity_type_id', $activity->activity_type_id) === (string) $type->id)>{{ $type->name }}</option>
             @endforeach
+            <option value="otro" @selected(old('activity_type_id') === 'otro')>Otro (escribirlo)…</option>
         </select>
-        @if ($types->isEmpty())
-            <p class="mt-1 text-xs text-amber-700">No hay tipos de actividad. Un administrador o gerente debe darlos de alta en Catálogos.</p>
-        @endif
+        <input id="activity_type_new" name="activity_type_new" value="{{ old('activity_type_new') }}" maxlength="120"
+               placeholder="Escribe el tipo de actividad" aria-label="Nuevo tipo de actividad"
+               @class(['input mt-2', 'hidden' => old('activity_type_id') !== 'otro'])>
     </div>
 
     {{-- 3. Comunidad --}}
     <div>
         <label for="community_id" class="label">Comunidad *</label>
-        <select id="community_id" name="community_id" required class="input">
+        <select id="community_id" name="community_id" required class="input" data-other="community_new">
             <option value="">Selecciona una comunidad</option>
             @foreach ($communities as $community)
-                <option value="{{ $community->id }}" @selected((int) old('community_id', $activity->community_id) === $community->id)>{{ $community->name }}</option>
+                <option value="{{ $community->id }}" @selected((string) old('community_id', $activity->community_id) === (string) $community->id)>{{ $community->name }}</option>
             @endforeach
+            <option value="otro" @selected(old('community_id') === 'otro')>Otra (escribirla)…</option>
         </select>
-        @if ($communities->isEmpty())
-            <p class="mt-1 text-xs text-amber-700">No hay comunidades. Un administrador o gerente debe darlas de alta en Catálogos.</p>
-        @endif
+        <input id="community_new" name="community_new" value="{{ old('community_new') }}" maxlength="120"
+               placeholder="Escribe el nombre de la comunidad" aria-label="Nueva comunidad"
+               @class(['input mt-2', 'hidden' => old('community_id') !== 'otro'])>
     </div>
 
     {{-- Asignar a --}}
@@ -133,6 +143,32 @@
             });
         });
     });
+    // «Otro…»: muestra el campo para escribirlo a mano
+    document.querySelectorAll('select[data-other]').forEach((select) => {
+        const input = document.getElementById(select.dataset.other);
+        const sync = () => {
+            const other = select.value === 'otro';
+            input.classList.toggle('hidden', !other);
+            input.required = other;
+            if (other) input.focus();
+        };
+        select.addEventListener('change', sync);
+        input.required = select.value === 'otro';
+    });
+
+    // Folio: cambia según el equipo de la persona asignada
+    const previews = @json($folioPreviews ?? []);
+    const assignee = document.getElementById('assigned_to');
+    const folio = document.querySelector('[data-folio]');
+    const hint = document.querySelector('[data-folio-hint]');
+    if (assignee && folio && Object.keys(previews).length) {
+        assignee.addEventListener('change', () => {
+            const code = previews[assignee.value];
+            folio.value = code ?? '—';
+            hint.textContent = code ? 'Folio del equipo; se confirma al guardar.' : 'Elige a quién se asigna para ver el folio de su equipo.';
+        });
+    }
+
     const start = document.getElementById('start_date');
     const end = document.getElementById('end_date');
     start?.addEventListener('change', () => {

@@ -17,26 +17,38 @@ class TeamController extends Controller
     {
         $teams = Team::with('leader:id,name')
             ->withCount('members')
-            ->orderBy('name')
+            ->orderBy('number')
             ->get();
 
-        return view('teams.index', ['teams' => $teams]);
+        return view('teams.index', [
+            'teams' => $teams,
+            'max' => Team::maxTeams(),
+            'limitReached' => Team::limitReached(),
+        ]);
     }
 
-    public function create(): View
+    public function create(): View|RedirectResponse
     {
+        if (Team::limitReached()) {
+            return redirect()->route('teams.index')->withErrors(['name' => 'Se alcanzó el máximo de '.Team::maxTeams().' equipos. Elimina uno para crear otro.']);
+        }
+
         return view('teams.create', [
-            'team' => new Team(),
+            'team' => new Team(['number' => Team::freeNumber()]),
             'leaders' => $this->leaders(),
         ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
+        if (Team::limitReached()) {
+            return redirect()->route('teams.index')->withErrors(['name' => 'Se alcanzó el máximo de '.Team::maxTeams().' equipos. Elimina uno para crear otro.']);
+        }
+
         $team = Team::create($this->validated($request));
         $this->attachLeader($team);
 
-        return redirect()->route('teams.index')->with('status', 'Equipo creado.');
+        return redirect()->route('teams.index')->with('status', "Equipo creado con el número {$team->number}: sus actividades llevarán el folio {$team->prefix}.0001, {$team->prefix}.0002…");
     }
 
     public function edit(Team $team): View

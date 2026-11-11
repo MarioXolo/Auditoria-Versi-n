@@ -107,7 +107,7 @@ class DemoSeeder extends Seeder
             $this->createAttendance($team->leader);
         }
 
-        // Guardar en orden de creación para que los folios ACT-0001… sigan la cronología
+        // Guardar en orden de creación para que los folios de cada equipo (ID1.0001…) sigan la cronología
         foreach (collect($this->pending)->sortBy(fn ($a) => $a->created_at->timestamp) as $activity) {
             $activity->save();
         }

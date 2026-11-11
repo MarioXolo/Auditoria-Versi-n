@@ -7,6 +7,12 @@
 
 return [
 
+    /*
+    | Máximo de equipos. Cada equipo recibe un número del 1 al máximo, que es el
+    | prefijo del folio de sus actividades (ID1.0001, ID2.0001…).
+    */
+    'max_equipos' => 30,
+
     // Hora oficial de entrada y minutos de tolerancia para contar un retardo
     'hora_entrada' => env('AUDITORIA_HORA_ENTRADA', '09:00'),
     'tolerancia_minutos' => (int) env('AUDITORIA_TOLERANCIA', 10),

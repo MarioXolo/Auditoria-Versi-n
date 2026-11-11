@@ -27,13 +27,17 @@ class ActivityController extends Controller
             ->when($request->filled('q'), function ($q) use ($request) {
                 $term = trim((string) $request->string('q'));
 
-                // «ACT-0012» o «12» buscan por folio
-                if (preg_match('/^(?:act-?)?0*(\d+)$/i', $term, $m)) {
-                    return $q->whereKey((int) $m[1]);
+                // «ID1.0012» o «1.12» buscan un folio exacto; «ID1» todo el equipo 1
+                if (preg_match('/^(?:id)?\s*(\d{1,2})\.(\d+)$/i', $term, $m)) {
+                    return $q->where('folio_group', (int) $m[1])->where('folio_seq', (int) $m[2]);
+                }
+                if (preg_match('/^id\s*(\d{1,2})$/i', $term, $m)) {
+                    return $q->where('folio_group', (int) $m[1]);
                 }
 
                 return $q->where(fn ($w) => $w
-                    ->whereHas('type', fn ($t) => $t->where('name', 'like', "%{$term}%"))
+                    ->where('folio', 'like', "%{$term}%")
+                    ->orWhereHas('type', fn ($t) => $t->where('name', 'like', "%{$term}%"))
                     ->orWhereHas('community', fn ($c) => $c->where('name', 'like', "%{$term}%"))
                     ->orWhere('evidence_text', 'like', "%{$term}%"));
             })
@@ -55,7 +59,8 @@ class ActivityController extends Controller
         $activities = $query
             ->orderByRaw("CASE WHEN status IN ('no_iniciado','en_proceso') THEN 0 WHEN status = 'no_completada' THEN 1 WHEN status = 'suspendida' THEN 2 ELSE 3 END")
             ->orderBy('end_date')
-            ->latest('id')
+            ->orderBy('folio_group')
+            ->orderBy('folio_seq')
             ->paginate(15)
             ->withQueryString();
 
@@ -251,9 +256,12 @@ class ActivityController extends Controller
         $typeIds = ActivityType::active()->pluck('id')->push($activity?->activity_type_id)->filter()->all();
         $communityIds = Community::active()->pluck('id')->push($activity?->community_id)->filter()->all();
 
+        // «otro» = escribirlo a mano; se agrega al catálogo al guardar
         $data = $request->validate([
-            'activity_type_id' => ['required', 'integer', Rule::in($typeIds)],
-            'community_id' => ['required', 'integer', Rule::in($communityIds)],
+            'activity_type_id' => ['required', Rule::in([...$typeIds, 'otro'])],
+            'activity_type_new' => ['nullable', 'required_if:activity_type_id,otro', 'string', 'max:120'],
+            'community_id' => ['required', Rule::in([...$communityIds, 'otro'])],
+            'community_new' => ['nullable', 'required_if:community_id,otro', 'string', 'max:120'],
             'assigned_to' => ['required', 'integer', Rule::in($assignableIds)],
             'evidence' => ['nullable', 'file', 'max:10240', 'mimes:jpg,jpeg,png,webp,heic,heif'],
             'evidence_text' => ['nullable', 'string', 'max:5000'],
@@ -261,13 +269,17 @@ class ActivityController extends Controller
             'end_date' => ['required', 'date', 'after_or_equal:start_date'],
         ], [
             'assigned_to.in' => 'No puedes asignar actividades a esa persona.',
-            'activity_type_id.in' => 'Elige un tipo de actividad del catálogo.',
-            'community_id.in' => 'Elige una comunidad del catálogo.',
+            'activity_type_id.in' => 'Elige un tipo de actividad de la lista o escribe uno nuevo.',
+            'community_id.in' => 'Elige una comunidad de la lista o escribe una nueva.',
+            'activity_type_new.required_if' => 'Escribe el tipo de actividad.',
+            'community_new.required_if' => 'Escribe el nombre de la comunidad.',
             'evidence.mimes' => 'La evidencia debe ser una fotografía (JPG, PNG, WEBP o HEIC).',
             'end_date.after_or_equal' => 'La fecha de fin no puede ser anterior a la de inicio.',
         ], [
             'activity_type_id' => 'tipo de actividad',
             'community_id' => 'comunidad',
+            'activity_type_new' => 'nuevo tipo de actividad',
+            'community_new' => 'nueva comunidad',
             'assigned_to' => 'persona asignada',
             'evidence' => 'fotografía',
             'evidence_text' => 'evidencia en texto',
@@ -275,27 +287,68 @@ class ActivityController extends Controller
             'end_date' => 'fecha de fin',
         ]);
 
-        unset($data['evidence']);
+        $data['activity_type_id'] = $this->catalogId(ActivityType::class, $data['activity_type_id'], $data['activity_type_new'] ?? null);
+        $data['community_id'] = $this->catalogId(Community::class, $data['community_id'], $data['community_new'] ?? null);
+
+        unset($data['evidence'], $data['activity_type_new'], $data['community_new']);
 
         return $data;
     }
 
+    /**
+     * Id del catálogo: el elegido de la lista o el escrito a mano. Lo escrito se busca
+     * sin distinguir mayúsculas para no duplicar; si no existe, se agrega al catálogo.
+     *
+     * @param  class-string<ActivityType|Community>  $model
+     */
+    private function catalogId(string $model, int|string $selected, ?string $typed): int
+    {
+        if ($selected !== 'otro') {
+            return (int) $selected;
+        }
+
+        $name = preg_replace('/\s+/', ' ', trim((string) $typed));
+        $item = $model::whereRaw('LOWER(name) = ?', [mb_strtolower($name)])->first()
+            ?? $model::create(['name' => $name, 'active' => true]);
+
+        if (! $item->active) {
+            $item->update(['active' => true]);
+        }
+
+        return $item->id;
+    }
+
     private function formData(User $user, Activity $activity): array
     {
-        $people = $user->assignableUsers()->get(['id', 'name', 'role']);
+        $people = $user->assignableUsers()->get(['id', 'name', 'role', 'team_id']);
 
         if ($activity->assigned_to && ! $people->contains('id', $activity->assigned_to)) {
-            $people->push(User::find($activity->assigned_to, ['id', 'name', 'role']));
+            $people->push(User::find($activity->assigned_to, ['id', 'name', 'role', 'team_id']));
         }
+        $people = $people->filter();
+
+        // Vista previa del folio: depende del equipo de la persona asignada
+        $numbers = Team::pluck('number', 'id');
+        $groupOf = fn (?int $teamId) => $teamId ? (int) ($numbers[$teamId] ?? 0) : 0;
+        $previews = $people->mapWithKeys(fn ($p) => [$p->id => Activity::nextCode($groupOf($p->team_id))]);
+        $code = match (true) {
+            $activity->exists => $activity->code,
+            $user->isEmpleado() => Activity::nextCode($groupOf($user->team_id)),
+            (bool) $activity->assigned_to => $previews[$activity->assigned_to] ?? Activity::nextCode(0),
+            // Si todas las personas son del mismo equipo (caso del encargado), el folio ya se conoce
+            $previews->unique()->count() === 1 => $previews->first(),
+            default => null,
+        };
 
         return [
             'activity' => $activity,
-            'people' => $people->filter(),
+            'people' => $people,
+            'folioPreviews' => $activity->exists ? collect() : $previews,
             'teams' => $this->teamsFor($user),
             'statuses' => ActivityStatus::editableOptions(),
             'types' => ActivityType::active()->orWhere('id', $activity->activity_type_id)->orderBy('name')->get(['id', 'name']),
             'communities' => Community::active()->orWhere('id', $activity->community_id)->orderBy('name')->get(['id', 'name']),
-            'code' => $activity->exists ? $activity->code : Activity::nextCode(),
+            'code' => $code,
         ];
     }
 

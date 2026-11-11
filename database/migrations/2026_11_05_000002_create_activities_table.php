@@ -9,8 +9,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('activities', function (Blueprint $table) {
-            // El id es el folio visible: ACT-0001, ACT-0002…
             $table->id();
+            // Folio por equipo: ID{número de equipo}.{secuencia}, ej. ID1.0001. Equipo 0 = sin equipo.
+            $table->string('folio', 20)->unique();
+            $table->unsignedTinyInteger('folio_group')->default(0);
+            $table->unsignedInteger('folio_seq')->default(0);
             $table->foreignId('activity_type_id')->constrained('activity_types')->restrictOnDelete();
             $table->foreignId('community_id')->constrained('communities')->restrictOnDelete();
             $table->foreignId('assigned_to')->constrained('users')->cascadeOnDelete();
@@ -25,6 +28,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index(['assigned_to', 'status']);
+            $table->index(['folio_group', 'folio_seq']);
         });
     }
 
