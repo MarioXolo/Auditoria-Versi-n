@@ -10,7 +10,7 @@
 @section('content')
     @include('campaigns._nav')
 
-    <p class="mb-4 text-sm text-slate-500">Revisar en la junta semanal. Los primeros indicadores se calculan solos con los datos del cuaderno; los de captura manual se actualizan con su <b>valor actual</b> y <b>fecha de corte</b>. Semáforo: verde ≥ 90 %, ámbar ≥ 60 %, rojo debajo.</p>
+    <p class="mb-4 text-sm text-slate-500">Revisar en la junta semanal. Los primeros indicadores se calculan solos con los datos del cuaderno; los de captura manual se actualizan con su <b>valor actual</b> y <b>fecha de corte</b>. Semáforo: verde ≥ 90 %, ámbar ≥ 60 %, rojo debajo; en el gasto es al revés: verde por debajo del 90 % del tope y rojo si lo rebasa.</p>
 
     <div class="card overflow-x-auto">
         <table class="min-w-full divide-y divide-slate-200 text-sm">
@@ -33,11 +33,11 @@
                                 <span class="font-medium {{ $kpi->meta === null ? '' : 'text-slate-900' }}">{{ $kpi->nombre }}</span>
                                 <span class="block text-xs {{ $kpi->meta === null ? '' : 'text-slate-500' }}">{{ $kpi->fuente }}</span>
                             </td>
-                            <td class="table-cell text-right tabular-nums">{{ $fmt($kpi->meta, false) }}</td>
-                            <td class="table-cell text-right tabular-nums">{{ $fmt($kpi->valor, false) }}</td>
+                            <td class="table-cell text-right tabular-nums">{{ $kpi->money ? \App\Services\CampaignSheets::money($kpi->meta) : $fmt($kpi->meta, false) }}</td>
+                            <td class="table-cell text-right tabular-nums">{{ $kpi->money ? \App\Services\CampaignSheets::money($kpi->valor) : $fmt($kpi->valor, false) }}</td>
                             <td class="table-cell text-right tabular-nums">{{ $kpi->status && $kpi->status['ratio'] !== null ? number_format($kpi->status['ratio'] * 100, 1).'%' : '—' }}</td>
                             <td class="table-cell">@if ($kpi->status)<span class="badge {{ $kpi->status['class'] }}">{{ $kpi->status['label'] }}</span>@else — @endif</td>
-                            <td class="table-cell text-xs">@if ($kpi->meta !== null)<span class="badge bg-brand-50 text-brand-700">Automático · hoy</span>@else Etapa 2 @endif</td>
+                            <td class="table-cell text-xs"><span class="badge bg-brand-50 text-brand-700">Automático · hoy</span></td>
                             <td class="table-cell"></td>
                         </tr>
                     @else

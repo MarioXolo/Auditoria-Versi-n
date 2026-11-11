@@ -1,18 +1,20 @@
 {{-- Encabezado y pestañas de una campaña --}}
 @php
-    // Mismas pestañas y numeración que el Cuaderno Maestro de Campaña (Excel). Las de la etapa 2 aún no están activas.
+    // Mismas pestañas y numeración que el Cuaderno Maestro de Campaña (Excel)
+    $sheetTab = fn (string $key) => ['url' => route('campaigns.sheets.index', [$campaign, $key]), 'active' => request()->routeIs('campaigns.sheets.*') && request()->route('sheet') === $key, 'label' => \App\Services\CampaignSheets::get($key)['tab']];
+    $tab = fn (string $route, string $match, string $label) => ['url' => route($route, $campaign), 'active' => request()->routeIs($match), 'label' => $label];
     $tabs = [
-        ['route' => 'campaigns.show', 'match' => 'campaigns.show', 'label' => 'Inicio'],
-        ['route' => 'campaigns.edit', 'match' => 'campaigns.edit', 'label' => '1. Meta de Votos'],
-        ['route' => 'campaigns.territories.index', 'match' => 'campaigns.territories.*', 'label' => '2. Estructura Territorial'],
-        ['route' => 'campaigns.voters.index', 'match' => 'campaigns.voters.*', 'label' => '3. Base de Votantes'],
-        ['route' => 'campaigns.promoters.index', 'match' => 'campaigns.promoters.*', 'label' => '4. Padrón de Promotores'],
-        ['route' => null, 'label' => '5. Mapeo de Actores'],
-        ['route' => null, 'label' => '6. Defensa del Voto'],
-        ['route' => null, 'label' => '7. Presupuesto'],
-        ['route' => null, 'label' => '8. Cronograma'],
-        ['route' => 'campaigns.kpis.index', 'match' => 'campaigns.kpis.*', 'label' => '9. Tablero KPI'],
-        ['route' => null, 'label' => '10. Logros Comunicables'],
+        $tab('campaigns.show', 'campaigns.show', 'Inicio'),
+        $tab('campaigns.edit', 'campaigns.edit', '1. Meta de Votos'),
+        $tab('campaigns.territories.index', 'campaigns.territories.*', '2. Estructura Territorial'),
+        $tab('campaigns.voters.index', 'campaigns.voters.*', '3. Base de Votantes'),
+        $tab('campaigns.promoters.index', 'campaigns.promoters.*', '4. Padrón de Promotores'),
+        $sheetTab('actores'),
+        $sheetTab('defensa-del-voto'),
+        $sheetTab('presupuesto'),
+        $sheetTab('cronograma'),
+        $tab('campaigns.kpis.index', 'campaigns.kpis.*', '9. Tablero KPI'),
+        $sheetTab('logros'),
     ];
 @endphp
 <div class="mb-5">
@@ -28,12 +30,8 @@
     </p>
     <nav class="mt-4 -mb-px flex gap-1 overflow-x-auto border-b border-slate-200 text-sm" aria-label="Secciones de la campaña">
         @foreach ($tabs as $tab)
-            @if (! $tab['route'])
-                <span class="shrink-0 cursor-not-allowed border-b-2 border-transparent px-3 py-2 whitespace-nowrap text-slate-300" title="Llega en la etapa 2">{{ $tab['label'] }}</span>
-                @continue
-            @endif
-            @php $active = request()->routeIs($tab['match']); @endphp
-            <a href="{{ route($tab['route'], $campaign) }}" @class([
+            @php $active = $tab['active']; @endphp
+            <a href="{{ $tab['url'] }}" @class([
                 'shrink-0 border-b-2 px-3 py-2 font-medium whitespace-nowrap transition',
                 'border-brand-600 text-brand-700' => $active,
                 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-800' => ! $active,

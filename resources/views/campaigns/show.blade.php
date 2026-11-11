@@ -111,7 +111,7 @@
                     ])>@if ($done)✓@endif</span>
                     <div class="min-w-0 text-sm">
                         @if ($route)
-                            <a href="{{ route($route, $campaign) }}" class="font-medium text-slate-900 hover:text-brand-600">{{ $label }}</a>
+                            <a href="{{ is_array($route) ? route($route[0], [$campaign, $route[1]]) : route($route, $campaign) }}" class="font-medium text-slate-900 hover:text-brand-600">{{ $label }}</a>
                         @else
                             <span class="font-medium text-slate-400">{{ $label }}</span> <span class="badge bg-slate-100 text-slate-500">Etapa 2</span>
                         @endif

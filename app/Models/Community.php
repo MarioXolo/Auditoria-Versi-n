@@ -27,7 +27,8 @@ class Community extends Model
         return $this->activities()->exists()
             || CampaignTerritory::where('community_id', $this->id)->exists()
             || CampaignPromoter::where('community_id', $this->id)->exists()
-            || CampaignVoter::where('community_id', $this->id)->exists();
+            || CampaignVoter::where('community_id', $this->id)->exists()
+            || CampaignActor::where('community_id', $this->id)->exists();
     }
 
     public function scopeActive(Builder $query): Builder

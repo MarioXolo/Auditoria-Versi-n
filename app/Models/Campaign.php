@@ -20,9 +20,19 @@ class Campaign extends Model
         ['nombre' => 'Incidencias jurídicas abiertas', 'es_porcentaje' => false],
     ];
 
+    /** Rubros y % sugeridos de la pestaña «Presupuesto» del Excel; cada campaña los recibe en ceros. */
+    public const DEFAULT_BUDGET = [
+        ['rubro' => 'Territorio y movilización', 'porcentaje' => 0.40],
+        ['rubro' => 'Comunicación y digital', 'porcentaje' => 0.25],
+        ['rubro' => 'Operación día D', 'porcentaje' => 0.12],
+        ['rubro' => 'Estructura y administración', 'porcentaje' => 0.08],
+        ['rubro' => 'Eventos y logística', 'porcentaje' => 0.05],
+        ['rubro' => 'Reserva de contingencia', 'porcentaje' => 0.10],
+    ];
+
     protected $fillable = [
         'name', 'municipality', 'election_date', 'listado_nominal', 'participacion',
-        'objetivo', 'colchon', 'votantes_por_promotor', 'notes', 'active', 'created_by',
+        'objetivo', 'colchon', 'votantes_por_promotor', 'tope_gastos', 'notes', 'active', 'created_by',
     ];
 
     protected function casts(): array
@@ -34,6 +44,7 @@ class Campaign extends Model
             'objetivo' => 'float',
             'colchon' => 'float',
             'votantes_por_promotor' => 'integer',
+            'tope_gastos' => 'float',
             'active' => 'boolean',
         ];
     }
@@ -43,6 +54,9 @@ class Campaign extends Model
         static::created(function (Campaign $campaign) {
             foreach (self::DEFAULT_KPIS as $i => $kpi) {
                 $campaign->kpis()->create($kpi + ['orden' => $i + 1]);
+            }
+            foreach (self::DEFAULT_BUDGET as $item) {
+                $campaign->budgetItems()->create($item);
             }
         });
     }
@@ -95,6 +109,31 @@ class Campaign extends Model
     public function kpis(): HasMany
     {
         return $this->hasMany(CampaignKpi::class)->orderBy('orden');
+    }
+
+    public function actors(): HasMany
+    {
+        return $this->hasMany(CampaignActor::class);
+    }
+
+    public function pollingStations(): HasMany
+    {
+        return $this->hasMany(CampaignPollingStation::class);
+    }
+
+    public function budgetItems(): HasMany
+    {
+        return $this->hasMany(CampaignBudgetItem::class);
+    }
+
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(CampaignTask::class);
+    }
+
+    public function achievements(): HasMany
+    {
+        return $this->hasMany(CampaignAchievement::class);
     }
 
     public function creator(): BelongsTo

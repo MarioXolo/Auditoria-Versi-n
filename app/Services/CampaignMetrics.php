@@ -35,6 +35,37 @@ class CampaignMetrics
         };
     }
 
+    /**
+     * Gasto: aquí gastar más no es mejor. Verde por debajo del 90 % del tope,
+     * Ámbar del 90 al 100 % y Rojo si lo rebasa (el Excel solo dice «¡REBASA TOPE!»).
+     */
+    public static function spendStatus(float $tope, float $ejercido): array
+    {
+        if ($tope == 0.0) {
+            return ['label' => '—', 'class' => 'bg-slate-100 text-slate-500', 'ratio' => null];
+        }
+
+        $ratio = $ejercido / $tope;
+
+        return match (true) {
+            $ratio > 1 => ['label' => 'Rebasa tope', 'class' => 'bg-rose-100 text-rose-800', 'ratio' => $ratio],
+            $ratio >= 0.9 => ['label' => 'Ámbar', 'class' => 'bg-amber-100 text-amber-800', 'ratio' => $ratio],
+            default => ['label' => 'Verde', 'class' => 'bg-emerald-100 text-emerald-800', 'ratio' => $ratio],
+        };
+    }
+
+    /** Defensa del voto: casillas registradas y cubiertas (propietario + suplente). */
+    public function pollingStations(): object
+    {
+        $q = fn () => $this->campaign->pollingStations();
+
+        return (object) [
+            'casillas' => $q()->count(),
+            'cubiertas' => $q()->whereNotNull('rc_propietario')->where('rc_propietario', '!=', '')
+                ->whereNotNull('rc_suplente')->where('rc_suplente', '!=', '')->count(),
+        ];
+    }
+
     public function votersByCommunity(): array
     {
         return $this->votersByCommunity ??= $this->campaign->voters()
@@ -115,24 +146,27 @@ class CampaignMetrics
     }
 
     /**
-     * Indicadores calculados solos (los de la etapa 2 aparecen como pendientes)
-     * seguidos de los que se capturan a mano.
+     * Indicadores calculados solos con los datos del cuaderno, seguidos de los
+     * que se capturan a mano.
      */
     public function kpis(): Collection
     {
         $s = $this->summary();
         $territorios = $this->territoryRows();
         $completas = $territorios['rows']->where('completa', true)->count();
+        $rc = $this->pollingStations();
+        $gasto = (object) ['tope' => $this->campaign->tope_gastos, 'ejercido' => (float) $this->campaign->budgetItems()->sum('ejercido')];
 
         $auto = collect([
             ['nombre' => 'Votos identificados (base de votantes)', 'meta' => round($s->meta), 'valor' => $s->votantes, 'pct' => false, 'fuente' => 'Base de votantes vs. meta con colchón'],
             ['nombre' => 'Comunidades con estructura completa', 'meta' => $territorios['rows']->count(), 'valor' => $completas, 'pct' => false, 'fuente' => 'Promotores reclutados ≥ necesarios'],
             ['nombre' => 'Promotores reclutados y verificados', 'meta' => $s->necesarios, 'valor' => $s->verificados, 'pct' => false, 'fuente' => 'Padrón de promotores (verificados)'],
-            ['nombre' => '% casillas con RC propietario + suplente', 'meta' => null, 'valor' => null, 'pct' => true, 'fuente' => 'Defensa del voto · etapa 2'],
-            ['nombre' => 'Gasto ejercido (% del tope)', 'meta' => null, 'valor' => null, 'pct' => true, 'fuente' => 'Presupuesto · etapa 2'],
+            ['nombre' => '% casillas con RC propietario + suplente', 'meta' => $rc->casillas, 'valor' => $rc->cubiertas, 'pct' => false, 'fuente' => 'Defensa del voto: casillas registradas vs. cubiertas'],
+            ['nombre' => 'Gasto ejercido (% del tope)', 'meta' => $gasto->tope, 'valor' => $gasto->ejercido, 'pct' => false, 'money' => true, 'fuente' => 'Presupuesto: ejercido vs. tope del IEEQ', 'gasto' => true],
         ])->map(fn ($k) => (object) ($k + [
             'auto' => true,
-            'status' => $k['meta'] === null ? null : self::status((float) $k['meta'], (float) $k['valor']),
+            'money' => false,
+            'status' => ($k['gasto'] ?? false) ? self::spendStatus((float) $k['meta'], (float) $k['valor']) : self::status((float) $k['meta'], (float) $k['valor']),
         ]));
 
         $manual = $this->campaign->kpis()->get()->map(fn ($k) => (object) [

@@ -12,7 +12,7 @@ use App\Services\CampaignMetrics;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-/** V2 · Cuaderno Maestro de Campaña (etapa 1). */
+/** V2 · Cuaderno Maestro de Campaña (etapa 1: meta, estructura, votantes, promotores y KPIs). */
 class CampaignTest extends TestCase
 {
     use RefreshDatabase;
@@ -210,7 +210,7 @@ class CampaignTest extends TestCase
     {
         $c = $this->excelCampaign();
 
-        // Pestañas con la numeración del Excel; las de la etapa 2 se ven deshabilitadas
+        // Pestañas con la numeración del Excel
         $this->actingAs($this->gerente)->get("/campanas/{$c->id}")
             ->assertSeeInOrder(['1. Meta de Votos', '2. Estructura Territorial', '3. Base de Votantes', '4. Padrón de Promotores', '5. Mapeo de Actores', '9. Tablero KPI', '10. Logros Comunicables'])
             ->assertSee('Pestañas del cuaderno');

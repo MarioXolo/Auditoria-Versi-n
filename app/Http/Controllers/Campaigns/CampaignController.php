@@ -52,12 +52,12 @@ class CampaignController extends Controller
             ['2. Estructura Territorial', 'Metas y avance por delegación.', 'campaigns.territories.index', $summary->comunidades > 0],
             ['3. Base de Votantes', 'El padrón nominal propio: votante por votante identificado.', 'campaigns.voters.index', $summary->votantes > 0],
             ['4. Padrón de Promotores', 'Tu ejército: quién es, a cuántos moviliza, avance.', 'campaigns.promoters.index', $summary->promotores > 0],
-            ['5. Mapeo de Actores', 'Liderazgos por comunidad: afines, neutrales, adversos.', null, false],
-            ['6. Defensa del Voto', 'Control de representantes de casilla (RC) y generales (RG).', null, false],
-            ['7. Presupuesto', 'Rubros vs. tope legal, gasto ejercido y disponible.', null, false],
-            ['8. Cronograma', 'Fases y tareas rumbo a la jornada.', null, false],
+            ['5. Mapeo de Actores', 'Liderazgos por comunidad: afines, neutrales, adversos.', ['campaigns.sheets.index', 'actores'], $campaign->actors()->exists()],
+            ['6. Defensa del Voto', 'Control de representantes de casilla (RC) y generales (RG).', ['campaigns.sheets.index', 'defensa-del-voto'], $campaign->pollingStations()->exists()],
+            ['7. Presupuesto', 'Rubros vs. tope legal, gasto ejercido y disponible.', ['campaigns.sheets.index', 'presupuesto'], $campaign->tope_gastos > 0],
+            ['8. Cronograma', 'Fases y tareas rumbo a la jornada.', ['campaigns.sheets.index', 'cronograma'], $campaign->tasks()->exists()],
             ['9. Tablero KPI', 'Seguimiento semanal de los indicadores clave.', 'campaigns.kpis.index', $campaign->kpis()->where('valor', '>', 0)->exists()],
-            ['10. Logros Comunicables', 'Inventario de obra del gobierno, munición para el mensaje.', null, false],
+            ['10. Logros Comunicables', 'Inventario de obra del gobierno, munición para el mensaje.', ['campaigns.sheets.index', 'logros'], $campaign->achievements()->exists()],
         ];
 
         return view('campaigns.show', [
@@ -89,8 +89,10 @@ class CampaignController extends Controller
 
     public function destroy(Campaign $campaign): RedirectResponse
     {
-        if ($campaign->voters()->exists() || $campaign->promoters()->exists()) {
-            return back()->withErrors(['name' => 'La campaña ya tiene votantes o promotores. Archívala en lugar de eliminarla.']);
+        $hasData = $campaign->voters()->exists() || $campaign->promoters()->exists() || $campaign->actors()->exists()
+            || $campaign->pollingStations()->exists() || $campaign->tasks()->exists() || $campaign->achievements()->exists();
+        if ($hasData) {
+            return back()->withErrors(['name' => 'La campaña ya tiene información capturada. Archívala en lugar de eliminarla.']);
         }
 
         $campaign->delete();

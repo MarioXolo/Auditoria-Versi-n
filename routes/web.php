@@ -7,6 +7,7 @@ use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\Campaigns\CampaignController;
 use App\Http\Controllers\Campaigns\KpiController;
 use App\Http\Controllers\Campaigns\PromoterController;
+use App\Http\Controllers\Campaigns\SheetController;
 use App\Http\Controllers\Campaigns\TerritoryController;
 use App\Http\Controllers\Campaigns\VoterController;
 use App\Http\Controllers\Auth\LoginController;
@@ -90,6 +91,16 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::post('/kpi', [KpiController::class, 'store'])->name('kpis.store');
             Route::put('/kpi/{kpi}', [KpiController::class, 'update'])->name('kpis.update');
             Route::delete('/kpi/{kpi}', [KpiController::class, 'destroy'])->name('kpis.destroy');
+
+            // Etapa 2: pestañas 5, 6, 7, 8 y 10 (mismo controlador; columnas en App\Services\CampaignSheets)
+            Route::put('/presupuesto/tope', [SheetController::class, 'tope'])->name('sheets.tope');
+            Route::post('/cronograma/plantilla', [SheetController::class, 'template'])->name('sheets.template');
+            Route::pattern('sheet', implode('|', \App\Services\CampaignSheets::keys()));
+            Route::get('/{sheet}/exportar', [SheetController::class, 'export'])->name('sheets.export');
+            Route::get('/{sheet}', [SheetController::class, 'index'])->name('sheets.index');
+            Route::post('/{sheet}', [SheetController::class, 'store'])->name('sheets.store');
+            Route::put('/{sheet}/{row}', [SheetController::class, 'update'])->whereNumber('row')->name('sheets.update');
+            Route::delete('/{sheet}/{row}', [SheetController::class, 'destroy'])->whereNumber('row')->name('sheets.destroy');
         });
     });
 
