@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#1d1d1b">
+    <title>Base de votantes · Campaña demo 2027 · Sistema de Auditorías</title>
+    <link rel="icon" href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,600;1,8..60,600&display=swap" rel="stylesheet">
+    <link rel="preload" as="style" href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/build/assets/app-us-fyaJe.css" /><link rel="modulepreload" as="script" href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/build/assets/app-Buj5iI_6.js" /><link rel="stylesheet" href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/build/assets/app-us-fyaJe.css" /><script type="module" src="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/build/assets/app-Buj5iI_6.js"></script></head>
+<body class="min-h-screen bg-slate-100 font-sans text-slate-900 antialiased">
+
+<div class="lg:flex">
+    
+    <aside class="bg-ink text-white print:hidden lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-64 lg:shrink-0 lg:flex-col">
+        <div class="flex items-center justify-between px-4 py-4 lg:px-5 lg:py-6">
+            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev" class="flex items-center gap-2">
+                <img src="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/images/logo.svg" alt="WeAdvise" class="h-7 w-auto">
+                <span class="text-sm font-semibold leading-tight">Sistema de Auditorías</span>
+            </a>
+            <label for="nav-toggle" class="cursor-pointer rounded-md p-2 hover:bg-white/10 lg:hidden" aria-label="Abrir menú">
+                <svg class="size-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </label>
+        </div>
+
+        <input type="checkbox" id="nav-toggle" class="peer hidden">
+        <nav class="hidden flex-1 flex-col gap-1 px-3 pb-4 peer-checked:flex lg:flex">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/dashboard" class="nav-link">
+                    <svg class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+                    Dashboard
+                </a>
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities" class="nav-link">
+                    <svg class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                    Actividades
+                </a>
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/calendario" class="nav-link">
+                    <svg class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 3v3m8-3v3M4 9h16M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1zm3 8h2m3 0h2m-7 3h2"/></svg>
+                    Calendario
+                </a>
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/asistencia" class="nav-link">
+                    <svg class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z"/></svg>
+                    Asistencia
+                </a>
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/users" class="nav-link">
+                    <svg class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m22 0v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    Usuarios
+                </a>
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/teams" class="nav-link">
+                    <svg class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7h18M3 12h18M3 17h18"/></svg>
+                    Equipos
+                </a>
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas" class="nav-link nav-link-active">
+                    <svg class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 21V4m0 0h11l-1.5 4L15 12H4"/></svg>
+                    Campañas
+                </a>
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos" class="nav-link">
+                    <svg class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h3l2 2h7a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm4 6h8m-8 4h5"/></svg>
+                    Catálogos
+                </a>
+            
+            <div class="mt-4 border-t border-white/10 pt-4 lg:mt-auto">
+                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/perfil" class="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10">
+                    <span class="grid size-8 place-items-center rounded-full bg-white/15 text-xs font-semibold">GD</span>
+                    <span class="min-w-0">
+                        <span class="block truncate text-sm font-medium">Gerente Demo</span>
+                        <span class="block text-xs text-slate-300">Gerente</span>
+                    </span>
+                </a>
+                <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/logout" class="mt-1">
+                    <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                    <button class="nav-link w-full">
+                        <svg class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                        Cerrar sesión
+                    </button>
+                </form>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-10 lg:py-8 print:p-0">
+        <div class="mx-auto max-w-7xl print:max-w-none">
+            
+            
+            
+                <div class="mb-5">
+    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas" class="text-sm text-slate-500 hover:text-slate-800">← Campañas</a>
+    <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
+        <h1 class="text-2xl font-semibold">Campaña demo 2027</h1>
+            </div>
+    <p class="text-sm text-slate-500">
+        Municipio demo · Elección 6 de junio de 2027    </p>
+    <nav class="mt-4 -mb-px flex gap-1 overflow-x-auto border-b border-slate-200 text-sm" aria-label="Secciones de la campaña">
+                                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1" class="shrink-0 border-b-2 px-3 py-2 font-medium whitespace-nowrap transition border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-800" >Inicio</a>
+                                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/edit" class="shrink-0 border-b-2 px-3 py-2 font-medium whitespace-nowrap transition border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-800" >1. Meta de Votos</a>
+                                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/estructura" class="shrink-0 border-b-2 px-3 py-2 font-medium whitespace-nowrap transition border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-800" >2. Estructura Territorial</a>
+                                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes" class="shrink-0 border-b-2 px-3 py-2 font-medium whitespace-nowrap transition border-brand-600 text-brand-700"  aria-current="page" >3. Base de Votantes</a>
+                                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/promotores" class="shrink-0 border-b-2 px-3 py-2 font-medium whitespace-nowrap transition border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-800" >4. Padrón de Promotores</a>
+                                    <span class="shrink-0 cursor-not-allowed border-b-2 border-transparent px-3 py-2 whitespace-nowrap text-slate-300" title="Llega en la etapa 2">5. Mapeo de Actores</span>
+                                            <span class="shrink-0 cursor-not-allowed border-b-2 border-transparent px-3 py-2 whitespace-nowrap text-slate-300" title="Llega en la etapa 2">6. Defensa del Voto</span>
+                                            <span class="shrink-0 cursor-not-allowed border-b-2 border-transparent px-3 py-2 whitespace-nowrap text-slate-300" title="Llega en la etapa 2">7. Presupuesto</span>
+                                            <span class="shrink-0 cursor-not-allowed border-b-2 border-transparent px-3 py-2 whitespace-nowrap text-slate-300" title="Llega en la etapa 2">8. Cronograma</span>
+                                                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/kpi" class="shrink-0 border-b-2 px-3 py-2 font-medium whitespace-nowrap transition border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-800" >9. Tablero KPI</a>
+                                    <span class="shrink-0 cursor-not-allowed border-b-2 border-transparent px-3 py-2 whitespace-nowrap text-slate-300" title="Llega en la etapa 2">10. Logros Comunicables</span>
+                    </nav>
+</div>
+
+    <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <p class="text-sm text-slate-500"><b class="text-slate-900">180</b> votantes identificados · meta 9,075. Información personal: solo la ven administradores y gerentes.</p>
+        <div class="flex gap-2">
+            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/exportar" class="btn btn-secondary">Exportar CSV</a>
+            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/create" class="btn btn-primary">Registrar votante</a>
+        </div>
+    </div>
+
+    <form method="GET" class="card mb-5 grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-6">
+        <input type="search" name="q" value="" placeholder="Nombre, teléfono o domicilio" class="input lg:col-span-2">
+        <select name="community_id" class="input" onchange="this.form.submit()">
+            <option value="">Todas las comunidades</option>
+                            <option value="2" >El Mirador</option>
+                            <option value="3" >La Esperanza</option>
+                            <option value="5" >Los Pinos</option>
+                            <option value="1" >San Isidro</option>
+                            <option value="4" >Santa Cruz</option>
+                            <option value="6" >Valle Verde</option>
+                    </select>
+        <select name="promoter_id" class="input" onchange="this.form.submit()">
+            <option value="">Todos los promotores</option>
+            <option value="sin" >Sin promotor</option>
+                            <option value="4" >Abril Delao</option>
+                            <option value="2" >Abril Requena Segundo</option>
+                            <option value="6" >Ainara Piña</option>
+                            <option value="10" >Alonso Molina Segundo</option>
+                            <option value="15" >Ariadna Orta Hijo</option>
+                            <option value="20" >Cristina Almonte</option>
+                            <option value="14" >David Duran Tercero</option>
+                            <option value="17" >David Villalobos</option>
+                            <option value="1" >Dr. Claudia Muñiz Tercero</option>
+                            <option value="9" >Dr. Miguel Mayorga Segundo</option>
+                            <option value="23" >Gerard Barroso</option>
+                            <option value="8" >Ing. Encarnación Costa</option>
+                            <option value="19" >Iván Rodrigo</option>
+                            <option value="3" >José Tovar Tercero</option>
+                            <option value="13" >Lic. Ángel Estévez Segundo</option>
+                            <option value="7" >Marc Miranda Tercero</option>
+                            <option value="21" >Paula Pantoja</option>
+                            <option value="22" >Pedro Delafuente</option>
+                            <option value="12" >Pedro Montemayor</option>
+                            <option value="24" >Rosa Rentería</option>
+                            <option value="16" >Unai Alonso</option>
+                            <option value="18" >Yaiza Escudero</option>
+                            <option value="5" >Álvaro Viera</option>
+                            <option value="11" >Ángela Laureano Tercero</option>
+                    </select>
+        <select name="afinidad" class="input" onchange="this.form.submit()">
+            <option value="">Toda afinidad</option>
+                            <option value="Duro" >Duro</option>
+                            <option value="Blando" >Blando</option>
+                            <option value="Indeciso" >Indeciso</option>
+                    </select>
+        <div class="flex gap-2">
+            <input name="seccion" value="" placeholder="Sección" class="input" aria-label="Sección">
+            <button class="btn btn-primary">Filtrar</button>
+        </div>
+    </form>
+
+    
+    <div class="space-y-3 md:hidden">
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/168/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Aaron Benítez</p>
+                    <span class="badge bg-emerald-100 text-emerald-800">Duro</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">San Isidro · Secc. 0506 · Ainara Piña</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/85/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Aaron Valverde</p>
+                    <span class="badge bg-emerald-100 text-emerald-800">Duro</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">La Esperanza · Secc. 0502 · Cristina Almonte</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/80/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Abril Reynoso</p>
+                                    </div>
+                <p class="mt-1 text-xs text-slate-500">Los Pinos · Secc. 0504 · Pedro Delafuente</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/118/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Adrián Caro</p>
+                    <span class="badge bg-emerald-100 text-emerald-800">Duro</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">San Isidro · Secc. 0506 · Ainara Piña</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/61/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Adrián Mares</p>
+                                    </div>
+                <p class="mt-1 text-xs text-slate-500">Valle Verde · Secc. 0505 · Álvaro Viera</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/126/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Aitana Casares Segundo</p>
+                    <span class="badge bg-sky-100 text-sky-800">Blando</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">La Esperanza · Secc. 0502 · Abril Requena Segundo</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/109/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Aitor Sepúlveda</p>
+                    <span class="badge bg-emerald-100 text-emerald-800">Duro</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">San Isidro · Secc. 0500 · Yaiza Escudero</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/52/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Alba Gaytán</p>
+                                    </div>
+                <p class="mt-1 text-xs text-slate-500">El Mirador · Secc. 0507 · Marc Miranda Tercero</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/172/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Alberto Jiménez</p>
+                                    </div>
+                <p class="mt-1 text-xs text-slate-500">Los Pinos · Secc. 0507 · Unai Alonso</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/31/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Alexia Benito</p>
+                    <span class="badge bg-emerald-100 text-emerald-800">Duro</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">San Isidro · Secc. 0506 · Rosa Rentería</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/163/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Alexia Gamboa</p>
+                    <span class="badge bg-emerald-100 text-emerald-800">Duro</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">Los Pinos · Secc. 0501 · Alonso Molina Segundo</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/74/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Alma Pelayo Segundo</p>
+                    <span class="badge bg-sky-100 text-sky-800">Blando</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">Valle Verde · Secc. 0505 · Gerard Barroso</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/154/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Amparo Mojica</p>
+                    <span class="badge bg-emerald-100 text-emerald-800">Duro</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">La Esperanza · Secc. 0502 · Abril Requena Segundo</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/97/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Ana Valdez</p>
+                    <span class="badge bg-emerald-100 text-emerald-800">Duro</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">Santa Cruz · Secc. 0503 · Paula Pantoja</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/133/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Ana Villar Hijo</p>
+                    <span class="badge bg-emerald-100 text-emerald-800">Duro</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">Los Pinos · Secc. 0504 · Abril Delao</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/7/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Ander Adorno Tercero</p>
+                    <span class="badge bg-amber-100 text-amber-800">Indeciso</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">La Esperanza · Secc. 0502 · Cristina Almonte</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/40/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Andrea Olivas</p>
+                    <span class="badge bg-sky-100 text-sky-800">Blando</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">Los Pinos · Secc. 0507 · Unai Alonso</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/128/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Andrea Soto</p>
+                    <span class="badge bg-amber-100 text-amber-800">Indeciso</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">Santa Cruz · Secc. 0503 · José Tovar Tercero</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/83/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Antonia Cazares</p>
+                    <span class="badge bg-emerald-100 text-emerald-800">Duro</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">Santa Cruz · Secc. 0503 · José Tovar Tercero</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/79/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Asier Lorenzo</p>
+                    <span class="badge bg-emerald-100 text-emerald-800">Duro</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">San Isidro · Secc. 0503 · Pedro Montemayor</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/57/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Bruno Aguirre</p>
+                                    </div>
+                <p class="mt-1 text-xs text-slate-500">Los Pinos · Secc. 0504 · Abril Delao</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/124/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Bruno Negrón</p>
+                    <span class="badge bg-amber-100 text-amber-800">Indeciso</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">Valle Verde · Secc. 0505 · Álvaro Viera</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/138/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Candela Maya</p>
+                    <span class="badge bg-amber-100 text-amber-800">Indeciso</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">El Mirador · Secc. 0507 · Marc Miranda Tercero</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/178/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Candela Moreno</p>
+                    <span class="badge bg-emerald-100 text-emerald-800">Duro</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">Valle Verde · Secc. 0505 · Gerard Barroso</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/19/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Carlota Castellano</p>
+                    <span class="badge bg-amber-100 text-amber-800">Indeciso</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">Santa Cruz · Secc. 0506 · Ariadna Orta Hijo</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/2/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Carlota Muro</p>
+                    <span class="badge bg-sky-100 text-sky-800">Blando</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">San Isidro · Secc. 0500 · Yaiza Escudero</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/129/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Carlota Rodarte</p>
+                                    </div>
+                <p class="mt-1 text-xs text-slate-500">Valle Verde · Secc. 0505 · Gerard Barroso</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/171/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">D. Antonio Fonseca</p>
+                    <span class="badge bg-sky-100 text-sky-800">Blando</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">Los Pinos · Secc. 0504 · Abril Delao</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/162/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Daniel Montalvo Hijo</p>
+                    <span class="badge bg-sky-100 text-sky-800">Blando</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">San Isidro · Secc. 0500 · Yaiza Escudero</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/142/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Daniel Torres</p>
+                                    </div>
+                <p class="mt-1 text-xs text-slate-500">Valle Verde · Secc. 0508 · David Villalobos</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/25/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Daniela Prado</p>
+                                    </div>
+                <p class="mt-1 text-xs text-slate-500">El Mirador · Secc. 0501 · Dr. Claudia Muñiz Tercero</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/125/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">David Abreu</p>
+                                    </div>
+                <p class="mt-1 text-xs text-slate-500">Santa Cruz · Secc. 0500 · Dr. Miguel Mayorga Segundo</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/88/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Diego Lomeli</p>
+                    <span class="badge bg-sky-100 text-sky-800">Blando</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">Santa Cruz · Secc. 0500 · Dr. Miguel Mayorga Segundo</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/16/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Diego Munguía</p>
+                    <span class="badge bg-amber-100 text-amber-800">Indeciso</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">Valle Verde · Secc. 0502 · Ángela Laureano Tercero</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/176/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Dr. Alicia León</p>
+                    <span class="badge bg-amber-100 text-amber-800">Indeciso</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">La Esperanza · Secc. 0505 · Sin promotor</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/99/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Dr. Isabel Patiño Hijo</p>
+                                    </div>
+                <p class="mt-1 text-xs text-slate-500">La Esperanza · Secc. 0505 · David Duran Tercero</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/49/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Dr. Izan Bustos Hijo</p>
+                    <span class="badge bg-emerald-100 text-emerald-800">Duro</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">El Mirador · Secc. 0501 · Dr. Claudia Muñiz Tercero</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/153/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Dr. Jaime Gil Tercero</p>
+                    <span class="badge bg-emerald-100 text-emerald-800">Duro</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">San Isidro · Secc. 0506 · Ainara Piña</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/115/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Dr. Jimena Carrión</p>
+                                    </div>
+                <p class="mt-1 text-xs text-slate-500">Santa Cruz · Secc. 0506 · Ariadna Orta Hijo</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/72/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Dr. Juan José Aguayo</p>
+                    <span class="badge bg-emerald-100 text-emerald-800">Duro</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">Santa Cruz · Secc. 0500 · Dr. Miguel Mayorga Segundo</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/28/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Dr. Luis Ochoa</p>
+                    <span class="badge bg-sky-100 text-sky-800">Blando</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">El Mirador · Secc. 0501 · Dr. Claudia Muñiz Tercero</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/170/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Dr. Marina Sandoval</p>
+                                    </div>
+                <p class="mt-1 text-xs text-slate-500">Los Pinos · Secc. 0500 · Sin promotor</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/165/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Dr. Mireia Navas</p>
+                    <span class="badge bg-emerald-100 text-emerald-800">Duro</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">Santa Cruz · Secc. 0503 · Paula Pantoja</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/29/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Dr. Olga Martínez Segundo</p>
+                    <span class="badge bg-emerald-100 text-emerald-800">Duro</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">San Isidro · Secc. 0506 · Ainara Piña</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/143/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Dr. Omar Pacheco Tercero</p>
+                    <span class="badge bg-emerald-100 text-emerald-800">Duro</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">Santa Cruz · Secc. 0500 · Dr. Miguel Mayorga Segundo</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/11/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Dr. Valeria Reséndez Tercero</p>
+                    <span class="badge bg-amber-100 text-amber-800">Indeciso</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">Santa Cruz · Secc. 0500 · Dr. Miguel Mayorga Segundo</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/41/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Dr. Víctor Clemente</p>
+                    <span class="badge bg-sky-100 text-sky-800">Blando</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">San Isidro · Secc. 0503 · Pedro Montemayor</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/110/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Dr. Yago Sáez Tercero</p>
+                    <span class="badge bg-emerald-100 text-emerald-800">Duro</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">El Mirador · Secc. 0503 · Sin promotor</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/59/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Dña Cristina Henríquez Tercero</p>
+                    <span class="badge bg-emerald-100 text-emerald-800">Duro</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">Valle Verde · Secc. 0505 · Álvaro Viera</p>
+            </a>
+                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/68/edit" class="card block p-4">
+                <div class="flex items-start justify-between gap-3">
+                    <p class="font-medium">Dña Luisa Meraz</p>
+                    <span class="badge bg-emerald-100 text-emerald-800">Duro</span>                </div>
+                <p class="mt-1 text-xs text-slate-500">Valle Verde · Secc. 0508 · David Villalobos</p>
+            </a>
+            </div>
+
+    
+    <div class="card hidden overflow-x-auto md:block">
+        <table class="min-w-full divide-y divide-slate-200 text-sm">
+            <thead class="bg-slate-50">
+                <tr>
+                    <th class="table-head">#</th>
+                    <th class="table-head">Nombre completo</th>
+                    <th class="table-head">Sección</th>
+                    <th class="table-head">Casilla</th>
+                    <th class="table-head">Domicilio</th>
+                    <th class="table-head">Tel / WhatsApp</th>
+                    <th class="table-head">Comunidad</th>
+                    <th class="table-head">Promotor responsable</th>
+                    <th class="table-head">Afinidad</th>
+                    <th class="table-head">¿Recibe apoyo gob?</th>
+                    <th class="table-head">Notas</th>
+                    <th class="table-head"></th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">1</td>
+                        <td class="table-cell font-medium text-slate-900">Aaron Benítez</td>
+                        <td class="table-cell tabular-nums">0506</td>
+                        <td class="table-cell">B1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Passeig Miramontes, 2, 94º B">Passeig Miramontes, 2, 94º B</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524423917980" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-391-7980
+    </a>
+</td>
+                        <td class="table-cell">San Isidro</td>
+                        <td class="table-cell">Ainara Piña</td>
+                        <td class="table-cell"><span class="badge bg-emerald-100 text-emerald-800">Duro</span></td>
+                        <td class="table-cell">Sí</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/168/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">2</td>
+                        <td class="table-cell font-medium text-slate-900">Aaron Valverde</td>
+                        <td class="table-cell tabular-nums">0502</td>
+                        <td class="table-cell">B1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Avinguda Hugo, 103, Ático 1º">Avinguda Hugo, 103, Ático 1º</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524424709443" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-470-9443
+    </a>
+</td>
+                        <td class="table-cell">La Esperanza</td>
+                        <td class="table-cell">Cristina Almonte</td>
+                        <td class="table-cell"><span class="badge bg-emerald-100 text-emerald-800">Duro</span></td>
+                        <td class="table-cell">Sí</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/85/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">3</td>
+                        <td class="table-cell font-medium text-slate-900">Abril Reynoso</td>
+                        <td class="table-cell tabular-nums">0504</td>
+                        <td class="table-cell">B1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Camino Gloria, 91, 18º C">Camino Gloria, 91, 18º C</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524423092393" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-309-2393
+    </a>
+</td>
+                        <td class="table-cell">Los Pinos</td>
+                        <td class="table-cell">Pedro Delafuente</td>
+                        <td class="table-cell"> — </td>
+                        <td class="table-cell">—</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/80/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">4</td>
+                        <td class="table-cell font-medium text-slate-900">Adrián Caro</td>
+                        <td class="table-cell tabular-nums">0506</td>
+                        <td class="table-cell">C2</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Avenida Aitor, 59, 36º D">Avenida Aitor, 59, 36º D</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524425685691" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-568-5691
+    </a>
+</td>
+                        <td class="table-cell">San Isidro</td>
+                        <td class="table-cell">Ainara Piña</td>
+                        <td class="table-cell"><span class="badge bg-emerald-100 text-emerald-800">Duro</span></td>
+                        <td class="table-cell">No</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/118/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">5</td>
+                        <td class="table-cell font-medium text-slate-900">Adrián Mares</td>
+                        <td class="table-cell tabular-nums">0505</td>
+                        <td class="table-cell">C1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Avinguda Inmaculada, 23, 70º E">Avinguda Inmaculada, 23, 70º E</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524429365055" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-936-5055
+    </a>
+</td>
+                        <td class="table-cell">Valle Verde</td>
+                        <td class="table-cell">Álvaro Viera</td>
+                        <td class="table-cell"> — </td>
+                        <td class="table-cell">No</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/61/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">6</td>
+                        <td class="table-cell font-medium text-slate-900">Aitana Casares Segundo</td>
+                        <td class="table-cell tabular-nums">0502</td>
+                        <td class="table-cell">B1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Carrer Aaron, 183, 20º 4º">Carrer Aaron, 183, 20º 4º</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524424874571" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-487-4571
+    </a>
+</td>
+                        <td class="table-cell">La Esperanza</td>
+                        <td class="table-cell">Abril Requena Segundo</td>
+                        <td class="table-cell"><span class="badge bg-sky-100 text-sky-800">Blando</span></td>
+                        <td class="table-cell">No</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/126/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">7</td>
+                        <td class="table-cell font-medium text-slate-900">Aitor Sepúlveda</td>
+                        <td class="table-cell tabular-nums">0500</td>
+                        <td class="table-cell">C1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Camiño Vega, 67, 4º">Camiño Vega, 67, 4º</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524421655458" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-165-5458
+    </a>
+</td>
+                        <td class="table-cell">San Isidro</td>
+                        <td class="table-cell">Yaiza Escudero</td>
+                        <td class="table-cell"><span class="badge bg-emerald-100 text-emerald-800">Duro</span></td>
+                        <td class="table-cell">Sí</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/109/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">8</td>
+                        <td class="table-cell font-medium text-slate-900">Alba Gaytán</td>
+                        <td class="table-cell tabular-nums">0507</td>
+                        <td class="table-cell">C2</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Plaza Alcaráz, 12, Ático 9º">Plaza Alcaráz, 12, Ático 9º</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524427861025" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-786-1025
+    </a>
+</td>
+                        <td class="table-cell">El Mirador</td>
+                        <td class="table-cell">Marc Miranda Tercero</td>
+                        <td class="table-cell"> — </td>
+                        <td class="table-cell">Sí</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/52/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">9</td>
+                        <td class="table-cell font-medium text-slate-900">Alberto Jiménez</td>
+                        <td class="table-cell tabular-nums">0507</td>
+                        <td class="table-cell">B1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Calle Pelayo, 61, 09º D">Calle Pelayo, 61, 09º D</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524428733917" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-873-3917
+    </a>
+</td>
+                        <td class="table-cell">Los Pinos</td>
+                        <td class="table-cell">Unai Alonso</td>
+                        <td class="table-cell"> — </td>
+                        <td class="table-cell">—</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/172/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">10</td>
+                        <td class="table-cell font-medium text-slate-900">Alexia Benito</td>
+                        <td class="table-cell tabular-nums">0506</td>
+                        <td class="table-cell">C2</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Travessera Ruelas, 8, 5º A">Travessera Ruelas, 8, 5º A</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524426552197" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-655-2197
+    </a>
+</td>
+                        <td class="table-cell">San Isidro</td>
+                        <td class="table-cell">Rosa Rentería</td>
+                        <td class="table-cell"><span class="badge bg-emerald-100 text-emerald-800">Duro</span></td>
+                        <td class="table-cell">—</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/31/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">11</td>
+                        <td class="table-cell font-medium text-slate-900">Alexia Gamboa</td>
+                        <td class="table-cell tabular-nums">0501</td>
+                        <td class="table-cell">B1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Rúa Sergio, 43, 1º">Rúa Sergio, 43, 1º</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524428497947" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-849-7947
+    </a>
+</td>
+                        <td class="table-cell">Los Pinos</td>
+                        <td class="table-cell">Alonso Molina Segundo</td>
+                        <td class="table-cell"><span class="badge bg-emerald-100 text-emerald-800">Duro</span></td>
+                        <td class="table-cell">—</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/163/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">12</td>
+                        <td class="table-cell font-medium text-slate-900">Alma Pelayo Segundo</td>
+                        <td class="table-cell tabular-nums">0505</td>
+                        <td class="table-cell">B1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Plaza Ismael, 721, 17º A">Plaza Ismael, 721, 17º A</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524423756407" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-375-6407
+    </a>
+</td>
+                        <td class="table-cell">Valle Verde</td>
+                        <td class="table-cell">Gerard Barroso</td>
+                        <td class="table-cell"><span class="badge bg-sky-100 text-sky-800">Blando</span></td>
+                        <td class="table-cell">No</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/74/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">13</td>
+                        <td class="table-cell font-medium text-slate-900">Amparo Mojica</td>
+                        <td class="table-cell tabular-nums">0502</td>
+                        <td class="table-cell">C1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Plaza Morales, 420, 8º">Plaza Morales, 420, 8º</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524429828062" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-982-8062
+    </a>
+</td>
+                        <td class="table-cell">La Esperanza</td>
+                        <td class="table-cell">Abril Requena Segundo</td>
+                        <td class="table-cell"><span class="badge bg-emerald-100 text-emerald-800">Duro</span></td>
+                        <td class="table-cell">No</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/154/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">14</td>
+                        <td class="table-cell font-medium text-slate-900">Ana Valdez</td>
+                        <td class="table-cell tabular-nums">0503</td>
+                        <td class="table-cell">C2</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Ronda Gerard, 58, 25º 0º">Ronda Gerard, 58, 25º 0º</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524422444722" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-244-4722
+    </a>
+</td>
+                        <td class="table-cell">Santa Cruz</td>
+                        <td class="table-cell">Paula Pantoja</td>
+                        <td class="table-cell"><span class="badge bg-emerald-100 text-emerald-800">Duro</span></td>
+                        <td class="table-cell">No</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/97/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">15</td>
+                        <td class="table-cell font-medium text-slate-900">Ana Villar Hijo</td>
+                        <td class="table-cell tabular-nums">0504</td>
+                        <td class="table-cell">C1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Travesía Granados, 869, 2º C">Travesía Granados, 869, 2º C</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524426726620" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-672-6620
+    </a>
+</td>
+                        <td class="table-cell">Los Pinos</td>
+                        <td class="table-cell">Abril Delao</td>
+                        <td class="table-cell"><span class="badge bg-emerald-100 text-emerald-800">Duro</span></td>
+                        <td class="table-cell">No</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/133/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">16</td>
+                        <td class="table-cell font-medium text-slate-900">Ander Adorno Tercero</td>
+                        <td class="table-cell tabular-nums">0502</td>
+                        <td class="table-cell">C2</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Paseo Rivero, 39, 6º B">Paseo Rivero, 39, 6º B</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524421689725" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-168-9725
+    </a>
+</td>
+                        <td class="table-cell">La Esperanza</td>
+                        <td class="table-cell">Cristina Almonte</td>
+                        <td class="table-cell"><span class="badge bg-amber-100 text-amber-800">Indeciso</span></td>
+                        <td class="table-cell">No</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/7/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">17</td>
+                        <td class="table-cell font-medium text-slate-900">Andrea Olivas</td>
+                        <td class="table-cell tabular-nums">0507</td>
+                        <td class="table-cell">C2</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Calle Teresa, 34, 0º A">Calle Teresa, 34, 0º A</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524421557879" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-155-7879
+    </a>
+</td>
+                        <td class="table-cell">Los Pinos</td>
+                        <td class="table-cell">Unai Alonso</td>
+                        <td class="table-cell"><span class="badge bg-sky-100 text-sky-800">Blando</span></td>
+                        <td class="table-cell">Sí</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/40/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">18</td>
+                        <td class="table-cell font-medium text-slate-900">Andrea Soto</td>
+                        <td class="table-cell tabular-nums">0503</td>
+                        <td class="table-cell">B1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Praza Zepeda, 62, 72º A">Praza Zepeda, 62, 72º A</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524428436545" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-843-6545
+    </a>
+</td>
+                        <td class="table-cell">Santa Cruz</td>
+                        <td class="table-cell">José Tovar Tercero</td>
+                        <td class="table-cell"><span class="badge bg-amber-100 text-amber-800">Indeciso</span></td>
+                        <td class="table-cell">Sí</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/128/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">19</td>
+                        <td class="table-cell font-medium text-slate-900">Antonia Cazares</td>
+                        <td class="table-cell tabular-nums">0503</td>
+                        <td class="table-cell">B1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Plaza Ulibarri, 5, 38º E">Plaza Ulibarri, 5, 38º E</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524427778368" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-777-8368
+    </a>
+</td>
+                        <td class="table-cell">Santa Cruz</td>
+                        <td class="table-cell">José Tovar Tercero</td>
+                        <td class="table-cell"><span class="badge bg-emerald-100 text-emerald-800">Duro</span></td>
+                        <td class="table-cell">—</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/83/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">20</td>
+                        <td class="table-cell font-medium text-slate-900">Asier Lorenzo</td>
+                        <td class="table-cell tabular-nums">0503</td>
+                        <td class="table-cell">C2</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Avinguda Lovato, 92, 9º 6º">Avinguda Lovato, 92, 9º 6º</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524422938934" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-293-8934
+    </a>
+</td>
+                        <td class="table-cell">San Isidro</td>
+                        <td class="table-cell">Pedro Montemayor</td>
+                        <td class="table-cell"><span class="badge bg-emerald-100 text-emerald-800">Duro</span></td>
+                        <td class="table-cell">No</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/79/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">21</td>
+                        <td class="table-cell font-medium text-slate-900">Bruno Aguirre</td>
+                        <td class="table-cell tabular-nums">0504</td>
+                        <td class="table-cell">B1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Camino Gabriel, 764, Bajo 4º">Camino Gabriel, 764, Bajo 4º</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524422544579" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-254-4579
+    </a>
+</td>
+                        <td class="table-cell">Los Pinos</td>
+                        <td class="table-cell">Abril Delao</td>
+                        <td class="table-cell"> — </td>
+                        <td class="table-cell">Sí</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/57/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">22</td>
+                        <td class="table-cell font-medium text-slate-900">Bruno Negrón</td>
+                        <td class="table-cell tabular-nums">0505</td>
+                        <td class="table-cell">C2</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Carrer Cepeda, 67, 2º C">Carrer Cepeda, 67, 2º C</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524422976264" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-297-6264
+    </a>
+</td>
+                        <td class="table-cell">Valle Verde</td>
+                        <td class="table-cell">Álvaro Viera</td>
+                        <td class="table-cell"><span class="badge bg-amber-100 text-amber-800">Indeciso</span></td>
+                        <td class="table-cell">No</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/124/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">23</td>
+                        <td class="table-cell font-medium text-slate-900">Candela Maya</td>
+                        <td class="table-cell tabular-nums">0507</td>
+                        <td class="table-cell">B1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Paseo Arredondo, 676, 32º 3º">Paseo Arredondo, 676, 32º 3º</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524425802834" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-580-2834
+    </a>
+</td>
+                        <td class="table-cell">El Mirador</td>
+                        <td class="table-cell">Marc Miranda Tercero</td>
+                        <td class="table-cell"><span class="badge bg-amber-100 text-amber-800">Indeciso</span></td>
+                        <td class="table-cell">No</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/138/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">24</td>
+                        <td class="table-cell font-medium text-slate-900">Candela Moreno</td>
+                        <td class="table-cell tabular-nums">0505</td>
+                        <td class="table-cell">C1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Paseo Villanueva, 767, 6º B">Paseo Villanueva, 767, 6º B</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524422079184" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-207-9184
+    </a>
+</td>
+                        <td class="table-cell">Valle Verde</td>
+                        <td class="table-cell">Gerard Barroso</td>
+                        <td class="table-cell"><span class="badge bg-emerald-100 text-emerald-800">Duro</span></td>
+                        <td class="table-cell">Sí</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/178/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">25</td>
+                        <td class="table-cell font-medium text-slate-900">Carlota Castellano</td>
+                        <td class="table-cell tabular-nums">0506</td>
+                        <td class="table-cell">C2</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Camiño Rael, 134, 8º F">Camiño Rael, 134, 8º F</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524422405302" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-240-5302
+    </a>
+</td>
+                        <td class="table-cell">Santa Cruz</td>
+                        <td class="table-cell">Ariadna Orta Hijo</td>
+                        <td class="table-cell"><span class="badge bg-amber-100 text-amber-800">Indeciso</span></td>
+                        <td class="table-cell">—</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/19/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">26</td>
+                        <td class="table-cell font-medium text-slate-900">Carlota Muro</td>
+                        <td class="table-cell tabular-nums">0500</td>
+                        <td class="table-cell">C1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Avinguda Carbajal, 211, 71º C">Avinguda Carbajal, 211, 71º C</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524425835963" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-583-5963
+    </a>
+</td>
+                        <td class="table-cell">San Isidro</td>
+                        <td class="table-cell">Yaiza Escudero</td>
+                        <td class="table-cell"><span class="badge bg-sky-100 text-sky-800">Blando</span></td>
+                        <td class="table-cell">No</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/2/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">27</td>
+                        <td class="table-cell font-medium text-slate-900">Carlota Rodarte</td>
+                        <td class="table-cell tabular-nums">0505</td>
+                        <td class="table-cell">B1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Plaça Maya, 7, 82º E">Plaça Maya, 7, 82º E</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524424473087" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-447-3087
+    </a>
+</td>
+                        <td class="table-cell">Valle Verde</td>
+                        <td class="table-cell">Gerard Barroso</td>
+                        <td class="table-cell"> — </td>
+                        <td class="table-cell">Sí</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/129/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">28</td>
+                        <td class="table-cell font-medium text-slate-900">D. Antonio Fonseca</td>
+                        <td class="table-cell tabular-nums">0504</td>
+                        <td class="table-cell">C2</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Plaza Lara, 18, 4º C">Plaza Lara, 18, 4º C</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524426161677" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-616-1677
+    </a>
+</td>
+                        <td class="table-cell">Los Pinos</td>
+                        <td class="table-cell">Abril Delao</td>
+                        <td class="table-cell"><span class="badge bg-sky-100 text-sky-800">Blando</span></td>
+                        <td class="table-cell">—</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/171/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">29</td>
+                        <td class="table-cell font-medium text-slate-900">Daniel Montalvo Hijo</td>
+                        <td class="table-cell tabular-nums">0500</td>
+                        <td class="table-cell">B1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Plaza Ainara, 73, Entre suelo 6º">Plaza Ainara, 73, Entre suelo 6º</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524424153719" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-415-3719
+    </a>
+</td>
+                        <td class="table-cell">San Isidro</td>
+                        <td class="table-cell">Yaiza Escudero</td>
+                        <td class="table-cell"><span class="badge bg-sky-100 text-sky-800">Blando</span></td>
+                        <td class="table-cell">Sí</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/162/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">30</td>
+                        <td class="table-cell font-medium text-slate-900">Daniel Torres</td>
+                        <td class="table-cell tabular-nums">0508</td>
+                        <td class="table-cell">B1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Avinguda Asier, 5, 8º F">Avinguda Asier, 5, 8º F</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524424346898" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-434-6898
+    </a>
+</td>
+                        <td class="table-cell">Valle Verde</td>
+                        <td class="table-cell">David Villalobos</td>
+                        <td class="table-cell"> — </td>
+                        <td class="table-cell">—</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/142/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">31</td>
+                        <td class="table-cell font-medium text-slate-900">Daniela Prado</td>
+                        <td class="table-cell tabular-nums">0501</td>
+                        <td class="table-cell">C1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Travesía Mateos, 2, 5º C">Travesía Mateos, 2, 5º C</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524424429140" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-442-9140
+    </a>
+</td>
+                        <td class="table-cell">El Mirador</td>
+                        <td class="table-cell">Dr. Claudia Muñiz Tercero</td>
+                        <td class="table-cell"> — </td>
+                        <td class="table-cell">—</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/25/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">32</td>
+                        <td class="table-cell font-medium text-slate-900">David Abreu</td>
+                        <td class="table-cell tabular-nums">0500</td>
+                        <td class="table-cell">C2</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Camiño Pérez, 6, 2º">Camiño Pérez, 6, 2º</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524429285978" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-928-5978
+    </a>
+</td>
+                        <td class="table-cell">Santa Cruz</td>
+                        <td class="table-cell">Dr. Miguel Mayorga Segundo</td>
+                        <td class="table-cell"> — </td>
+                        <td class="table-cell">Sí</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/125/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">33</td>
+                        <td class="table-cell font-medium text-slate-900">Diego Lomeli</td>
+                        <td class="table-cell tabular-nums">0500</td>
+                        <td class="table-cell">B1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Avenida Eduardo, 628, Entre suelo 6º">Avenida Eduardo, 628, Entre suelo 6º</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524422241479" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-224-1479
+    </a>
+</td>
+                        <td class="table-cell">Santa Cruz</td>
+                        <td class="table-cell">Dr. Miguel Mayorga Segundo</td>
+                        <td class="table-cell"><span class="badge bg-sky-100 text-sky-800">Blando</span></td>
+                        <td class="table-cell">Sí</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/88/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">34</td>
+                        <td class="table-cell font-medium text-slate-900">Diego Munguía</td>
+                        <td class="table-cell tabular-nums">0502</td>
+                        <td class="table-cell">B1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Avenida Vera, 36, 05º 0º">Avenida Vera, 36, 05º 0º</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524421667579" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-166-7579
+    </a>
+</td>
+                        <td class="table-cell">Valle Verde</td>
+                        <td class="table-cell">Ángela Laureano Tercero</td>
+                        <td class="table-cell"><span class="badge bg-amber-100 text-amber-800">Indeciso</span></td>
+                        <td class="table-cell">No</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/16/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">35</td>
+                        <td class="table-cell font-medium text-slate-900">Dr. Alicia León</td>
+                        <td class="table-cell tabular-nums">0505</td>
+                        <td class="table-cell">C1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Plaça Ojeda, 472, Bajo 9º">Plaça Ojeda, 472, Bajo 9º</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524425429272" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-542-9272
+    </a>
+</td>
+                        <td class="table-cell">La Esperanza</td>
+                        <td class="table-cell">—</td>
+                        <td class="table-cell"><span class="badge bg-amber-100 text-amber-800">Indeciso</span></td>
+                        <td class="table-cell">Sí</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/176/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">36</td>
+                        <td class="table-cell font-medium text-slate-900">Dr. Isabel Patiño Hijo</td>
+                        <td class="table-cell tabular-nums">0505</td>
+                        <td class="table-cell">C1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Rúa José Antonio, 464, 88º 6º">Rúa José Antonio, 464, 88º 6º</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524425878252" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-587-8252
+    </a>
+</td>
+                        <td class="table-cell">La Esperanza</td>
+                        <td class="table-cell">David Duran Tercero</td>
+                        <td class="table-cell"> — </td>
+                        <td class="table-cell">—</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/99/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">37</td>
+                        <td class="table-cell font-medium text-slate-900">Dr. Izan Bustos Hijo</td>
+                        <td class="table-cell tabular-nums">0501</td>
+                        <td class="table-cell">C1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Travesía Santana, 72, 97º F">Travesía Santana, 72, 97º F</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524426458756" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-645-8756
+    </a>
+</td>
+                        <td class="table-cell">El Mirador</td>
+                        <td class="table-cell">Dr. Claudia Muñiz Tercero</td>
+                        <td class="table-cell"><span class="badge bg-emerald-100 text-emerald-800">Duro</span></td>
+                        <td class="table-cell">Sí</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/49/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">38</td>
+                        <td class="table-cell font-medium text-slate-900">Dr. Jaime Gil Tercero</td>
+                        <td class="table-cell tabular-nums">0506</td>
+                        <td class="table-cell">C1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Plaza Noa, 378, Bajos">Plaza Noa, 378, Bajos</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524428863554" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-886-3554
+    </a>
+</td>
+                        <td class="table-cell">San Isidro</td>
+                        <td class="table-cell">Ainara Piña</td>
+                        <td class="table-cell"><span class="badge bg-emerald-100 text-emerald-800">Duro</span></td>
+                        <td class="table-cell">No</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/153/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">39</td>
+                        <td class="table-cell font-medium text-slate-900">Dr. Jimena Carrión</td>
+                        <td class="table-cell tabular-nums">0506</td>
+                        <td class="table-cell">C1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Camino Olivárez, 5, 41º A">Camino Olivárez, 5, 41º A</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524429179720" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-917-9720
+    </a>
+</td>
+                        <td class="table-cell">Santa Cruz</td>
+                        <td class="table-cell">Ariadna Orta Hijo</td>
+                        <td class="table-cell"> — </td>
+                        <td class="table-cell">—</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/115/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">40</td>
+                        <td class="table-cell font-medium text-slate-900">Dr. Juan José Aguayo</td>
+                        <td class="table-cell tabular-nums">0500</td>
+                        <td class="table-cell">B1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Travessera Olivo, 5, 3º 0º">Travessera Olivo, 5, 3º 0º</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524428025869" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-802-5869
+    </a>
+</td>
+                        <td class="table-cell">Santa Cruz</td>
+                        <td class="table-cell">Dr. Miguel Mayorga Segundo</td>
+                        <td class="table-cell"><span class="badge bg-emerald-100 text-emerald-800">Duro</span></td>
+                        <td class="table-cell">Sí</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/72/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">41</td>
+                        <td class="table-cell font-medium text-slate-900">Dr. Luis Ochoa</td>
+                        <td class="table-cell tabular-nums">0501</td>
+                        <td class="table-cell">C1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Passeig Daniel, 41, 40º A">Passeig Daniel, 41, 40º A</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524421692223" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-169-2223
+    </a>
+</td>
+                        <td class="table-cell">El Mirador</td>
+                        <td class="table-cell">Dr. Claudia Muñiz Tercero</td>
+                        <td class="table-cell"><span class="badge bg-sky-100 text-sky-800">Blando</span></td>
+                        <td class="table-cell">No</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/28/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">42</td>
+                        <td class="table-cell font-medium text-slate-900">Dr. Marina Sandoval</td>
+                        <td class="table-cell tabular-nums">0500</td>
+                        <td class="table-cell">C1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Travessera Nevárez, 9, 9º C">Travessera Nevárez, 9, 9º C</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524422945393" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-294-5393
+    </a>
+</td>
+                        <td class="table-cell">Los Pinos</td>
+                        <td class="table-cell">—</td>
+                        <td class="table-cell"> — </td>
+                        <td class="table-cell">—</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/170/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">43</td>
+                        <td class="table-cell font-medium text-slate-900">Dr. Mireia Navas</td>
+                        <td class="table-cell tabular-nums">0503</td>
+                        <td class="table-cell">C1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Praza Sergio, 216, 3º 4º">Praza Sergio, 216, 3º 4º</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524424017664" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-401-7664
+    </a>
+</td>
+                        <td class="table-cell">Santa Cruz</td>
+                        <td class="table-cell">Paula Pantoja</td>
+                        <td class="table-cell"><span class="badge bg-emerald-100 text-emerald-800">Duro</span></td>
+                        <td class="table-cell">No</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/165/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">44</td>
+                        <td class="table-cell font-medium text-slate-900">Dr. Olga Martínez Segundo</td>
+                        <td class="table-cell tabular-nums">0506</td>
+                        <td class="table-cell">B1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Praza Nuria, 787, 0º E">Praza Nuria, 787, 0º E</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524423483200" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-348-3200
+    </a>
+</td>
+                        <td class="table-cell">San Isidro</td>
+                        <td class="table-cell">Ainara Piña</td>
+                        <td class="table-cell"><span class="badge bg-emerald-100 text-emerald-800">Duro</span></td>
+                        <td class="table-cell">No</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/29/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">45</td>
+                        <td class="table-cell font-medium text-slate-900">Dr. Omar Pacheco Tercero</td>
+                        <td class="table-cell tabular-nums">0500</td>
+                        <td class="table-cell">C1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Travessera Silva, 176, 53º 4º">Travessera Silva, 176, 53º 4º</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524422742620" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-274-2620
+    </a>
+</td>
+                        <td class="table-cell">Santa Cruz</td>
+                        <td class="table-cell">Dr. Miguel Mayorga Segundo</td>
+                        <td class="table-cell"><span class="badge bg-emerald-100 text-emerald-800">Duro</span></td>
+                        <td class="table-cell">No</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/143/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">46</td>
+                        <td class="table-cell font-medium text-slate-900">Dr. Valeria Reséndez Tercero</td>
+                        <td class="table-cell tabular-nums">0500</td>
+                        <td class="table-cell">B1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Plaça Alcala, 9, 8º A">Plaça Alcala, 9, 8º A</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524425961447" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-596-1447
+    </a>
+</td>
+                        <td class="table-cell">Santa Cruz</td>
+                        <td class="table-cell">Dr. Miguel Mayorga Segundo</td>
+                        <td class="table-cell"><span class="badge bg-amber-100 text-amber-800">Indeciso</span></td>
+                        <td class="table-cell">No</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/11/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">47</td>
+                        <td class="table-cell font-medium text-slate-900">Dr. Víctor Clemente</td>
+                        <td class="table-cell tabular-nums">0503</td>
+                        <td class="table-cell">C2</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Travessera Hernando, 3, 6º E">Travessera Hernando, 3, 6º E</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524427767274" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-776-7274
+    </a>
+</td>
+                        <td class="table-cell">San Isidro</td>
+                        <td class="table-cell">Pedro Montemayor</td>
+                        <td class="table-cell"><span class="badge bg-sky-100 text-sky-800">Blando</span></td>
+                        <td class="table-cell">No</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/41/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">48</td>
+                        <td class="table-cell font-medium text-slate-900">Dr. Yago Sáez Tercero</td>
+                        <td class="table-cell tabular-nums">0503</td>
+                        <td class="table-cell">C1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Paseo Pilar, 812, 93º 3º">Paseo Pilar, 812, 93º 3º</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524423327150" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-332-7150
+    </a>
+</td>
+                        <td class="table-cell">El Mirador</td>
+                        <td class="table-cell">—</td>
+                        <td class="table-cell"><span class="badge bg-emerald-100 text-emerald-800">Duro</span></td>
+                        <td class="table-cell">—</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/110/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">49</td>
+                        <td class="table-cell font-medium text-slate-900">Dña Cristina Henríquez Tercero</td>
+                        <td class="table-cell tabular-nums">0505</td>
+                        <td class="table-cell">B1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Calle Omar, 322, 83º A">Calle Omar, 322, 83º A</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524428992596" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-899-2596
+    </a>
+</td>
+                        <td class="table-cell">Valle Verde</td>
+                        <td class="table-cell">Álvaro Viera</td>
+                        <td class="table-cell"><span class="badge bg-emerald-100 text-emerald-800">Duro</span></td>
+                        <td class="table-cell">No</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/59/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                                    <tr>
+                        <td class="table-cell text-slate-400 tabular-nums">50</td>
+                        <td class="table-cell font-medium text-slate-900">Dña Luisa Meraz</td>
+                        <td class="table-cell tabular-nums">0508</td>
+                        <td class="table-cell">C1</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="Ruela Naiara, 412, 1º A">Ruela Naiara, 412, 1º A</span></td>
+                        <td class="table-cell"><a href="https://wa.me/524421098840" target="_blank" rel="noopener" class="inline-flex items-center gap-1 whitespace-nowrap hover:text-emerald-700" title="Escribir por WhatsApp">
+        <svg class="size-3.5 text-emerald-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 00-8.6 15.1L2 22l5-1.3A10 10 0 1012 2zm0 18a8 8 0 01-4.1-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8 8 0 1112 20zm4.4-6c-.2-.1-1.4-.7-1.7-.8s-.4-.1-.5.1-.6.8-.8.9-.3.2-.5 0a6.6 6.6 0 01-3.3-2.9c-.2-.4.2-.4.7-1.3a.4.4 0 000-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 00-.6.3 2.6 2.6 0 00-.8 1.9 4.5 4.5 0 00.9 2.4 10.3 10.3 0 004 3.5c1.5.6 2 .7 2.8.6a2.3 2.3 0 001.5-1.1 1.9 1.9 0 00.1-1.1c0-.1-.2-.2-.4-.3z"/></svg>
+        442-109-8840
+    </a>
+</td>
+                        <td class="table-cell">Valle Verde</td>
+                        <td class="table-cell">David Villalobos</td>
+                        <td class="table-cell"><span class="badge bg-emerald-100 text-emerald-800">Duro</span></td>
+                        <td class="table-cell">No</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="">—</span></td>
+                        <td class="table-cell text-right"><a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes/68/edit" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
+                    </tr>
+                            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-4"><nav role="navigation" aria-label="Navegación de páginas">
+
+        <div class="flex gap-2 items-center justify-between sm:hidden">
+
+                            <span class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 cursor-not-allowed leading-5 rounded-md dark:text-gray-300 dark:bg-gray-700 dark:border-gray-600">
+                    &laquo; Anterior
+                </span>
+            
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes?page=2" rel="next" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-800 bg-white border border-gray-300 leading-5 rounded-md hover:text-gray-700 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-800 transition ease-in-out duration-150 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200 dark:focus:border-blue-700 dark:active:bg-gray-700 dark:active:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900 dark:hover:text-gray-200">
+                    Siguiente &raquo;
+                </a>
+            
+        </div>
+
+        <div class="hidden sm:flex-1 sm:flex sm:gap-2 sm:items-center sm:justify-between">
+
+            <div>
+                <p class="text-sm text-gray-700 leading-5 dark:text-gray-600">
+                    Mostrando
+                                            <span class="font-medium">1</span>
+                        a
+                        <span class="font-medium">50</span>
+                                        de
+                    <span class="font-medium">180</span>
+                    resultados
+                </p>
+            </div>
+
+            <div>
+                <span class="inline-flex rtl:flex-row-reverse shadow-sm rounded-md">
+
+                    
+                                            <span aria-disabled="true" aria-label="&amp;laquo; Anterior">
+                            <span class="inline-flex items-center px-2 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-not-allowed rounded-l-md leading-5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400" aria-hidden="true">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                </svg>
+                            </span>
+                        </span>
+                    
+                    
+                                            
+                        
+                        
+                                                                                                                        <span aria-current="page">
+                                        <span class="inline-flex items-center px-4 py-2 -ml-px text-sm font-medium text-gray-700 bg-gray-200 border border-gray-300 cursor-default leading-5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">1</span>
+                                    </span>
+                                                                                                                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes?page=2" class="inline-flex items-center px-4 py-2 -ml-px text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 hover:text-gray-700 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:text-gray-300 dark:active:bg-gray-700 dark:focus:border-blue-800 hover:bg-gray-100 dark:hover:bg-gray-900" aria-label="Ir a la página 2">
+                                        2
+                                    </a>
+                                                                                                                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes?page=3" class="inline-flex items-center px-4 py-2 -ml-px text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 hover:text-gray-700 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:text-gray-300 dark:active:bg-gray-700 dark:focus:border-blue-800 hover:bg-gray-100 dark:hover:bg-gray-900" aria-label="Ir a la página 3">
+                                        3
+                                    </a>
+                                                                                                                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes?page=4" class="inline-flex items-center px-4 py-2 -ml-px text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 hover:text-gray-700 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:text-gray-300 dark:active:bg-gray-700 dark:focus:border-blue-800 hover:bg-gray-100 dark:hover:bg-gray-900" aria-label="Ir a la página 4">
+                                        4
+                                    </a>
+                                                                                                        
+                    
+                                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas/1/votantes?page=2" rel="next" class="inline-flex items-center px-2 py-2 -ml-px text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-r-md leading-5 hover:text-gray-400 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150 dark:bg-gray-800 dark:border-gray-600 dark:active:bg-gray-700 dark:focus:border-blue-800 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-gray-300" aria-label="Siguiente &amp;raquo;">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                                    </span>
+            </div>
+        </div>
+    </nav>
+</div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

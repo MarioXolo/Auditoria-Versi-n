@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#1d1d1b">
+    <title>Dashboard · Sistema de Auditorías</title>
+    <link rel="icon" href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,600;1,8..60,600&display=swap" rel="stylesheet">
+    <link rel="preload" as="style" href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/build/assets/app-us-fyaJe.css" /><link rel="modulepreload" as="script" href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/build/assets/app-Buj5iI_6.js" /><link rel="stylesheet" href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/build/assets/app-us-fyaJe.css" /><script type="module" src="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/build/assets/app-Buj5iI_6.js"></script></head>
+<body class="min-h-screen bg-slate-100 font-sans text-slate-900 antialiased">
+
+<div class="lg:flex">
+    
+    <aside class="bg-ink text-white print:hidden lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-64 lg:shrink-0 lg:flex-col">
+        <div class="flex items-center justify-between px-4 py-4 lg:px-5 lg:py-6">
+            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev" class="flex items-center gap-2">
+                <img src="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/images/logo.svg" alt="WeAdvise" class="h-7 w-auto">
+                <span class="text-sm font-semibold leading-tight">Sistema de Auditorías</span>
+            </a>
+            <label for="nav-toggle" class="cursor-pointer rounded-md p-2 hover:bg-white/10 lg:hidden" aria-label="Abrir menú">
+                <svg class="size-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </label>
+        </div>
+
+        <input type="checkbox" id="nav-toggle" class="peer hidden">
+        <nav class="hidden flex-1 flex-col gap-1 px-3 pb-4 peer-checked:flex lg:flex">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/dashboard" class="nav-link nav-link-active">
+                    <svg class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+                    Dashboard
+                </a>
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities" class="nav-link">
+                    <svg class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                    Actividades
+                </a>
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/calendario" class="nav-link">
+                    <svg class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 3v3m8-3v3M4 9h16M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1zm3 8h2m3 0h2m-7 3h2"/></svg>
+                    Calendario
+                </a>
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/asistencia" class="nav-link">
+                    <svg class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z"/></svg>
+                    Asistencia
+                </a>
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/users" class="nav-link">
+                    <svg class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m22 0v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    Usuarios
+                </a>
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/teams" class="nav-link">
+                    <svg class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7h18M3 12h18M3 17h18"/></svg>
+                    Equipos
+                </a>
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas" class="nav-link">
+                    <svg class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 21V4m0 0h11l-1.5 4L15 12H4"/></svg>
+                    Campañas
+                </a>
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos" class="nav-link">
+                    <svg class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h3l2 2h7a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm4 6h8m-8 4h5"/></svg>
+                    Catálogos
+                </a>
+            
+            <div class="mt-4 border-t border-white/10 pt-4 lg:mt-auto">
+                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/perfil" class="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10">
+                    <span class="grid size-8 place-items-center rounded-full bg-white/15 text-xs font-semibold">AG</span>
+                    <span class="min-w-0">
+                        <span class="block truncate text-sm font-medium">Administrador General</span>
+                        <span class="block text-xs text-slate-300">Administrador</span>
+                    </span>
+                </a>
+                <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/logout" class="mt-1">
+                    <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                    <button class="nav-link w-full">
+                        <svg class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                        Cerrar sesión
+                    </button>
+                </form>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-10 lg:py-8 print:p-0">
+        <div class="mx-auto max-w-7xl print:max-w-none">
+                            <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between print:hidden">
+                        <div>
+        <h1 class="text-2xl font-semibold">Dashboard de auditoría</h1>
+        <p class="text-sm text-slate-500">
+            13 oct. 2026 – 11 nov. 2026
+            · 26 días laborales · actualizado 12:50
+        </p>
+    </div>
+
+    <form method="GET" class="flex flex-wrap items-center gap-2">
+        <select name="period" class="input w-auto" onchange="this.form.submit()" aria-label="Periodo">
+                            <option value="7" >Últimos 7 días</option>
+                            <option value="30" selected>Últimos 30 días</option>
+                            <option value="90" >Últimos 90 días</option>
+                            <option value="all" >Todo el historial</option>
+                    </select>
+        <select name="team_id" class="input w-auto" onchange="this.form.submit()" aria-label="Equipo">
+            <option value="">Todos los equipos</option>
+                            <option value="1" >Equipo Norte</option>
+                            <option value="2" >Equipo Sur</option>
+                    </select>
+        <noscript><button class="btn btn-secondary">Aplicar</button></noscript>
+        <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/dashboard/exportar" class="btn btn-secondary">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+            Exportar CSV
+        </a>
+    </form>
+                </div>
+            
+            
+            
+                
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                                <div class="card p-5">
+                <div class="flex items-start justify-between gap-2">
+                    <p class="text-xs font-semibold tracking-wide text-slate-500 uppercase">Cumplimiento</p>
+                    <span class="badge bg-rose-100 text-rose-800">Bajo meta</span>
+                </div>
+                <div class="mt-2 flex items-baseline gap-2">
+                    <p class="text-4xl font-semibold tabular-nums text-rose-700">42.2%</p>
+                    <p class="text-xs text-slate-500">meta 80%</p>
+                </div>
+                <div class="relative mt-3 h-2 rounded-full bg-slate-100" aria-hidden="true">
+                    <div class="h-2 rounded-full bg-rose-500" style="width: 42.2%"></div>
+                    <div class="absolute -top-1 h-4 w-0.5 bg-slate-700" style="left: 80%" title="Meta"></div>
+                </div>
+                <p class="mt-3 text-xs text-slate-500">19 de 45 marcadas «Concluido»</p>
+                <p class="mt-1 text-xs"><span class="text-rose-700 font-medium">▼ 7.8 pts</span> <span class="text-slate-400">vs periodo anterior</span></p>
+            </div>
+                                <div class="card p-5">
+                <div class="flex items-start justify-between gap-2">
+                    <p class="text-xs font-semibold tracking-wide text-slate-500 uppercase">Entrega a tiempo</p>
+                    <span class="badge bg-rose-100 text-rose-800">Bajo meta</span>
+                </div>
+                <div class="mt-2 flex items-baseline gap-2">
+                    <p class="text-4xl font-semibold tabular-nums text-rose-700">52.6%</p>
+                    <p class="text-xs text-slate-500">meta 85%</p>
+                </div>
+                <div class="relative mt-3 h-2 rounded-full bg-slate-100" aria-hidden="true">
+                    <div class="h-2 rounded-full bg-rose-500" style="width: 52.6%"></div>
+                    <div class="absolute -top-1 h-4 w-0.5 bg-slate-700" style="left: 85%" title="Meta"></div>
+                </div>
+                <p class="mt-3 text-xs text-slate-500">de las concluidas, antes de su fecha de fin</p>
+                <p class="mt-1 text-xs"><span class="text-emerald-700 font-medium">▲ 29.5 pts</span> <span class="text-slate-400">vs periodo anterior</span></p>
+            </div>
+                                <div class="card p-5">
+                <div class="flex items-start justify-between gap-2">
+                    <p class="text-xs font-semibold tracking-wide text-slate-500 uppercase">Asistencia</p>
+                    <span class="badge bg-amber-100 text-amber-800">Cerca</span>
+                </div>
+                <div class="mt-2 flex items-baseline gap-2">
+                    <p class="text-4xl font-semibold tabular-nums text-amber-700">87.7%</p>
+                    <p class="text-xs text-slate-500">meta 95%</p>
+                </div>
+                <div class="relative mt-3 h-2 rounded-full bg-slate-100" aria-hidden="true">
+                    <div class="h-2 rounded-full bg-amber-500" style="width: 87.7%"></div>
+                    <div class="absolute -top-1 h-4 w-0.5 bg-slate-700" style="left: 95%" title="Meta"></div>
+                </div>
+                <p class="mt-3 text-xs text-slate-500">228 de 260 jornadas esperadas</p>
+                <p class="mt-1 text-xs"><span class="text-rose-700 font-medium">▼ 5.5 pts</span> <span class="text-slate-400">vs periodo anterior</span></p>
+            </div>
+                                <div class="card p-5">
+                <div class="flex items-start justify-between gap-2">
+                    <p class="text-xs font-semibold tracking-wide text-slate-500 uppercase">Puntualidad</p>
+                    <span class="badge bg-amber-100 text-amber-800">Cerca</span>
+                </div>
+                <div class="mt-2 flex items-baseline gap-2">
+                    <p class="text-4xl font-semibold tabular-nums text-amber-700">85.5%</p>
+                    <p class="text-xs text-slate-500">meta 90%</p>
+                </div>
+                <div class="relative mt-3 h-2 rounded-full bg-slate-100" aria-hidden="true">
+                    <div class="h-2 rounded-full bg-amber-500" style="width: 85.5%"></div>
+                    <div class="absolute -top-1 h-4 w-0.5 bg-slate-700" style="left: 90%" title="Meta"></div>
+                </div>
+                <p class="mt-3 text-xs text-slate-500">33 retardos (entrada después de 09:00 + 10 min)</p>
+                <p class="mt-1 text-xs"><span class="text-rose-700 font-medium">▼ 2.9 pts</span> <span class="text-slate-400">vs periodo anterior</span></p>
+            </div>
+            </div>
+
+    
+    <div class="mt-4 grid grid-cols-2 gap-4 xl:grid-cols-4">
+                                <a  href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities"  class="card block p-4 transition hover:border-brand-500">
+                <p class="text-xs font-semibold tracking-wide text-slate-500 uppercase">Actividades</p>
+                <p class="mt-1 text-2xl font-semibold tabular-nums">51</p>
+                <p class="mt-1 text-xs text-slate-500">16 sin revisar · 10 no completadas</p>
+                <p class="mt-1 text-xs"><span class="text-emerald-700 font-medium">▲ 24 </span> <span class="text-slate-400">vs periodo anterior</span></p>
+            </a>
+                                <a  href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities?status=vencida"  class="card block p-4 transition hover:border-brand-500">
+                <p class="text-xs font-semibold tracking-wide text-slate-500 uppercase">Vencidas</p>
+                <p class="mt-1 text-2xl font-semibold tabular-nums text-rose-600">11</p>
+                <p class="mt-1 text-xs text-slate-500">abiertas con fecha de fin pasada</p>
+                <p class="mt-1 text-xs"><span class="text-rose-700 font-medium">▲ 4 </span> <span class="text-slate-400">vs periodo anterior</span></p>
+            </a>
+                                <div  class="card block p-4 ">
+                <p class="text-xs font-semibold tracking-wide text-slate-500 uppercase">Tiempo de cierre</p>
+                <p class="mt-1 text-2xl font-semibold tabular-nums">8.2 días</p>
+                <p class="mt-1 text-xs text-slate-500">promedio de creación a completado</p>
+                <p class="mt-1 text-xs"><span class="text-emerald-700 font-medium">▼ 8.8 días</span> <span class="text-slate-400">vs periodo anterior</span></p>
+            </div>
+                                <div  class="card block p-4 ">
+                <p class="text-xs font-semibold tracking-wide text-slate-500 uppercase">Horas por jornada</p>
+                <p class="mt-1 text-2xl font-semibold tabular-nums">8.5 h</p>
+                <p class="mt-1 text-xs text-slate-500">promedio entre entrada y salida</p>
+                <p class="mt-1 text-xs"><span class="text-slate-500">Sin cambio vs periodo anterior</span></p>
+            </div>
+            </div>
+
+    
+            <section class="card mt-6 overflow-hidden" aria-labelledby="alertas">
+            <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+                <h2 id="alertas" class="font-semibold">Requiere atención</h2>
+                <span class="badge bg-slate-100 text-slate-600">6</span>
+            </div>
+            <ul class="divide-y divide-slate-100">
+                                    <li class="flex gap-3 px-5 py-3">
+                        <span class="mt-1.5 size-2.5 shrink-0 rounded-full bg-rose-500"></span>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-sm font-medium">14 actividades vencidas hace más de 3 días</p>
+                            <p class="truncate text-xs text-slate-500">ID1.0002 Visita domiciliaria (Lucía Hernández, venció 02/10) · ID2.0002 Evento comunitario (Empleado Sur, venció 06/10) · ID2.0007 Reporte de incidencias (Empleado Sur, venció 07/10)</p>
+                        </div>
+                                                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities?status=vencida" class="shrink-0 self-center text-xs font-medium text-brand-600 hover:underline">Ver</a>
+                                            </li>
+                                    <li class="flex gap-3 px-5 py-3">
+                        <span class="mt-1.5 size-2.5 shrink-0 rounded-full bg-rose-500"></span>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-sm font-medium">10 actividades marcadas como No completada en el periodo</p>
+                            <p class="truncate text-xs text-slate-500">Lucía Hernández (2), Empleado Sur (2), Fernanda Torres (2), Ricardo Vega (1), Ana Sofía Morales (1)</p>
+                        </div>
+                                                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities?status=no_completada" class="shrink-0 self-center text-xs font-medium text-brand-600 hover:underline">Ver</a>
+                                            </li>
+                                    <li class="flex gap-3 px-5 py-3">
+                        <span class="mt-1.5 size-2.5 shrink-0 rounded-full bg-sky-500"></span>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-sm font-medium">16 actividades vencidas sin revisar</p>
+                            <p class="truncate text-xs text-slate-500">Revisa si se completaron y márcalas con ✓ o ✗.</p>
+                        </div>
+                                                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities?status=sin_marcar" class="shrink-0 self-center text-xs font-medium text-brand-600 hover:underline">Ver</a>
+                                            </li>
+                                    <li class="flex gap-3 px-5 py-3">
+                        <span class="mt-1.5 size-2.5 shrink-0 rounded-full bg-amber-500"></span>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-sm font-medium">1 persona con 2 o más faltas en los últimos 5 días laborales</p>
+                            <p class="truncate text-xs text-slate-500">Empleado Sur</p>
+                        </div>
+                                                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/asistencia" class="shrink-0 self-center text-xs font-medium text-brand-600 hover:underline">Ver</a>
+                                            </li>
+                                    <li class="flex gap-3 px-5 py-3">
+                        <span class="mt-1.5 size-2.5 shrink-0 rounded-full bg-amber-500"></span>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-sm font-medium">5 personas con 3 o más retardos en el periodo</p>
+                            <p class="truncate text-xs text-slate-500">Ana Sofía Morales (5), Lucía Hernández (6), Jorge Castillo (3), Ricardo Vega (5), Empleado Norte (5)</p>
+                        </div>
+                                                    <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/asistencia" class="shrink-0 self-center text-xs font-medium text-brand-600 hover:underline">Ver</a>
+                                            </li>
+                                    <li class="flex gap-3 px-5 py-3">
+                        <span class="mt-1.5 size-2.5 shrink-0 rounded-full bg-amber-500"></span>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-sm font-medium">Encargados con menos de 50% de cumplimiento en lo que asignaron</p>
+                            <p class="truncate text-xs text-slate-500">Encargado Sur (44.4%), Encargado Norte (37.5%)</p>
+                        </div>
+                                            </li>
+                            </ul>
+        </section>
+    
+    
+    <div class="mt-6 grid gap-6 lg:grid-cols-3">
+        <section class="card p-5 lg:col-span-2">
+            <h2 class="font-semibold">Actividades creadas vs concluidas</h2>
+            <p class="text-xs text-slate-500">Por día en el periodo</p>
+            <div class="mt-4 h-64"><canvas id="chart-trend" role="img" aria-label="Gráfica de actividades creadas y concluidas"></canvas></div>
+        </section>
+        <section class="card p-5">
+            <h2 class="font-semibold">Distribución por estado</h2>
+            <p class="text-xs text-slate-500">51 actividades del periodo</p>
+            <div class="mt-4 h-64"><canvas id="chart-status" role="img" aria-label="Gráfica de distribución por estado"></canvas></div>
+        </section>
+    </div>
+
+    <div class="mt-6 grid gap-6 lg:grid-cols-3">
+        <section class="card p-5">
+            <h2 class="font-semibold">Asistencia y puntualidad diaria</h2>
+            <p class="text-xs text-slate-500">Días laborales, últimos 30 días como máximo</p>
+            <div class="mt-4 h-60"><canvas id="chart-attendance" role="img" aria-label="Gráfica de asistencia y puntualidad"></canvas></div>
+        </section>
+        <section class="card p-5">
+            <h2 class="font-semibold">Comparativo por equipo</h2>
+            <p class="text-xs text-slate-500">Cumplimiento, entrega a tiempo y asistencia</p>
+            <div class="mt-4 h-60"><canvas id="chart-teams" role="img" aria-label="Gráfica comparativa por equipo"></canvas></div>
+        </section>
+        <section class="card p-5">
+            <h2 class="font-semibold">Por tipo de actividad</h2>
+            <p class="text-xs text-slate-500">Concluidas, no completadas y sin revisar de cada tipo</p>
+            <div class="mt-4 h-60"><canvas id="chart-types" role="img" aria-label="Gráfica de actividades por tipo"></canvas></div>
+        </section>
+    </div>
+
+    <section class="card mt-6 p-5">
+        <h2 class="font-semibold">Por comunidad</h2>
+        <p class="text-xs text-slate-500">Las 10 comunidades con más actividades en el periodo</p>
+        <div class="mt-4 h-64"><canvas id="chart-communities" role="img" aria-label="Gráfica de actividades por comunidad"></canvas></div>
+    </section>
+
+    
+    <section class="card mt-6 overflow-hidden">
+        <div class="flex flex-col gap-1 border-b border-slate-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <h2 class="font-semibold">Indicadores por persona</h2>
+                <p class="text-xs text-slate-500">Ordenado por carga de trabajo. Los colores comparan contra la meta de cada indicador.</p>
+            </div>
+            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/dashboard/exportar" class="text-xs font-medium text-brand-600 hover:underline">Descargar esta tabla (CSV)</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="table-head">Persona</th>
+                        <th class="table-head text-right">Asignadas</th>
+                        <th class="table-head text-right">Concluidas</th>
+                        <th class="table-head text-right">No completadas</th>
+                        <th class="table-head text-right">Vencidas</th>
+                        <th class="table-head text-right">Cumplimiento</th>
+                        <th class="table-head text-right">A tiempo</th>
+                        <th class="table-head text-right">Días cierre</th>
+                        <th class="table-head text-right">Asistencia</th>
+                        <th class="table-head text-right">Faltas</th>
+                        <th class="table-head text-right">Retardos</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                                            <tr class="hover:bg-slate-50">
+                            <td class="table-cell">
+                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities?assigned_to=11" class="font-medium whitespace-nowrap text-slate-900 hover:text-brand-600">Ana Sofía Morales</a>
+                                <span class="block text-xs whitespace-nowrap text-slate-500">Empleado · Equipo Sur</span>
+                            </td>
+                            <td class="table-cell text-right font-medium tabular-nums">9</td>
+                            <td class="table-cell text-right tabular-nums">4</td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-rose-600">1</td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-rose-600">1</td>
+                                                            <td class="table-cell text-right"><span class="badge tabular-nums bg-rose-100 text-rose-800">57.1%</span></td>
+                                                            <td class="table-cell text-right"><span class="badge tabular-nums bg-rose-100 text-rose-800">25%</span></td>
+                                                        <td class="table-cell text-right tabular-nums">12.6</td>
+                            <td class="table-cell text-right"><span class="badge tabular-nums bg-emerald-100 text-emerald-800">96.2%</span></td>
+                            <td class="table-cell text-right tabular-nums">1</td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-amber-700">5</td>
+                        </tr>
+                                            <tr class="hover:bg-slate-50">
+                            <td class="table-cell">
+                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities?assigned_to=6" class="font-medium whitespace-nowrap text-slate-900 hover:text-brand-600">Diego Ramírez</a>
+                                <span class="block text-xs whitespace-nowrap text-slate-500">Empleado · Equipo Norte</span>
+                            </td>
+                            <td class="table-cell text-right font-medium tabular-nums">8</td>
+                            <td class="table-cell text-right tabular-nums">3</td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-rose-600">1</td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-rose-600">2</td>
+                                                            <td class="table-cell text-right"><span class="badge tabular-nums bg-rose-100 text-rose-800">42.9%</span></td>
+                                                            <td class="table-cell text-right"><span class="badge tabular-nums bg-rose-100 text-rose-800">66.7%</span></td>
+                                                        <td class="table-cell text-right tabular-nums">6</td>
+                            <td class="table-cell text-right"><span class="badge tabular-nums bg-amber-100 text-amber-800">92.3%</span></td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-rose-600">2</td>
+                            <td class="table-cell text-right tabular-nums">1</td>
+                        </tr>
+                                            <tr class="hover:bg-slate-50">
+                            <td class="table-cell">
+                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities?assigned_to=5" class="font-medium whitespace-nowrap text-slate-900 hover:text-brand-600">Lucía Hernández</a>
+                                <span class="block text-xs whitespace-nowrap text-slate-500">Empleado · Equipo Norte</span>
+                            </td>
+                            <td class="table-cell text-right font-medium tabular-nums">8</td>
+                            <td class="table-cell text-right tabular-nums">5</td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-rose-600">2</td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-rose-600">1</td>
+                                                            <td class="table-cell text-right"><span class="badge tabular-nums bg-rose-100 text-rose-800">62.5%</span></td>
+                                                            <td class="table-cell text-right"><span class="badge tabular-nums bg-rose-100 text-rose-800">60%</span></td>
+                                                        <td class="table-cell text-right tabular-nums">8.3</td>
+                            <td class="table-cell text-right"><span class="badge tabular-nums bg-amber-100 text-amber-800">88.5%</span></td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-rose-600">3</td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-amber-700">6</td>
+                        </tr>
+                                            <tr class="hover:bg-slate-50">
+                            <td class="table-cell">
+                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities?assigned_to=9" class="font-medium whitespace-nowrap text-slate-900 hover:text-brand-600">Empleado Sur</a>
+                                <span class="block text-xs whitespace-nowrap text-slate-500">Empleado · Equipo Sur</span>
+                            </td>
+                            <td class="table-cell text-right font-medium tabular-nums">7</td>
+                            <td class="table-cell text-right tabular-nums">1</td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-rose-600">2</td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-rose-600">2</td>
+                                                            <td class="table-cell text-right"><span class="badge tabular-nums bg-rose-100 text-rose-800">16.7%</span></td>
+                                                            <td class="table-cell text-right"><span class="badge tabular-nums bg-rose-100 text-rose-800">0%</span></td>
+                                                        <td class="table-cell text-right tabular-nums">14.7</td>
+                            <td class="table-cell text-right"><span class="badge tabular-nums bg-amber-100 text-amber-800">80.8%</span></td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-rose-600">5</td>
+                            <td class="table-cell text-right tabular-nums">2</td>
+                        </tr>
+                                            <tr class="hover:bg-slate-50">
+                            <td class="table-cell">
+                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities?assigned_to=10" class="font-medium whitespace-nowrap text-slate-900 hover:text-brand-600">Jorge Castillo</a>
+                                <span class="block text-xs whitespace-nowrap text-slate-500">Empleado · Equipo Sur</span>
+                            </td>
+                            <td class="table-cell text-right font-medium tabular-nums">7</td>
+                            <td class="table-cell text-right tabular-nums">2</td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-rose-600">1</td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-rose-600">1</td>
+                                                            <td class="table-cell text-right"><span class="badge tabular-nums bg-rose-100 text-rose-800">33.3%</span></td>
+                                                            <td class="table-cell text-right"><span class="badge tabular-nums bg-rose-100 text-rose-800">50%</span></td>
+                                                        <td class="table-cell text-right tabular-nums">4.4</td>
+                            <td class="table-cell text-right"><span class="badge tabular-nums bg-rose-100 text-rose-800">73.1%</span></td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-rose-600">7</td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-amber-700">3</td>
+                        </tr>
+                                            <tr class="hover:bg-slate-50">
+                            <td class="table-cell">
+                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities?assigned_to=12" class="font-medium whitespace-nowrap text-slate-900 hover:text-brand-600">Ricardo Vega</a>
+                                <span class="block text-xs whitespace-nowrap text-slate-500">Empleado · Equipo Sur</span>
+                            </td>
+                            <td class="table-cell text-right font-medium tabular-nums">5</td>
+                            <td class="table-cell text-right tabular-nums">1</td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-rose-600">1</td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-rose-600">2</td>
+                                                            <td class="table-cell text-right"><span class="badge tabular-nums bg-rose-100 text-rose-800">25%</span></td>
+                                                            <td class="table-cell text-right"><span class="badge tabular-nums bg-emerald-100 text-emerald-800">100%</span></td>
+                                                        <td class="table-cell text-right tabular-nums">1</td>
+                            <td class="table-cell text-right"><span class="badge tabular-nums bg-emerald-100 text-emerald-800">96.2%</span></td>
+                            <td class="table-cell text-right tabular-nums">1</td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-amber-700">5</td>
+                        </tr>
+                                            <tr class="hover:bg-slate-50">
+                            <td class="table-cell">
+                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities?assigned_to=4" class="font-medium whitespace-nowrap text-slate-900 hover:text-brand-600">Empleado Norte</a>
+                                <span class="block text-xs whitespace-nowrap text-slate-500">Empleado · Equipo Norte</span>
+                            </td>
+                            <td class="table-cell text-right font-medium tabular-nums">4</td>
+                            <td class="table-cell text-right tabular-nums">3</td>
+                            <td class="table-cell text-right tabular-nums">0</td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-rose-600">1</td>
+                                                            <td class="table-cell text-right"><span class="badge tabular-nums bg-amber-100 text-amber-800">75%</span></td>
+                                                            <td class="table-cell text-right"><span class="badge tabular-nums bg-rose-100 text-rose-800">66.7%</span></td>
+                                                        <td class="table-cell text-right tabular-nums">7</td>
+                            <td class="table-cell text-right"><span class="badge tabular-nums bg-amber-100 text-amber-800">84.6%</span></td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-rose-600">4</td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-amber-700">5</td>
+                        </tr>
+                                            <tr class="hover:bg-slate-50">
+                            <td class="table-cell">
+                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities?assigned_to=7" class="font-medium whitespace-nowrap text-slate-900 hover:text-brand-600">Fernanda Torres</a>
+                                <span class="block text-xs whitespace-nowrap text-slate-500">Empleado · Equipo Norte</span>
+                            </td>
+                            <td class="table-cell text-right font-medium tabular-nums">3</td>
+                            <td class="table-cell text-right tabular-nums">0</td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-rose-600">2</td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-rose-600">1</td>
+                                                            <td class="table-cell text-right"><span class="badge tabular-nums bg-rose-100 text-rose-800">0%</span></td>
+                                                            <td class="table-cell text-right"><span class="badge tabular-nums bg-slate-100 text-slate-600">—</span></td>
+                                                        <td class="table-cell text-right tabular-nums">—</td>
+                            <td class="table-cell text-right"><span class="badge tabular-nums bg-amber-100 text-amber-800">92.3%</span></td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-rose-600">2</td>
+                            <td class="table-cell text-right tabular-nums">2</td>
+                        </tr>
+                                            <tr class="hover:bg-slate-50">
+                            <td class="table-cell">
+                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities?assigned_to=3" class="font-medium whitespace-nowrap text-slate-900 hover:text-brand-600">Encargado Norte</a>
+                                <span class="block text-xs whitespace-nowrap text-slate-500">Encargado · Equipo Norte</span>
+                            </td>
+                            <td class="table-cell text-right font-medium tabular-nums">0</td>
+                            <td class="table-cell text-right tabular-nums">0</td>
+                            <td class="table-cell text-right tabular-nums">0</td>
+                            <td class="table-cell text-right tabular-nums">0</td>
+                                                            <td class="table-cell text-right"><span class="badge tabular-nums bg-slate-100 text-slate-600">—</span></td>
+                                                            <td class="table-cell text-right"><span class="badge tabular-nums bg-slate-100 text-slate-600">—</span></td>
+                                                        <td class="table-cell text-right tabular-nums">—</td>
+                            <td class="table-cell text-right"><span class="badge tabular-nums bg-amber-100 text-amber-800">84.6%</span></td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-rose-600">4</td>
+                            <td class="table-cell text-right tabular-nums">2</td>
+                        </tr>
+                                            <tr class="hover:bg-slate-50">
+                            <td class="table-cell">
+                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities?assigned_to=8" class="font-medium whitespace-nowrap text-slate-900 hover:text-brand-600">Encargado Sur</a>
+                                <span class="block text-xs whitespace-nowrap text-slate-500">Encargado · Equipo Sur</span>
+                            </td>
+                            <td class="table-cell text-right font-medium tabular-nums">0</td>
+                            <td class="table-cell text-right tabular-nums">0</td>
+                            <td class="table-cell text-right tabular-nums">0</td>
+                            <td class="table-cell text-right tabular-nums">0</td>
+                                                            <td class="table-cell text-right"><span class="badge tabular-nums bg-slate-100 text-slate-600">—</span></td>
+                                                            <td class="table-cell text-right"><span class="badge tabular-nums bg-slate-100 text-slate-600">—</span></td>
+                                                        <td class="table-cell text-right tabular-nums">—</td>
+                            <td class="table-cell text-right"><span class="badge tabular-nums bg-amber-100 text-amber-800">88.5%</span></td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-rose-600">3</td>
+                            <td class="table-cell text-right tabular-nums">2</td>
+                        </tr>
+                                    </tbody>
+            </table>
+        </div>
+    </section>
+
+    
+    <section class="card mt-6 overflow-hidden">
+        <div class="border-b border-slate-200 px-5 py-4">
+            <h2 class="font-semibold">Auditoría de encargados</h2>
+            <p class="text-xs text-slate-500">Lo que cada encargado asignó en el periodo, cómo se cumplió y la asistencia de su equipo</p>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="table-head">Encargado</th>
+                        <th class="table-head text-right">Integrantes</th>
+                        <th class="table-head text-right">Asignó</th>
+                        <th class="table-head text-right">Concluidas</th>
+                        <th class="table-head text-right">Vencidas</th>
+                        <th class="table-head text-right">Cumplimiento</th>
+                        <th class="table-head text-right">A tiempo</th>
+                        <th class="table-head text-right">Asistencia del equipo</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                                            <tr>
+                            <td class="table-cell">
+                                <span class="font-medium whitespace-nowrap text-slate-900">Encargado Sur</span>
+                                <span class="block text-xs text-slate-500">Equipo Sur</span>
+                            </td>
+                            <td class="table-cell text-right tabular-nums">5</td>
+                            <td class="table-cell text-right font-medium tabular-nums">10</td>
+                            <td class="table-cell text-right tabular-nums">4</td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-rose-600">2</td>
+                            <td class="table-cell text-right"><span class="badge tabular-nums bg-rose-100 text-rose-800">44.4%</span></td>
+                            <td class="table-cell text-right"><span class="badge tabular-nums bg-rose-100 text-rose-800">50%</span></td>
+                            <td class="table-cell text-right"><span class="badge tabular-nums bg-amber-100 text-amber-800">86.9%</span></td>
+                        </tr>
+                                            <tr>
+                            <td class="table-cell">
+                                <span class="font-medium whitespace-nowrap text-slate-900">Encargado Norte</span>
+                                <span class="block text-xs text-slate-500">Equipo Norte</span>
+                            </td>
+                            <td class="table-cell text-right tabular-nums">5</td>
+                            <td class="table-cell text-right font-medium tabular-nums">8</td>
+                            <td class="table-cell text-right tabular-nums">3</td>
+                            <td class="table-cell text-right tabular-nums font-semibold text-rose-600">4</td>
+                            <td class="table-cell text-right"><span class="badge tabular-nums bg-rose-100 text-rose-800">37.5%</span></td>
+                            <td class="table-cell text-right"><span class="badge tabular-nums bg-rose-100 text-rose-800">66.7%</span></td>
+                            <td class="table-cell text-right"><span class="badge tabular-nums bg-amber-100 text-amber-800">88.5%</span></td>
+                        </tr>
+                                    </tbody>
+            </table>
+        </div>
+    </section>
+
+    <div class="mt-6 grid gap-6 lg:grid-cols-2">
+        
+        <section class="card overflow-hidden">
+            <div class="border-b border-slate-200 px-5 py-4">
+                <h2 class="font-semibold">Movimientos recientes</h2>
+            </div>
+            <ul class="divide-y divide-slate-100">
+                                    <li class="flex items-center justify-between gap-3 px-5 py-3">
+                        <div class="min-w-0">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/76" class="block truncate text-sm font-medium hover:text-brand-600"><span class="font-mono text-xs text-slate-500">ID2.0040</span> Levantamiento de encuesta · Lomas del Sol</a>
+                            <span class="block truncate text-xs text-slate-500">Jorge Castillo · asignada por Jorge Castillo · hace 3 minutos</span>
+                        </div>
+                        <span class="badge bg-amber-100 text-amber-800">No iniciado</span>
+                    </li>
+                                    <li class="flex items-center justify-between gap-3 px-5 py-3">
+                        <div class="min-w-0">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/78" class="block truncate text-sm font-medium hover:text-brand-600"><span class="font-mono text-xs text-slate-500">ID1.0038</span> Recorrido de zona · San Isidro</a>
+                            <span class="block truncate text-xs text-slate-500">Lucía Hernández · asignada por Lucía Hernández · hace 1 hora</span>
+                        </div>
+                        <span class="badge bg-emerald-600 text-white">Concluido</span>
+                    </li>
+                                    <li class="flex items-center justify-between gap-3 px-5 py-3">
+                        <div class="min-w-0">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/74" class="block truncate text-sm font-medium hover:text-brand-600"><span class="font-mono text-xs text-slate-500">ID2.0039</span> Visita domiciliaria · Los Pinos</a>
+                            <span class="block truncate text-xs text-slate-500">Ana Sofía Morales · asignada por Encargado Sur · hace 2 horas</span>
+                        </div>
+                        <span class="badge bg-amber-100 text-amber-800">No iniciado</span>
+                    </li>
+                                    <li class="flex items-center justify-between gap-3 px-5 py-3">
+                        <div class="min-w-0">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/75" class="block truncate text-sm font-medium hover:text-brand-600"><span class="font-mono text-xs text-slate-500">ID1.0036</span> Levantamiento de encuesta · Centro</a>
+                            <span class="block truncate text-xs text-slate-500">Lucía Hernández · asignada por Encargado Norte · hace 8 horas</span>
+                        </div>
+                        <span class="badge bg-emerald-600 text-white">Concluido</span>
+                    </li>
+                                    <li class="flex items-center justify-between gap-3 px-5 py-3">
+                        <div class="min-w-0">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/77" class="block truncate text-sm font-medium hover:text-brand-600"><span class="font-mono text-xs text-slate-500">ID1.0037</span> Evento comunitario · El Mirador</a>
+                            <span class="block truncate text-xs text-slate-500">Diego Ramírez · asignada por Diego Ramírez · hace 9 horas</span>
+                        </div>
+                        <span class="badge bg-sky-100 text-sky-800">En proceso</span>
+                    </li>
+                                    <li class="flex items-center justify-between gap-3 px-5 py-3">
+                        <div class="min-w-0">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/68" class="block truncate text-sm font-medium hover:text-brand-600"><span class="font-mono text-xs text-slate-500">ID1.0031</span> Levantamiento de encuesta · La Esperanza</a>
+                            <span class="block truncate text-xs text-slate-500">Empleado Norte · asignada por Gerente Demo · hace 11 horas</span>
+                        </div>
+                        <span class="badge bg-emerald-600 text-white">Concluido</span>
+                    </li>
+                                    <li class="flex items-center justify-between gap-3 px-5 py-3">
+                        <div class="min-w-0">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/73" class="block truncate text-sm font-medium hover:text-brand-600"><span class="font-mono text-xs text-slate-500">ID1.0035</span> Visita domiciliaria · Los Pinos</a>
+                            <span class="block truncate text-xs text-slate-500">Diego Ramírez · asignada por Diego Ramírez · hace 11 horas</span>
+                        </div>
+                        <span class="badge bg-emerald-600 text-white">Concluido</span>
+                    </li>
+                                    <li class="flex items-center justify-between gap-3 px-5 py-3">
+                        <div class="min-w-0">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/67" class="block truncate text-sm font-medium hover:text-brand-600"><span class="font-mono text-xs text-slate-500">ID1.0030</span> Entrega de material · Valle Verde</a>
+                            <span class="block truncate text-xs text-slate-500">Diego Ramírez · asignada por Diego Ramírez · hace 11 horas</span>
+                        </div>
+                        <span class="badge bg-emerald-600 text-white">Concluido</span>
+                    </li>
+                            </ul>
+        </section>
+
+        
+        <section class="card overflow-hidden">
+            <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+                <div>
+                    <h2 class="font-semibold">Sin entrada registrada hoy</h2>
+                    <p class="text-xs text-slate-500">miércoles 11 de noviembre</p>
+                </div>
+                <span class="badge bg-rose-100 text-rose-800">2</span>
+            </div>
+            <ul class="max-h-96 divide-y divide-slate-100 overflow-y-auto">
+                                    <li class="flex items-center justify-between px-5 py-3 text-sm">
+                        <span>Empleado Sur</span>
+                        <span class="text-xs text-slate-500">Empleado · Equipo Sur</span>
+                    </li>
+                                    <li class="flex items-center justify-between px-5 py-3 text-sm">
+                        <span>Jorge Castillo</span>
+                        <span class="text-xs text-slate-500">Empleado · Equipo Sur</span>
+                    </li>
+                            </ul>
+        </section>
+    </div>
+
+    
+    <details class="card mt-6 overflow-hidden" open>
+        <summary class="cursor-pointer px-5 py-4 font-semibold">Cómo se calcula cada indicador</summary>
+        <div class="overflow-x-auto border-t border-slate-200">
+            <table class="min-w-full divide-y divide-slate-200">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th class="table-head">Indicador</th>
+                        <th class="table-head">Fórmula</th>
+                        <th class="table-head">Meta</th>
+                        <th class="table-head">Fuente</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                                            <tr>
+                            <td class="table-cell font-medium whitespace-nowrap">Cumplimiento</td>
+                            <td class="table-cell">Marcadas «Concluido» por un superior ÷ (asignadas − suspendidas) × 100</td>
+                            <td class="table-cell whitespace-nowrap">≥ 80%</td>
+                            <td class="table-cell text-slate-500">Actividades creadas en el periodo</td>
+                        </tr>
+                                            <tr>
+                            <td class="table-cell font-medium whitespace-nowrap">Entrega a tiempo</td>
+                            <td class="table-cell">Concluidas en o antes de su fecha de fin ÷ concluidas × 100</td>
+                            <td class="table-cell whitespace-nowrap">≥ 85%</td>
+                            <td class="table-cell text-slate-500">Actividades concluidas del periodo</td>
+                        </tr>
+                                            <tr>
+                            <td class="table-cell font-medium whitespace-nowrap">Asistencia</td>
+                            <td class="table-cell">Entradas registradas ÷ (personal activo × días laborales) × 100. Hoy cuenta a partir de las 09:00 + 10 min</td>
+                            <td class="table-cell whitespace-nowrap">≥ 95%</td>
+                            <td class="table-cell text-slate-500">Registros de asistencia en días laborales</td>
+                        </tr>
+                                            <tr>
+                            <td class="table-cell font-medium whitespace-nowrap">Puntualidad</td>
+                            <td class="table-cell">Entradas hasta las 09:00 + 10 min ÷ entradas registradas × 100</td>
+                            <td class="table-cell whitespace-nowrap">≥ 90%</td>
+                            <td class="table-cell text-slate-500">Hora de entrada de cada registro</td>
+                        </tr>
+                                            <tr>
+                            <td class="table-cell font-medium whitespace-nowrap">No completadas</td>
+                            <td class="table-cell">Actividades que un superior marcó en rojo (✗) en el periodo</td>
+                            <td class="table-cell whitespace-nowrap">Lo más bajo posible</td>
+                            <td class="table-cell text-slate-500">Marcado de actividades</td>
+                        </tr>
+                                            <tr>
+                            <td class="table-cell font-medium whitespace-nowrap">Vencidas</td>
+                            <td class="table-cell">No iniciadas o en proceso con fecha de fin anterior a hoy</td>
+                            <td class="table-cell whitespace-nowrap">Lo más bajo posible</td>
+                            <td class="table-cell text-slate-500">Actividades creadas en el periodo</td>
+                        </tr>
+                                            <tr>
+                            <td class="table-cell font-medium whitespace-nowrap">Tiempo de cierre</td>
+                            <td class="table-cell">Promedio de días entre la creación y la marca «Concluido»</td>
+                            <td class="table-cell whitespace-nowrap">Tendencia a la baja</td>
+                            <td class="table-cell text-slate-500">Actividades concluidas del periodo</td>
+                        </tr>
+                                            <tr>
+                            <td class="table-cell font-medium whitespace-nowrap">Horas por jornada</td>
+                            <td class="table-cell">Promedio de horas entre entrada y salida</td>
+                            <td class="table-cell whitespace-nowrap">Referencia</td>
+                            <td class="table-cell text-slate-500">Registros con entrada y salida</td>
+                        </tr>
+                                            <tr>
+                            <td class="table-cell font-medium whitespace-nowrap">Comparativo</td>
+                            <td class="table-cell">Valor actual − valor del periodo anterior de la misma duración</td>
+                            <td class="table-cell whitespace-nowrap">Positivo</td>
+                            <td class="table-cell text-slate-500">Mismo cálculo en el periodo previo</td>
+                        </tr>
+                                    </tbody>
+            </table>
+        </div>
+        <p class="border-t border-slate-200 px-5 py-3 text-xs text-slate-500">
+            Semáforo: verde en meta o arriba, ámbar hasta 15 puntos debajo de la meta, rojo por debajo de eso.
+            Días laborales: lun, mar, mié, jue, vie, sáb.
+        </p>
+    </details>
+
+    <script type="application/json" id="dashboard-data">{"trend":[{"label":"mar. 13","created":1,"completed":0},{"label":"mi\u00e9. 14","created":1,"completed":1},{"label":"jue. 15","created":1,"completed":0},{"label":"vie. 16","created":0,"completed":0},{"label":"s\u00e1b. 17","created":0,"completed":0},{"label":"dom. 18","created":1,"completed":1},{"label":"lun. 19","created":0,"completed":0},{"label":"mar. 20","created":1,"completed":0},{"label":"mi\u00e9. 21","created":1,"completed":0},{"label":"jue. 22","created":5,"completed":0},{"label":"vie. 23","created":1,"completed":1},{"label":"s\u00e1b. 24","created":1,"completed":1},{"label":"dom. 25","created":1,"completed":0},{"label":"lun. 26","created":2,"completed":0},{"label":"mar. 27","created":0,"completed":0},{"label":"mi\u00e9. 28","created":4,"completed":2},{"label":"jue. 29","created":1,"completed":0},{"label":"vie. 30","created":0,"completed":1},{"label":"s\u00e1b. 31","created":3,"completed":1},{"label":"dom. 1","created":0,"completed":0},{"label":"lun. 2","created":2,"completed":0},{"label":"mar. 3","created":4,"completed":1},{"label":"mi\u00e9. 4","created":4,"completed":1},{"label":"jue. 5","created":1,"completed":2},{"label":"vie. 6","created":2,"completed":1},{"label":"s\u00e1b. 7","created":4,"completed":4},{"label":"dom. 8","created":3,"completed":3},{"label":"lun. 9","created":2,"completed":3},{"label":"mar. 10","created":5,"completed":0},{"label":"mi\u00e9. 11","created":0,"completed":6}],"attendance":[{"label":"mar. 13","asistencia":80,"puntualidad":75},{"label":"mi\u00e9. 14","asistencia":90,"puntualidad":77.8},{"label":"jue. 15","asistencia":70,"puntualidad":100},{"label":"vie. 16","asistencia":90,"puntualidad":100},{"label":"s\u00e1b. 17","asistencia":80,"puntualidad":87.5},{"label":"lun. 19","asistencia":90,"puntualidad":77.8},{"label":"mar. 20","asistencia":70,"puntualidad":100},{"label":"mi\u00e9. 21","asistencia":80,"puntualidad":87.5},{"label":"jue. 22","asistencia":90,"puntualidad":88.9},{"label":"vie. 23","asistencia":100,"puntualidad":100},{"label":"s\u00e1b. 24","asistencia":90,"puntualidad":88.9},{"label":"lun. 26","asistencia":100,"puntualidad":90},{"label":"mar. 27","asistencia":90,"puntualidad":66.7},{"label":"mi\u00e9. 28","asistencia":90,"puntualidad":88.9},{"label":"jue. 29","asistencia":70,"puntualidad":100},{"label":"vie. 30","asistencia":90,"puntualidad":88.9},{"label":"s\u00e1b. 31","asistencia":100,"puntualidad":80},{"label":"lun. 2","asistencia":100,"puntualidad":60},{"label":"mar. 3","asistencia":90,"puntualidad":77.8},{"label":"mi\u00e9. 4","asistencia":80,"puntualidad":75},{"label":"jue. 5","asistencia":100,"puntualidad":80},{"label":"vie. 6","asistencia":100,"puntualidad":100},{"label":"s\u00e1b. 7","asistencia":90,"puntualidad":88.9},{"label":"lun. 9","asistencia":90,"puntualidad":77.8},{"label":"mar. 10","asistencia":80,"puntualidad":87.5},{"label":"mi\u00e9. 11","asistencia":80,"puntualidad":87.5}],"status":[{"label":"No iniciado","value":10},{"label":"En proceso","value":6},{"label":"Suspendida","value":6},{"label":"Concluido","value":19},{"label":"No completada","value":10}],"types":[{"label":"Levantamiento de encuesta","total":9,"completadas":4,"incompletas":0,"sin_marcar":5},{"label":"Visita domiciliaria","total":8,"completadas":1,"incompletas":3,"sin_marcar":4},{"label":"Entrega de material","total":7,"completadas":4,"incompletas":1,"sin_marcar":2},{"label":"Evento comunitario","total":7,"completadas":3,"incompletas":2,"sin_marcar":2},{"label":"Recorrido de zona","total":5,"completadas":4,"incompletas":1,"sin_marcar":0},{"label":"Reporte de incidencias","total":5,"completadas":2,"incompletas":1,"sin_marcar":2},{"label":"Reuni\u00f3n vecinal","total":3,"completadas":1,"incompletas":1,"sin_marcar":1},{"label":"Capacitaci\u00f3n","total":1,"completadas":0,"incompletas":1,"sin_marcar":0}],"communities":[{"label":"Valle Verde","total":9,"completadas":3,"incompletas":3,"sin_marcar":3},{"label":"La Joya","total":6,"completadas":2,"incompletas":1,"sin_marcar":3},{"label":"Los Pinos","total":5,"completadas":2,"incompletas":1,"sin_marcar":2},{"label":"San Miguel","total":4,"completadas":2,"incompletas":2,"sin_marcar":0},{"label":"Centro","total":4,"completadas":2,"incompletas":1,"sin_marcar":1},{"label":"Santa Cruz","total":4,"completadas":2,"incompletas":0,"sin_marcar":2},{"label":"Lomas del Sol","total":4,"completadas":1,"incompletas":1,"sin_marcar":2},{"label":"San Isidro","total":3,"completadas":2,"incompletas":0,"sin_marcar":1},{"label":"El Mirador","total":3,"completadas":2,"incompletas":0,"sin_marcar":1},{"label":"La Esperanza","total":3,"completadas":1,"incompletas":1,"sin_marcar":1}],"teams":[{"name":"Equipo Norte","assigned":23,"cumplimiento":50,"a_tiempo":63.6,"asistencia":88.5},{"name":"Equipo Sur","assigned":28,"cumplimiento":34.8,"a_tiempo":37.5,"asistencia":86.9}],"goals":{"cumplimiento":80,"a_tiempo":85,"asistencia":95,"puntualidad":90}}</script>
+        </div>
+    </main>
+</div>
+    <link rel="modulepreload" as="script" href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/build/assets/dashboard-BnOmeFB_.js" /><script type="module" src="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/build/assets/dashboard-BnOmeFB_.js"></script></body>
+</html>

@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#1d1d1b">
+    <title>Actividades · Sistema de Auditorías</title>
+    <link rel="icon" href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,600;1,8..60,600&display=swap" rel="stylesheet">
+    <link rel="preload" as="style" href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/build/assets/app-us-fyaJe.css" /><link rel="modulepreload" as="script" href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/build/assets/app-Buj5iI_6.js" /><link rel="stylesheet" href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/build/assets/app-us-fyaJe.css" /><script type="module" src="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/build/assets/app-Buj5iI_6.js"></script></head>
+<body class="min-h-screen bg-slate-100 font-sans text-slate-900 antialiased">
+
+<div class="lg:flex">
+    
+    <aside class="bg-ink text-white print:hidden lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-64 lg:shrink-0 lg:flex-col">
+        <div class="flex items-center justify-between px-4 py-4 lg:px-5 lg:py-6">
+            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev" class="flex items-center gap-2">
+                <img src="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/images/logo.svg" alt="WeAdvise" class="h-7 w-auto">
+                <span class="text-sm font-semibold leading-tight">Sistema de Auditorías</span>
+            </a>
+            <label for="nav-toggle" class="cursor-pointer rounded-md p-2 hover:bg-white/10 lg:hidden" aria-label="Abrir menú">
+                <svg class="size-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </label>
+        </div>
+
+        <input type="checkbox" id="nav-toggle" class="peer hidden">
+        <nav class="hidden flex-1 flex-col gap-1 px-3 pb-4 peer-checked:flex lg:flex">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities" class="nav-link nav-link-active">
+                    <svg class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                    Actividades
+                </a>
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/calendario" class="nav-link">
+                    <svg class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 3v3m8-3v3M4 9h16M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1zm3 8h2m3 0h2m-7 3h2"/></svg>
+                    Calendario
+                </a>
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/asistencia" class="nav-link">
+                    <svg class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z"/></svg>
+                    Asistencia
+                </a>
+            
+            <div class="mt-4 border-t border-white/10 pt-4 lg:mt-auto">
+                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/perfil" class="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10">
+                    <span class="grid size-8 place-items-center rounded-full bg-white/15 text-xs font-semibold">EN</span>
+                    <span class="min-w-0">
+                        <span class="block truncate text-sm font-medium">Encargado Norte</span>
+                        <span class="block text-xs text-slate-300">Encargado</span>
+                    </span>
+                </a>
+                <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/logout" class="mt-1">
+                    <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                    <button class="nav-link w-full">
+                        <svg class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                        Cerrar sesión
+                    </button>
+                </form>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-10 lg:py-8 print:p-0">
+        <div class="mx-auto max-w-7xl print:max-w-none">
+                            <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between print:hidden">
+                        <div>
+        <h1 class="text-2xl font-semibold">Actividades</h1>
+        <p class="text-sm text-slate-500">29 actividades</p>
+    </div>
+            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/create" class="btn btn-primary">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M12 5v14M5 12h14"/></svg>
+            Nueva actividad
+        </a>
+                    </div>
+            
+            
+            
+                <form method="GET" class="card mb-5 grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
+        <input type="search" name="q" value="" placeholder="Buscar por ID, tipo o comunidad" class="input lg:col-span-2">
+        <select name="status" class="input">
+            <option value="">Todos los estados</option>
+                            <option value="no_iniciado" >No iniciado</option>
+                            <option value="en_proceso" >En proceso</option>
+                            <option value="suspendida" >Suspendida</option>
+                            <option value="concluido" >Concluido</option>
+                            <option value="no_completada" >No completada</option>
+                        <option value="vencida" >Vencidas</option>
+            <option value="sin_marcar" >Sin revisar (no iniciado o en proceso)</option>
+        </select>
+        <select name="activity_type_id" class="input">
+            <option value="">Todos los tipos</option>
+                            <option value="5" >Capacitación</option>
+                            <option value="4" >Entrega de material</option>
+                            <option value="7" >Evento comunitario</option>
+                            <option value="6" >Levantamiento de encuesta</option>
+                            <option value="3" >Recorrido de zona</option>
+                            <option value="8" >Reporte de incidencias</option>
+                            <option value="2" >Reunión vecinal</option>
+                            <option value="1" >Visita domiciliaria</option>
+                            <option value="9" >Volanteo</option>
+                    </select>
+        <select name="community_id" class="input">
+            <option value="">Todas las comunidades</option>
+                            <option value="8" >Centro</option>
+                            <option value="2" >El Mirador</option>
+                            <option value="3" >La Esperanza</option>
+                            <option value="10" >La Joya</option>
+                            <option value="7" >Lomas del Sol</option>
+                            <option value="5" >Los Pinos</option>
+                            <option value="1" >San Isidro</option>
+                            <option value="9" >San Miguel</option>
+                            <option value="4" >Santa Cruz</option>
+                            <option value="6" >Valle Verde</option>
+                    </select>
+                    <select name="assigned_to" class="input">
+                <option value="">Todas las personas</option>
+                                    <option value="6" >Diego Ramírez</option>
+                                    <option value="4" >Empleado Norte</option>
+                                    <option value="3" >Encargado Norte</option>
+                                    <option value="7" >Fernanda Torres</option>
+                                    <option value="5" >Lucía Hernández</option>
+                            </select>
+                        <div class="flex gap-2 sm:col-span-2 lg:col-span-4 lg:justify-end">
+            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities" class="btn btn-secondary">Limpiar</a>
+            <button class="btn btn-primary">Filtrar</button>
+        </div>
+    </form>
+
+    
+    <div class="space-y-3 md:hidden">
+                                <div class="card flex items-start gap-3 p-4">
+                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/20/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/20/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="no_completada">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como no completada"
+                title="Marcar como no completada (rojo)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-slate-300 hover:border-rose-500 hover:text-rose-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/20" class="min-w-0 flex-1">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="font-mono text-xs font-semibold text-slate-500">ID1.0011</p>
+                            <p class="font-medium">Evento comunitario</p>
+                            <p class="text-sm text-slate-600">Lomas del Sol</p>
+                        </div>
+                        <span class="badge bg-amber-100 text-amber-800">No iniciado</span>
+                    </div>
+                    <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                        <span>Lucía Hernández</span>
+                        <span class="font-semibold text-rose-600">
+                            10/10 – 12/10/2026 · Vencida
+                        </span>
+                    </div>
+                </a>
+            </div>
+                                <div class="card flex items-start gap-3 p-4">
+                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/13/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/13/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="no_completada">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como no completada"
+                title="Marcar como no completada (rojo)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-slate-300 hover:border-rose-500 hover:text-rose-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/13" class="min-w-0 flex-1">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="font-mono text-xs font-semibold text-slate-500">ID1.0006</p>
+                            <p class="font-medium">Capacitación</p>
+                            <p class="text-sm text-slate-600">Centro</p>
+                        </div>
+                        <span class="badge bg-amber-100 text-amber-800">No iniciado</span>
+                    </div>
+                    <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                        <span>Lucía Hernández</span>
+                        <span class="font-semibold text-rose-600">
+                            06/10 – 16/10/2026 · Vencida
+                        </span>
+                    </div>
+                </a>
+            </div>
+                                <div class="card flex items-start gap-3 p-4">
+                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/40/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/40/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="no_completada">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como no completada"
+                title="Marcar como no completada (rojo)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-slate-300 hover:border-rose-500 hover:text-rose-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/40" class="min-w-0 flex-1">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="font-mono text-xs font-semibold text-slate-500">ID1.0020</p>
+                            <p class="font-medium">Visita domiciliaria</p>
+                            <p class="text-sm text-slate-600">Centro</p>
+                        </div>
+                        <span class="badge bg-amber-100 text-amber-800">No iniciado</span>
+                    </div>
+                    <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                        <span>Lucía Hernández</span>
+                        <span class="font-semibold text-rose-600">
+                            24/10 – 27/10/2026 · Vencida
+                        </span>
+                    </div>
+                </a>
+            </div>
+                                <div class="card flex items-start gap-3 p-4">
+                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/43/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/43/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="no_completada">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como no completada"
+                title="Marcar como no completada (rojo)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-slate-300 hover:border-rose-500 hover:text-rose-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/43" class="min-w-0 flex-1">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="font-mono text-xs font-semibold text-slate-500">ID1.0022</p>
+                            <p class="font-medium">Entrega de material</p>
+                            <p class="text-sm text-slate-600">Los Pinos</p>
+                        </div>
+                        <span class="badge bg-sky-100 text-sky-800">En proceso</span>
+                    </div>
+                    <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                        <span>Diego Ramírez</span>
+                        <span class="font-semibold text-rose-600">
+                            26/10 – 30/10/2026 · Vencida
+                        </span>
+                    </div>
+                </a>
+            </div>
+                                <div class="card flex items-start gap-3 p-4">
+                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/45/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/45/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="no_completada">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como no completada"
+                title="Marcar como no completada (rojo)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-slate-300 hover:border-rose-500 hover:text-rose-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/45" class="min-w-0 flex-1">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="font-mono text-xs font-semibold text-slate-500">ID1.0023</p>
+                            <p class="font-medium">Evento comunitario</p>
+                            <p class="text-sm text-slate-600">La Joya</p>
+                        </div>
+                        <span class="badge bg-sky-100 text-sky-800">En proceso</span>
+                    </div>
+                    <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                        <span>Empleado Norte</span>
+                        <span class="font-semibold text-rose-600">
+                            30/10 – 03/11/2026 · Vencida
+                        </span>
+                    </div>
+                </a>
+            </div>
+                                <div class="card flex items-start gap-3 p-4">
+                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/55/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/55/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="no_completada">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como no completada"
+                title="Marcar como no completada (rojo)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-slate-300 hover:border-rose-500 hover:text-rose-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/55" class="min-w-0 flex-1">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="font-mono text-xs font-semibold text-slate-500">ID1.0026</p>
+                            <p class="font-medium">Visita domiciliaria</p>
+                            <p class="text-sm text-slate-600">La Joya</p>
+                        </div>
+                        <span class="badge bg-amber-100 text-amber-800">No iniciado</span>
+                    </div>
+                    <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                        <span>Diego Ramírez</span>
+                        <span class="font-semibold text-rose-600">
+                            03/11 – 05/11/2026 · Vencida
+                        </span>
+                    </div>
+                </a>
+            </div>
+                                <div class="card flex items-start gap-3 p-4">
+                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/70/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/70/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="no_completada">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como no completada"
+                title="Marcar como no completada (rojo)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-slate-300 hover:border-rose-500 hover:text-rose-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/70" class="min-w-0 flex-1">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="font-mono text-xs font-semibold text-slate-500">ID1.0032</p>
+                            <p class="font-medium">Levantamiento de encuesta</p>
+                            <p class="text-sm text-slate-600">Santa Cruz</p>
+                        </div>
+                        <span class="badge bg-amber-100 text-amber-800">No iniciado</span>
+                    </div>
+                    <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                        <span>Fernanda Torres</span>
+                        <span class="font-semibold text-rose-600">
+                            08/11 – 10/11/2026 · Vencida
+                        </span>
+                    </div>
+                </a>
+            </div>
+                                <div class="card flex items-start gap-3 p-4">
+                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/77/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/77/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="no_completada">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como no completada"
+                title="Marcar como no completada (rojo)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-slate-300 hover:border-rose-500 hover:text-rose-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/77" class="min-w-0 flex-1">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="font-mono text-xs font-semibold text-slate-500">ID1.0037</p>
+                            <p class="font-medium">Evento comunitario</p>
+                            <p class="text-sm text-slate-600">El Mirador</p>
+                        </div>
+                        <span class="badge bg-sky-100 text-sky-800">En proceso</span>
+                    </div>
+                    <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                        <span>Diego Ramírez</span>
+                        <span class="">
+                            11/11 – 18/11/2026
+                        </span>
+                    </div>
+                </a>
+            </div>
+                                <div class="card flex items-start gap-3 p-4 border-rose-300 bg-rose-50">
+                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/1/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/1/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="sin_marcar">
+        <button type="submit" role="checkbox" aria-checked="true"
+                aria-label="Quitar No completada"
+                title="No completada · tocar para quitar la marca"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-rose-600 bg-rose-600 text-white">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/1" class="min-w-0 flex-1">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="font-mono text-xs font-semibold text-slate-500">ID1.0001</p>
+                            <p class="font-medium text-rose-900">Reporte de incidencias</p>
+                            <p class="text-sm text-slate-600">Santa Cruz</p>
+                        </div>
+                        <span class="badge bg-rose-600 text-white">No completada</span>
+                    </div>
+                    <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                        <span>Fernanda Torres</span>
+                        <span class="">
+                            28/09 – 01/10/2026
+                        </span>
+                    </div>
+                </a>
+            </div>
+                                <div class="card flex items-start gap-3 p-4 border-rose-300 bg-rose-50">
+                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/17/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/17/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="sin_marcar">
+        <button type="submit" role="checkbox" aria-checked="true"
+                aria-label="Quitar No completada"
+                title="No completada · tocar para quitar la marca"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-rose-600 bg-rose-600 text-white">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/17" class="min-w-0 flex-1">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="font-mono text-xs font-semibold text-slate-500">ID1.0009</p>
+                            <p class="font-medium text-rose-900">Entrega de material</p>
+                            <p class="text-sm text-slate-600">San Isidro</p>
+                        </div>
+                        <span class="badge bg-rose-600 text-white">No completada</span>
+                    </div>
+                    <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                        <span>Empleado Norte</span>
+                        <span class="">
+                            09/10 – 18/10/2026
+                        </span>
+                    </div>
+                </a>
+            </div>
+                                <div class="card flex items-start gap-3 p-4 border-rose-300 bg-rose-50">
+                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/28/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/28/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="sin_marcar">
+        <button type="submit" role="checkbox" aria-checked="true"
+                aria-label="Quitar No completada"
+                title="No completada · tocar para quitar la marca"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-rose-600 bg-rose-600 text-white">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/28" class="min-w-0 flex-1">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="font-mono text-xs font-semibold text-slate-500">ID1.0016</p>
+                            <p class="font-medium text-rose-900">Entrega de material</p>
+                            <p class="text-sm text-slate-600">San Miguel</p>
+                        </div>
+                        <span class="badge bg-rose-600 text-white">No completada</span>
+                    </div>
+                    <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                        <span>Lucía Hernández</span>
+                        <span class="">
+                            14/10 – 18/10/2026
+                        </span>
+                    </div>
+                </a>
+            </div>
+                                <div class="card flex items-start gap-3 p-4 border-rose-300 bg-rose-50">
+                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/63/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/63/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="sin_marcar">
+        <button type="submit" role="checkbox" aria-checked="true"
+                aria-label="Quitar No completada"
+                title="No completada · tocar para quitar la marca"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-rose-600 bg-rose-600 text-white">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/63" class="min-w-0 flex-1">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="font-mono text-xs font-semibold text-slate-500">ID1.0027</p>
+                            <p class="font-medium text-rose-900">Reporte de incidencias</p>
+                            <p class="text-sm text-slate-600">Los Pinos</p>
+                        </div>
+                        <span class="badge bg-rose-600 text-white">No completada</span>
+                    </div>
+                    <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                        <span>Diego Ramírez</span>
+                        <span class="">
+                            08/11 – 09/11/2026
+                        </span>
+                    </div>
+                </a>
+            </div>
+                                <div class="card flex items-start gap-3 p-4 border-rose-300 bg-rose-50">
+                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/65/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/65/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="sin_marcar">
+        <button type="submit" role="checkbox" aria-checked="true"
+                aria-label="Quitar No completada"
+                title="No completada · tocar para quitar la marca"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-rose-600 bg-rose-600 text-white">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/65" class="min-w-0 flex-1">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="font-mono text-xs font-semibold text-slate-500">ID1.0028</p>
+                            <p class="font-medium text-rose-900">Evento comunitario</p>
+                            <p class="text-sm text-slate-600">San Miguel</p>
+                        </div>
+                        <span class="badge bg-rose-600 text-white">No completada</span>
+                    </div>
+                    <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                        <span>Lucía Hernández</span>
+                        <span class="">
+                            07/11 – 10/11/2026
+                        </span>
+                    </div>
+                </a>
+            </div>
+                                <div class="card flex items-start gap-3 p-4 border-rose-300 bg-rose-50">
+                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/79/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/79/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="sin_marcar">
+        <button type="submit" role="checkbox" aria-checked="true"
+                aria-label="Quitar No completada"
+                title="No completada · tocar para quitar la marca"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-rose-600 bg-rose-600 text-white">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/79" class="min-w-0 flex-1">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="font-mono text-xs font-semibold text-slate-500">ID1.0039</p>
+                            <p class="font-medium text-rose-900">Reunión vecinal</p>
+                            <p class="text-sm text-slate-600">San Isidro</p>
+                        </div>
+                        <span class="badge bg-rose-600 text-white">No completada</span>
+                    </div>
+                    <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                        <span>Empleado Norte</span>
+                        <span class="">
+                            11/11 – 13/11/2026
+                        </span>
+                    </div>
+                </a>
+            </div>
+                                <div class="card flex items-start gap-3 p-4 border-rose-300 bg-rose-50">
+                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/72/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/72/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="sin_marcar">
+        <button type="submit" role="checkbox" aria-checked="true"
+                aria-label="Quitar No completada"
+                title="No completada · tocar para quitar la marca"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-rose-600 bg-rose-600 text-white">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/72" class="min-w-0 flex-1">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="font-mono text-xs font-semibold text-slate-500">ID1.0034</p>
+                            <p class="font-medium text-rose-900">Reunión vecinal</p>
+                            <p class="text-sm text-slate-600">La Esperanza</p>
+                        </div>
+                        <span class="badge bg-rose-600 text-white">No completada</span>
+                    </div>
+                    <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                        <span>Fernanda Torres</span>
+                        <span class="">
+                            09/11 – 14/11/2026
+                        </span>
+                    </div>
+                </a>
+            </div>
+            </div>
+
+    
+    <div class="card hidden overflow-hidden md:block">
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50">
+                <tr>
+                                            <th class="table-head w-24">Revisión</th>
+                                        <th class="table-head">ID</th>
+                    <th class="table-head">Tipo de actividad</th>
+                    <th class="table-head">Comunidad</th>
+                    <th class="table-head">Asignada a</th>
+                    <th class="table-head">Inicio – Fin</th>
+                    <th class="table-head">Estado</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+                                                        <tr class="hover:bg-slate-50">
+                                                    <td class="table-cell">
+                                                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/20/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/20/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="no_completada">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como no completada"
+                title="Marcar como no completada (rojo)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-slate-300 hover:border-rose-500 hover:text-rose-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                                            </td>
+                                                <td class="table-cell whitespace-nowrap">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/20" class="font-mono text-sm font-semibold hover:text-brand-600 text-slate-700">ID1.0011</a>
+                        </td>
+                        <td class="table-cell">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/20" class="font-medium hover:text-brand-600 text-slate-900">Evento comunitario</a>
+                                                            <span class="block text-xs text-slate-500">Equipo Norte</span>
+                                                    </td>
+                        <td class="table-cell">Lomas del Sol</td>
+                        <td class="table-cell">Lucía Hernández</td>
+                        <td class="table-cell whitespace-nowrap font-semibold text-rose-600">
+                            10/10/2026
+                            <span class="block text-xs ">al 12/10/2026 · Vencida</span>
+                        </td>
+                        <td class="table-cell">
+                            <span class="badge bg-amber-100 text-amber-800">No iniciado</span>
+                                                            <span class="mt-1 block text-xs text-slate-500">Cargada por el empleado</span>
+                                                    </td>
+                    </tr>
+                                                        <tr class="hover:bg-slate-50">
+                                                    <td class="table-cell">
+                                                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/13/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/13/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="no_completada">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como no completada"
+                title="Marcar como no completada (rojo)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-slate-300 hover:border-rose-500 hover:text-rose-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                                            </td>
+                                                <td class="table-cell whitespace-nowrap">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/13" class="font-mono text-sm font-semibold hover:text-brand-600 text-slate-700">ID1.0006</a>
+                        </td>
+                        <td class="table-cell">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/13" class="font-medium hover:text-brand-600 text-slate-900">Capacitación</a>
+                                                            <span class="block text-xs text-slate-500">Equipo Norte</span>
+                                                    </td>
+                        <td class="table-cell">Centro</td>
+                        <td class="table-cell">Lucía Hernández</td>
+                        <td class="table-cell whitespace-nowrap font-semibold text-rose-600">
+                            06/10/2026
+                            <span class="block text-xs ">al 16/10/2026 · Vencida</span>
+                        </td>
+                        <td class="table-cell">
+                            <span class="badge bg-amber-100 text-amber-800">No iniciado</span>
+                                                            <span class="mt-1 block text-xs text-slate-500">Cargada por el empleado</span>
+                                                    </td>
+                    </tr>
+                                                        <tr class="hover:bg-slate-50">
+                                                    <td class="table-cell">
+                                                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/40/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/40/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="no_completada">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como no completada"
+                title="Marcar como no completada (rojo)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-slate-300 hover:border-rose-500 hover:text-rose-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                                            </td>
+                                                <td class="table-cell whitespace-nowrap">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/40" class="font-mono text-sm font-semibold hover:text-brand-600 text-slate-700">ID1.0020</a>
+                        </td>
+                        <td class="table-cell">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/40" class="font-medium hover:text-brand-600 text-slate-900">Visita domiciliaria</a>
+                                                            <span class="block text-xs text-slate-500">Equipo Norte</span>
+                                                    </td>
+                        <td class="table-cell">Centro</td>
+                        <td class="table-cell">Lucía Hernández</td>
+                        <td class="table-cell whitespace-nowrap font-semibold text-rose-600">
+                            24/10/2026
+                            <span class="block text-xs ">al 27/10/2026 · Vencida</span>
+                        </td>
+                        <td class="table-cell">
+                            <span class="badge bg-amber-100 text-amber-800">No iniciado</span>
+                                                    </td>
+                    </tr>
+                                                        <tr class="hover:bg-slate-50">
+                                                    <td class="table-cell">
+                                                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/43/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/43/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="no_completada">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como no completada"
+                title="Marcar como no completada (rojo)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-slate-300 hover:border-rose-500 hover:text-rose-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                                            </td>
+                                                <td class="table-cell whitespace-nowrap">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/43" class="font-mono text-sm font-semibold hover:text-brand-600 text-slate-700">ID1.0022</a>
+                        </td>
+                        <td class="table-cell">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/43" class="font-medium hover:text-brand-600 text-slate-900">Entrega de material</a>
+                                                            <span class="block text-xs text-slate-500">Equipo Norte</span>
+                                                    </td>
+                        <td class="table-cell">Los Pinos</td>
+                        <td class="table-cell">Diego Ramírez</td>
+                        <td class="table-cell whitespace-nowrap font-semibold text-rose-600">
+                            26/10/2026
+                            <span class="block text-xs ">al 30/10/2026 · Vencida</span>
+                        </td>
+                        <td class="table-cell">
+                            <span class="badge bg-sky-100 text-sky-800">En proceso</span>
+                                                    </td>
+                    </tr>
+                                                        <tr class="hover:bg-slate-50">
+                                                    <td class="table-cell">
+                                                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/45/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/45/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="no_completada">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como no completada"
+                title="Marcar como no completada (rojo)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-slate-300 hover:border-rose-500 hover:text-rose-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                                            </td>
+                                                <td class="table-cell whitespace-nowrap">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/45" class="font-mono text-sm font-semibold hover:text-brand-600 text-slate-700">ID1.0023</a>
+                        </td>
+                        <td class="table-cell">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/45" class="font-medium hover:text-brand-600 text-slate-900">Evento comunitario</a>
+                                                            <span class="block text-xs text-slate-500">Equipo Norte</span>
+                                                    </td>
+                        <td class="table-cell">La Joya</td>
+                        <td class="table-cell">Empleado Norte</td>
+                        <td class="table-cell whitespace-nowrap font-semibold text-rose-600">
+                            30/10/2026
+                            <span class="block text-xs ">al 03/11/2026 · Vencida</span>
+                        </td>
+                        <td class="table-cell">
+                            <span class="badge bg-sky-100 text-sky-800">En proceso</span>
+                                                    </td>
+                    </tr>
+                                                        <tr class="hover:bg-slate-50">
+                                                    <td class="table-cell">
+                                                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/55/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/55/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="no_completada">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como no completada"
+                title="Marcar como no completada (rojo)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-slate-300 hover:border-rose-500 hover:text-rose-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                                            </td>
+                                                <td class="table-cell whitespace-nowrap">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/55" class="font-mono text-sm font-semibold hover:text-brand-600 text-slate-700">ID1.0026</a>
+                        </td>
+                        <td class="table-cell">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/55" class="font-medium hover:text-brand-600 text-slate-900">Visita domiciliaria</a>
+                                                            <span class="block text-xs text-slate-500">Equipo Norte</span>
+                                                    </td>
+                        <td class="table-cell">La Joya</td>
+                        <td class="table-cell">Diego Ramírez</td>
+                        <td class="table-cell whitespace-nowrap font-semibold text-rose-600">
+                            03/11/2026
+                            <span class="block text-xs ">al 05/11/2026 · Vencida</span>
+                        </td>
+                        <td class="table-cell">
+                            <span class="badge bg-amber-100 text-amber-800">No iniciado</span>
+                                                    </td>
+                    </tr>
+                                                        <tr class="hover:bg-slate-50">
+                                                    <td class="table-cell">
+                                                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/70/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/70/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="no_completada">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como no completada"
+                title="Marcar como no completada (rojo)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-slate-300 hover:border-rose-500 hover:text-rose-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                                            </td>
+                                                <td class="table-cell whitespace-nowrap">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/70" class="font-mono text-sm font-semibold hover:text-brand-600 text-slate-700">ID1.0032</a>
+                        </td>
+                        <td class="table-cell">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/70" class="font-medium hover:text-brand-600 text-slate-900">Levantamiento de encuesta</a>
+                                                            <span class="block text-xs text-slate-500">Equipo Norte</span>
+                                                    </td>
+                        <td class="table-cell">Santa Cruz</td>
+                        <td class="table-cell">Fernanda Torres</td>
+                        <td class="table-cell whitespace-nowrap font-semibold text-rose-600">
+                            08/11/2026
+                            <span class="block text-xs ">al 10/11/2026 · Vencida</span>
+                        </td>
+                        <td class="table-cell">
+                            <span class="badge bg-amber-100 text-amber-800">No iniciado</span>
+                                                            <span class="mt-1 block text-xs text-slate-500">Cargada por el empleado</span>
+                                                    </td>
+                    </tr>
+                                                        <tr class="hover:bg-slate-50">
+                                                    <td class="table-cell">
+                                                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/77/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/77/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="no_completada">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como no completada"
+                title="Marcar como no completada (rojo)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-slate-300 hover:border-rose-500 hover:text-rose-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                                            </td>
+                                                <td class="table-cell whitespace-nowrap">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/77" class="font-mono text-sm font-semibold hover:text-brand-600 text-slate-700">ID1.0037</a>
+                        </td>
+                        <td class="table-cell">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/77" class="font-medium hover:text-brand-600 text-slate-900">Evento comunitario</a>
+                                                            <span class="block text-xs text-slate-500">Equipo Norte</span>
+                                                    </td>
+                        <td class="table-cell">El Mirador</td>
+                        <td class="table-cell">Diego Ramírez</td>
+                        <td class="table-cell whitespace-nowrap">
+                            11/11/2026
+                            <span class="block text-xs text-slate-500">al 18/11/2026</span>
+                        </td>
+                        <td class="table-cell">
+                            <span class="badge bg-sky-100 text-sky-800">En proceso</span>
+                                                            <span class="mt-1 block text-xs text-slate-500">Cargada por el empleado</span>
+                                                    </td>
+                    </tr>
+                                                        <tr class="bg-rose-100 shadow-[inset_4px_0_0_var(--color-rose-600)] hover:bg-rose-100">
+                                                    <td class="table-cell">
+                                                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/1/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/1/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="sin_marcar">
+        <button type="submit" role="checkbox" aria-checked="true"
+                aria-label="Quitar No completada"
+                title="No completada · tocar para quitar la marca"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-rose-600 bg-rose-600 text-white">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                                            </td>
+                                                <td class="table-cell whitespace-nowrap">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/1" class="font-mono text-sm font-semibold hover:text-brand-600 text-rose-900">ID1.0001</a>
+                        </td>
+                        <td class="table-cell">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/1" class="font-medium hover:text-brand-600 text-rose-900">Reporte de incidencias</a>
+                                                            <span class="block text-xs text-slate-500">Equipo Norte</span>
+                                                    </td>
+                        <td class="table-cell">Santa Cruz</td>
+                        <td class="table-cell">Fernanda Torres</td>
+                        <td class="table-cell whitespace-nowrap">
+                            28/09/2026
+                            <span class="block text-xs text-slate-500">al 01/10/2026</span>
+                        </td>
+                        <td class="table-cell">
+                            <span class="badge bg-rose-600 text-white">No completada</span>
+                                                    </td>
+                    </tr>
+                                                        <tr class="bg-rose-100 shadow-[inset_4px_0_0_var(--color-rose-600)] hover:bg-rose-100">
+                                                    <td class="table-cell">
+                                                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/17/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/17/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="sin_marcar">
+        <button type="submit" role="checkbox" aria-checked="true"
+                aria-label="Quitar No completada"
+                title="No completada · tocar para quitar la marca"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-rose-600 bg-rose-600 text-white">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                                            </td>
+                                                <td class="table-cell whitespace-nowrap">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/17" class="font-mono text-sm font-semibold hover:text-brand-600 text-rose-900">ID1.0009</a>
+                        </td>
+                        <td class="table-cell">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/17" class="font-medium hover:text-brand-600 text-rose-900">Entrega de material</a>
+                                                            <span class="block text-xs text-slate-500">Equipo Norte</span>
+                                                    </td>
+                        <td class="table-cell">San Isidro</td>
+                        <td class="table-cell">Empleado Norte</td>
+                        <td class="table-cell whitespace-nowrap">
+                            09/10/2026
+                            <span class="block text-xs text-slate-500">al 18/10/2026</span>
+                        </td>
+                        <td class="table-cell">
+                            <span class="badge bg-rose-600 text-white">No completada</span>
+                                                    </td>
+                    </tr>
+                                                        <tr class="bg-rose-100 shadow-[inset_4px_0_0_var(--color-rose-600)] hover:bg-rose-100">
+                                                    <td class="table-cell">
+                                                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/28/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/28/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="sin_marcar">
+        <button type="submit" role="checkbox" aria-checked="true"
+                aria-label="Quitar No completada"
+                title="No completada · tocar para quitar la marca"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-rose-600 bg-rose-600 text-white">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                                            </td>
+                                                <td class="table-cell whitespace-nowrap">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/28" class="font-mono text-sm font-semibold hover:text-brand-600 text-rose-900">ID1.0016</a>
+                        </td>
+                        <td class="table-cell">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/28" class="font-medium hover:text-brand-600 text-rose-900">Entrega de material</a>
+                                                            <span class="block text-xs text-slate-500">Equipo Norte</span>
+                                                    </td>
+                        <td class="table-cell">San Miguel</td>
+                        <td class="table-cell">Lucía Hernández</td>
+                        <td class="table-cell whitespace-nowrap">
+                            14/10/2026
+                            <span class="block text-xs text-slate-500">al 18/10/2026</span>
+                        </td>
+                        <td class="table-cell">
+                            <span class="badge bg-rose-600 text-white">No completada</span>
+                                                            <span class="mt-1 block text-xs text-slate-500">Cargada por el empleado</span>
+                                                    </td>
+                    </tr>
+                                                        <tr class="bg-rose-100 shadow-[inset_4px_0_0_var(--color-rose-600)] hover:bg-rose-100">
+                                                    <td class="table-cell">
+                                                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/63/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/63/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="sin_marcar">
+        <button type="submit" role="checkbox" aria-checked="true"
+                aria-label="Quitar No completada"
+                title="No completada · tocar para quitar la marca"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-rose-600 bg-rose-600 text-white">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                                            </td>
+                                                <td class="table-cell whitespace-nowrap">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/63" class="font-mono text-sm font-semibold hover:text-brand-600 text-rose-900">ID1.0027</a>
+                        </td>
+                        <td class="table-cell">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/63" class="font-medium hover:text-brand-600 text-rose-900">Reporte de incidencias</a>
+                                                            <span class="block text-xs text-slate-500">Equipo Norte</span>
+                                                    </td>
+                        <td class="table-cell">Los Pinos</td>
+                        <td class="table-cell">Diego Ramírez</td>
+                        <td class="table-cell whitespace-nowrap">
+                            08/11/2026
+                            <span class="block text-xs text-slate-500">al 09/11/2026</span>
+                        </td>
+                        <td class="table-cell">
+                            <span class="badge bg-rose-600 text-white">No completada</span>
+                                                            <span class="mt-1 block text-xs text-slate-500">Cargada por el empleado</span>
+                                                    </td>
+                    </tr>
+                                                        <tr class="bg-rose-100 shadow-[inset_4px_0_0_var(--color-rose-600)] hover:bg-rose-100">
+                                                    <td class="table-cell">
+                                                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/65/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/65/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="sin_marcar">
+        <button type="submit" role="checkbox" aria-checked="true"
+                aria-label="Quitar No completada"
+                title="No completada · tocar para quitar la marca"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-rose-600 bg-rose-600 text-white">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                                            </td>
+                                                <td class="table-cell whitespace-nowrap">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/65" class="font-mono text-sm font-semibold hover:text-brand-600 text-rose-900">ID1.0028</a>
+                        </td>
+                        <td class="table-cell">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/65" class="font-medium hover:text-brand-600 text-rose-900">Evento comunitario</a>
+                                                            <span class="block text-xs text-slate-500">Equipo Norte</span>
+                                                    </td>
+                        <td class="table-cell">San Miguel</td>
+                        <td class="table-cell">Lucía Hernández</td>
+                        <td class="table-cell whitespace-nowrap">
+                            07/11/2026
+                            <span class="block text-xs text-slate-500">al 10/11/2026</span>
+                        </td>
+                        <td class="table-cell">
+                            <span class="badge bg-rose-600 text-white">No completada</span>
+                                                            <span class="mt-1 block text-xs text-slate-500">Cargada por el empleado</span>
+                                                    </td>
+                    </tr>
+                                                        <tr class="bg-rose-100 shadow-[inset_4px_0_0_var(--color-rose-600)] hover:bg-rose-100">
+                                                    <td class="table-cell">
+                                                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/79/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/79/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="sin_marcar">
+        <button type="submit" role="checkbox" aria-checked="true"
+                aria-label="Quitar No completada"
+                title="No completada · tocar para quitar la marca"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-rose-600 bg-rose-600 text-white">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                                            </td>
+                                                <td class="table-cell whitespace-nowrap">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/79" class="font-mono text-sm font-semibold hover:text-brand-600 text-rose-900">ID1.0039</a>
+                        </td>
+                        <td class="table-cell">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/79" class="font-medium hover:text-brand-600 text-rose-900">Reunión vecinal</a>
+                                                            <span class="block text-xs text-slate-500">Equipo Norte</span>
+                                                    </td>
+                        <td class="table-cell">San Isidro</td>
+                        <td class="table-cell">Empleado Norte</td>
+                        <td class="table-cell whitespace-nowrap">
+                            11/11/2026
+                            <span class="block text-xs text-slate-500">al 13/11/2026</span>
+                        </td>
+                        <td class="table-cell">
+                            <span class="badge bg-rose-600 text-white">No completada</span>
+                                                    </td>
+                    </tr>
+                                                        <tr class="bg-rose-100 shadow-[inset_4px_0_0_var(--color-rose-600)] hover:bg-rose-100">
+                                                    <td class="table-cell">
+                                                                    <div class="flex items-center gap-1.5">
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/72/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="concluido">
+        <button type="submit" role="checkbox" aria-checked="false"
+                aria-label="Marcar como concluido"
+                title="Marcar como concluido (verde)"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-1 border-slate-300 bg-white text-transparent hover:border-emerald-500 hover:text-emerald-500">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+        </button>
+    </form>
+
+    
+    <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/72/marcar">
+        <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">        <input type="hidden" name="marca" value="sin_marcar">
+        <button type="submit" role="checkbox" aria-checked="true"
+                aria-label="Quitar No completada"
+                title="No completada · tocar para quitar la marca"
+                class="grid size-7 place-items-center rounded-md border-2 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500 focus-visible:ring-offset-1 border-rose-600 bg-rose-600 text-white">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
+        </button>
+    </form>
+</div>
+                                                            </td>
+                                                <td class="table-cell whitespace-nowrap">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/72" class="font-mono text-sm font-semibold hover:text-brand-600 text-rose-900">ID1.0034</a>
+                        </td>
+                        <td class="table-cell">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities/72" class="font-medium hover:text-brand-600 text-rose-900">Reunión vecinal</a>
+                                                            <span class="block text-xs text-slate-500">Equipo Norte</span>
+                                                    </td>
+                        <td class="table-cell">La Esperanza</td>
+                        <td class="table-cell">Fernanda Torres</td>
+                        <td class="table-cell whitespace-nowrap">
+                            09/11/2026
+                            <span class="block text-xs text-slate-500">al 14/11/2026</span>
+                        </td>
+                        <td class="table-cell">
+                            <span class="badge bg-rose-600 text-white">No completada</span>
+                                                            <span class="mt-1 block text-xs text-slate-500">Cargada por el empleado</span>
+                                                    </td>
+                    </tr>
+                            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-5"><nav role="navigation" aria-label="Navegación de páginas">
+
+        <div class="flex gap-2 items-center justify-between sm:hidden">
+
+                            <span class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 cursor-not-allowed leading-5 rounded-md dark:text-gray-300 dark:bg-gray-700 dark:border-gray-600">
+                    &laquo; Anterior
+                </span>
+            
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities?page=2" rel="next" class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-800 bg-white border border-gray-300 leading-5 rounded-md hover:text-gray-700 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-800 transition ease-in-out duration-150 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200 dark:focus:border-blue-700 dark:active:bg-gray-700 dark:active:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-900 dark:hover:text-gray-200">
+                    Siguiente &raquo;
+                </a>
+            
+        </div>
+
+        <div class="hidden sm:flex-1 sm:flex sm:gap-2 sm:items-center sm:justify-between">
+
+            <div>
+                <p class="text-sm text-gray-700 leading-5 dark:text-gray-600">
+                    Mostrando
+                                            <span class="font-medium">1</span>
+                        a
+                        <span class="font-medium">15</span>
+                                        de
+                    <span class="font-medium">29</span>
+                    resultados
+                </p>
+            </div>
+
+            <div>
+                <span class="inline-flex rtl:flex-row-reverse shadow-sm rounded-md">
+
+                    
+                                            <span aria-disabled="true" aria-label="&amp;laquo; Anterior">
+                            <span class="inline-flex items-center px-2 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 cursor-not-allowed rounded-l-md leading-5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400" aria-hidden="true">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                </svg>
+                            </span>
+                        </span>
+                    
+                    
+                                            
+                        
+                        
+                                                                                                                        <span aria-current="page">
+                                        <span class="inline-flex items-center px-4 py-2 -ml-px text-sm font-medium text-gray-700 bg-gray-200 border border-gray-300 cursor-default leading-5 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-300">1</span>
+                                    </span>
+                                                                                                                                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities?page=2" class="inline-flex items-center px-4 py-2 -ml-px text-sm font-medium text-gray-700 bg-white border border-gray-300 leading-5 hover:text-gray-700 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-700 transition ease-in-out duration-150 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:text-gray-300 dark:active:bg-gray-700 dark:focus:border-blue-800 hover:bg-gray-100 dark:hover:bg-gray-900" aria-label="Ir a la página 2">
+                                        2
+                                    </a>
+                                                                                                        
+                    
+                                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities?page=2" rel="next" class="inline-flex items-center px-2 py-2 -ml-px text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-r-md leading-5 hover:text-gray-400 focus:outline-none focus:ring ring-gray-300 focus:border-blue-300 active:bg-gray-100 active:text-gray-500 transition ease-in-out duration-150 dark:bg-gray-800 dark:border-gray-600 dark:active:bg-gray-700 dark:focus:border-blue-800 dark:text-gray-300 dark:hover:bg-gray-900 dark:hover:text-gray-300" aria-label="Siguiente &amp;raquo;">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                            </svg>
+                        </a>
+                                    </span>
+            </div>
+        </div>
+    </nav>
+</div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

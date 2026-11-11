@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#1d1d1b">
+    <title>Catálogos · Sistema de Auditorías</title>
+    <link rel="icon" href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,600;1,8..60,600&display=swap" rel="stylesheet">
+    <link rel="preload" as="style" href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/build/assets/app-us-fyaJe.css" /><link rel="modulepreload" as="script" href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/build/assets/app-Buj5iI_6.js" /><link rel="stylesheet" href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/build/assets/app-us-fyaJe.css" /><script type="module" src="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/build/assets/app-Buj5iI_6.js"></script></head>
+<body class="min-h-screen bg-slate-100 font-sans text-slate-900 antialiased">
+
+<div class="lg:flex">
+    
+    <aside class="bg-ink text-white print:hidden lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-64 lg:shrink-0 lg:flex-col">
+        <div class="flex items-center justify-between px-4 py-4 lg:px-5 lg:py-6">
+            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev" class="flex items-center gap-2">
+                <img src="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/images/logo.svg" alt="WeAdvise" class="h-7 w-auto">
+                <span class="text-sm font-semibold leading-tight">Sistema de Auditorías</span>
+            </a>
+            <label for="nav-toggle" class="cursor-pointer rounded-md p-2 hover:bg-white/10 lg:hidden" aria-label="Abrir menú">
+                <svg class="size-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </label>
+        </div>
+
+        <input type="checkbox" id="nav-toggle" class="peer hidden">
+        <nav class="hidden flex-1 flex-col gap-1 px-3 pb-4 peer-checked:flex lg:flex">
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/dashboard" class="nav-link">
+                    <svg class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+                    Dashboard
+                </a>
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/activities" class="nav-link">
+                    <svg class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                    Actividades
+                </a>
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/calendario" class="nav-link">
+                    <svg class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 3v3m8-3v3M4 9h16M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1zm3 8h2m3 0h2m-7 3h2"/></svg>
+                    Calendario
+                </a>
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/asistencia" class="nav-link">
+                    <svg class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z"/></svg>
+                    Asistencia
+                </a>
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/users" class="nav-link">
+                    <svg class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m22 0v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                    Usuarios
+                </a>
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/teams" class="nav-link">
+                    <svg class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 7h18M3 12h18M3 17h18"/></svg>
+                    Equipos
+                </a>
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/campanas" class="nav-link">
+                    <svg class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 21V4m0 0h11l-1.5 4L15 12H4"/></svg>
+                    Campañas
+                </a>
+                            <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos" class="nav-link nav-link-active">
+                    <svg class="size-5 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h3l2 2h7a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm4 6h8m-8 4h5"/></svg>
+                    Catálogos
+                </a>
+            
+            <div class="mt-4 border-t border-white/10 pt-4 lg:mt-auto">
+                <a href="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/perfil" class="flex items-center gap-3 rounded-lg px-3 py-2 hover:bg-white/10">
+                    <span class="grid size-8 place-items-center rounded-full bg-white/15 text-xs font-semibold">AG</span>
+                    <span class="min-w-0">
+                        <span class="block truncate text-sm font-medium">Administrador General</span>
+                        <span class="block text-xs text-slate-300">Administrador</span>
+                    </span>
+                </a>
+                <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/logout" class="mt-1">
+                    <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                    <button class="nav-link w-full">
+                        <svg class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                        Cerrar sesión
+                    </button>
+                </form>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-10 lg:py-8 print:p-0">
+        <div class="mx-auto max-w-7xl print:max-w-none">
+                            <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between print:hidden">
+                        <div>
+        <h1 class="text-2xl font-semibold">Catálogos</h1>
+        <p class="text-sm text-slate-500">Las opciones que aparecen al cargar una actividad.</p>
+    </div>
+                </div>
+            
+            
+            
+                <div class="grid gap-6 xl:grid-cols-2">
+                                <section class="card overflow-hidden">
+                <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+                    <h2 class="font-semibold">Tipos de actividad</h2>
+                    <span class="text-sm text-slate-500">8 activos</span>
+                </div>
+
+                <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/tipos" class="flex gap-2 border-b border-slate-200 bg-slate-50 px-5 py-4">
+                    <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                    <input name="name" required maxlength="120" placeholder="Ej. Visita domiciliaria" class="input"
+                           value="" aria-label="Nuevo elemento de tipos de actividad">
+                    <button class="btn btn-primary shrink-0">Agregar</button>
+                </form>
+                
+                <ul class="divide-y divide-slate-100">
+                                            <li class="flex flex-wrap items-center gap-3 px-5 py-3">
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/tipos/5" class="flex min-w-0 flex-1 items-center gap-2">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input name="name" value="Capacitación" required maxlength="120" aria-label="Nombre"
+                                       class="input py-1.5">
+                                <button class="btn btn-secondary shrink-0 px-3 py-1.5 text-xs">Guardar</button>
+                            </form>
+                            <span class="w-24 text-right text-xs text-slate-500 tabular-nums">6 actividades</span>
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/tipos/5">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input type="hidden" name="active" value="0">
+                                <button class="badge cursor-pointer bg-emerald-100 text-emerald-800"
+                                        title="Desactivar">Activo</button>
+                            </form>
+                                                    </li>
+                                            <li class="flex flex-wrap items-center gap-3 px-5 py-3">
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/tipos/4" class="flex min-w-0 flex-1 items-center gap-2">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input name="name" value="Entrega de material" required maxlength="120" aria-label="Nombre"
+                                       class="input py-1.5">
+                                <button class="btn btn-secondary shrink-0 px-3 py-1.5 text-xs">Guardar</button>
+                            </form>
+                            <span class="w-24 text-right text-xs text-slate-500 tabular-nums">11 actividades</span>
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/tipos/4">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input type="hidden" name="active" value="0">
+                                <button class="badge cursor-pointer bg-emerald-100 text-emerald-800"
+                                        title="Desactivar">Activo</button>
+                            </form>
+                                                    </li>
+                                            <li class="flex flex-wrap items-center gap-3 px-5 py-3">
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/tipos/7" class="flex min-w-0 flex-1 items-center gap-2">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input name="name" value="Evento comunitario" required maxlength="120" aria-label="Nombre"
+                                       class="input py-1.5">
+                                <button class="btn btn-secondary shrink-0 px-3 py-1.5 text-xs">Guardar</button>
+                            </form>
+                            <span class="w-24 text-right text-xs text-slate-500 tabular-nums">13 actividades</span>
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/tipos/7">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input type="hidden" name="active" value="0">
+                                <button class="badge cursor-pointer bg-emerald-100 text-emerald-800"
+                                        title="Desactivar">Activo</button>
+                            </form>
+                                                    </li>
+                                            <li class="flex flex-wrap items-center gap-3 px-5 py-3">
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/tipos/6" class="flex min-w-0 flex-1 items-center gap-2">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input name="name" value="Levantamiento de encuesta" required maxlength="120" aria-label="Nombre"
+                                       class="input py-1.5">
+                                <button class="btn btn-secondary shrink-0 px-3 py-1.5 text-xs">Guardar</button>
+                            </form>
+                            <span class="w-24 text-right text-xs text-slate-500 tabular-nums">13 actividades</span>
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/tipos/6">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input type="hidden" name="active" value="0">
+                                <button class="badge cursor-pointer bg-emerald-100 text-emerald-800"
+                                        title="Desactivar">Activo</button>
+                            </form>
+                                                    </li>
+                                            <li class="flex flex-wrap items-center gap-3 px-5 py-3">
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/tipos/3" class="flex min-w-0 flex-1 items-center gap-2">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input name="name" value="Recorrido de zona" required maxlength="120" aria-label="Nombre"
+                                       class="input py-1.5">
+                                <button class="btn btn-secondary shrink-0 px-3 py-1.5 text-xs">Guardar</button>
+                            </form>
+                            <span class="w-24 text-right text-xs text-slate-500 tabular-nums">8 actividades</span>
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/tipos/3">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input type="hidden" name="active" value="0">
+                                <button class="badge cursor-pointer bg-emerald-100 text-emerald-800"
+                                        title="Desactivar">Activo</button>
+                            </form>
+                                                    </li>
+                                            <li class="flex flex-wrap items-center gap-3 px-5 py-3">
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/tipos/8" class="flex min-w-0 flex-1 items-center gap-2">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input name="name" value="Reporte de incidencias" required maxlength="120" aria-label="Nombre"
+                                       class="input py-1.5">
+                                <button class="btn btn-secondary shrink-0 px-3 py-1.5 text-xs">Guardar</button>
+                            </form>
+                            <span class="w-24 text-right text-xs text-slate-500 tabular-nums">10 actividades</span>
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/tipos/8">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input type="hidden" name="active" value="0">
+                                <button class="badge cursor-pointer bg-emerald-100 text-emerald-800"
+                                        title="Desactivar">Activo</button>
+                            </form>
+                                                    </li>
+                                            <li class="flex flex-wrap items-center gap-3 px-5 py-3">
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/tipos/2" class="flex min-w-0 flex-1 items-center gap-2">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input name="name" value="Reunión vecinal" required maxlength="120" aria-label="Nombre"
+                                       class="input py-1.5">
+                                <button class="btn btn-secondary shrink-0 px-3 py-1.5 text-xs">Guardar</button>
+                            </form>
+                            <span class="w-24 text-right text-xs text-slate-500 tabular-nums">4 actividades</span>
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/tipos/2">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input type="hidden" name="active" value="0">
+                                <button class="badge cursor-pointer bg-emerald-100 text-emerald-800"
+                                        title="Desactivar">Activo</button>
+                            </form>
+                                                    </li>
+                                            <li class="flex flex-wrap items-center gap-3 px-5 py-3">
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/tipos/1" class="flex min-w-0 flex-1 items-center gap-2">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input name="name" value="Visita domiciliaria" required maxlength="120" aria-label="Nombre"
+                                       class="input py-1.5">
+                                <button class="btn btn-secondary shrink-0 px-3 py-1.5 text-xs">Guardar</button>
+                            </form>
+                            <span class="w-24 text-right text-xs text-slate-500 tabular-nums">13 actividades</span>
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/tipos/1">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input type="hidden" name="active" value="0">
+                                <button class="badge cursor-pointer bg-emerald-100 text-emerald-800"
+                                        title="Desactivar">Activo</button>
+                            </form>
+                                                    </li>
+                                            <li class="flex flex-wrap items-center gap-3 px-5 py-3 bg-slate-50/70">
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/tipos/9" class="flex min-w-0 flex-1 items-center gap-2">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input name="name" value="Volanteo" required maxlength="120" aria-label="Nombre"
+                                       class="input py-1.5 text-slate-400 line-through">
+                                <button class="btn btn-secondary shrink-0 px-3 py-1.5 text-xs">Guardar</button>
+                            </form>
+                            <span class="w-24 text-right text-xs text-slate-500 tabular-nums">0 actividades</span>
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/tipos/9">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input type="hidden" name="active" value="1">
+                                <button class="badge cursor-pointer bg-slate-200 text-slate-600"
+                                        title="Activar">Inactivo</button>
+                            </form>
+                                                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/tipos/9" onsubmit="return confirm('¿Eliminar «Volanteo»?')">
+                                    <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                    <input type="hidden" name="_method" value="DELETE">                                    <button class="text-xs font-medium text-rose-600 hover:underline">Eliminar</button>
+                                </form>
+                                                    </li>
+                                    </ul>
+            </section>
+                                <section class="card overflow-hidden">
+                <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+                    <h2 class="font-semibold">Comunidades</h2>
+                    <span class="text-sm text-slate-500">10 activos</span>
+                </div>
+
+                <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/comunidades" class="flex gap-2 border-b border-slate-200 bg-slate-50 px-5 py-4">
+                    <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                    <input name="name" required maxlength="120" placeholder="Ej. San Isidro" class="input"
+                           value="" aria-label="Nuevo elemento de comunidades">
+                    <button class="btn btn-primary shrink-0">Agregar</button>
+                </form>
+                
+                <ul class="divide-y divide-slate-100">
+                                            <li class="flex flex-wrap items-center gap-3 px-5 py-3">
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/comunidades/8" class="flex min-w-0 flex-1 items-center gap-2">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input name="name" value="Centro" required maxlength="120" aria-label="Nombre"
+                                       class="input py-1.5">
+                                <button class="btn btn-secondary shrink-0 px-3 py-1.5 text-xs">Guardar</button>
+                            </form>
+                            <span class="w-24 text-right text-xs text-slate-500 tabular-nums">6 actividades</span>
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/comunidades/8">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input type="hidden" name="active" value="0">
+                                <button class="badge cursor-pointer bg-emerald-100 text-emerald-800"
+                                        title="Desactivar">Activo</button>
+                            </form>
+                                                    </li>
+                                            <li class="flex flex-wrap items-center gap-3 px-5 py-3">
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/comunidades/2" class="flex min-w-0 flex-1 items-center gap-2">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input name="name" value="El Mirador" required maxlength="120" aria-label="Nombre"
+                                       class="input py-1.5">
+                                <button class="btn btn-secondary shrink-0 px-3 py-1.5 text-xs">Guardar</button>
+                            </form>
+                            <span class="w-24 text-right text-xs text-slate-500 tabular-nums">7 actividades</span>
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/comunidades/2">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input type="hidden" name="active" value="0">
+                                <button class="badge cursor-pointer bg-emerald-100 text-emerald-800"
+                                        title="Desactivar">Activo</button>
+                            </form>
+                                                    </li>
+                                            <li class="flex flex-wrap items-center gap-3 px-5 py-3">
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/comunidades/3" class="flex min-w-0 flex-1 items-center gap-2">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input name="name" value="La Esperanza" required maxlength="120" aria-label="Nombre"
+                                       class="input py-1.5">
+                                <button class="btn btn-secondary shrink-0 px-3 py-1.5 text-xs">Guardar</button>
+                            </form>
+                            <span class="w-24 text-right text-xs text-slate-500 tabular-nums">6 actividades</span>
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/comunidades/3">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input type="hidden" name="active" value="0">
+                                <button class="badge cursor-pointer bg-emerald-100 text-emerald-800"
+                                        title="Desactivar">Activo</button>
+                            </form>
+                                                    </li>
+                                            <li class="flex flex-wrap items-center gap-3 px-5 py-3">
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/comunidades/10" class="flex min-w-0 flex-1 items-center gap-2">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input name="name" value="La Joya" required maxlength="120" aria-label="Nombre"
+                                       class="input py-1.5">
+                                <button class="btn btn-secondary shrink-0 px-3 py-1.5 text-xs">Guardar</button>
+                            </form>
+                            <span class="w-24 text-right text-xs text-slate-500 tabular-nums">11 actividades</span>
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/comunidades/10">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input type="hidden" name="active" value="0">
+                                <button class="badge cursor-pointer bg-emerald-100 text-emerald-800"
+                                        title="Desactivar">Activo</button>
+                            </form>
+                                                    </li>
+                                            <li class="flex flex-wrap items-center gap-3 px-5 py-3">
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/comunidades/7" class="flex min-w-0 flex-1 items-center gap-2">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input name="name" value="Lomas del Sol" required maxlength="120" aria-label="Nombre"
+                                       class="input py-1.5">
+                                <button class="btn btn-secondary shrink-0 px-3 py-1.5 text-xs">Guardar</button>
+                            </form>
+                            <span class="w-24 text-right text-xs text-slate-500 tabular-nums">7 actividades</span>
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/comunidades/7">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input type="hidden" name="active" value="0">
+                                <button class="badge cursor-pointer bg-emerald-100 text-emerald-800"
+                                        title="Desactivar">Activo</button>
+                            </form>
+                                                    </li>
+                                            <li class="flex flex-wrap items-center gap-3 px-5 py-3">
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/comunidades/5" class="flex min-w-0 flex-1 items-center gap-2">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input name="name" value="Los Pinos" required maxlength="120" aria-label="Nombre"
+                                       class="input py-1.5">
+                                <button class="btn btn-secondary shrink-0 px-3 py-1.5 text-xs">Guardar</button>
+                            </form>
+                            <span class="w-24 text-right text-xs text-slate-500 tabular-nums">6 actividades</span>
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/comunidades/5">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input type="hidden" name="active" value="0">
+                                <button class="badge cursor-pointer bg-emerald-100 text-emerald-800"
+                                        title="Desactivar">Activo</button>
+                            </form>
+                                                    </li>
+                                            <li class="flex flex-wrap items-center gap-3 px-5 py-3">
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/comunidades/1" class="flex min-w-0 flex-1 items-center gap-2">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input name="name" value="San Isidro" required maxlength="120" aria-label="Nombre"
+                                       class="input py-1.5">
+                                <button class="btn btn-secondary shrink-0 px-3 py-1.5 text-xs">Guardar</button>
+                            </form>
+                            <span class="w-24 text-right text-xs text-slate-500 tabular-nums">7 actividades</span>
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/comunidades/1">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input type="hidden" name="active" value="0">
+                                <button class="badge cursor-pointer bg-emerald-100 text-emerald-800"
+                                        title="Desactivar">Activo</button>
+                            </form>
+                                                    </li>
+                                            <li class="flex flex-wrap items-center gap-3 px-5 py-3">
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/comunidades/9" class="flex min-w-0 flex-1 items-center gap-2">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input name="name" value="San Miguel" required maxlength="120" aria-label="Nombre"
+                                       class="input py-1.5">
+                                <button class="btn btn-secondary shrink-0 px-3 py-1.5 text-xs">Guardar</button>
+                            </form>
+                            <span class="w-24 text-right text-xs text-slate-500 tabular-nums">5 actividades</span>
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/comunidades/9">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input type="hidden" name="active" value="0">
+                                <button class="badge cursor-pointer bg-emerald-100 text-emerald-800"
+                                        title="Desactivar">Activo</button>
+                            </form>
+                                                    </li>
+                                            <li class="flex flex-wrap items-center gap-3 px-5 py-3">
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/comunidades/4" class="flex min-w-0 flex-1 items-center gap-2">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input name="name" value="Santa Cruz" required maxlength="120" aria-label="Nombre"
+                                       class="input py-1.5">
+                                <button class="btn btn-secondary shrink-0 px-3 py-1.5 text-xs">Guardar</button>
+                            </form>
+                            <span class="w-24 text-right text-xs text-slate-500 tabular-nums">8 actividades</span>
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/comunidades/4">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input type="hidden" name="active" value="0">
+                                <button class="badge cursor-pointer bg-emerald-100 text-emerald-800"
+                                        title="Desactivar">Activo</button>
+                            </form>
+                                                    </li>
+                                            <li class="flex flex-wrap items-center gap-3 px-5 py-3">
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/comunidades/6" class="flex min-w-0 flex-1 items-center gap-2">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input name="name" value="Valle Verde" required maxlength="120" aria-label="Nombre"
+                                       class="input py-1.5">
+                                <button class="btn btn-secondary shrink-0 px-3 py-1.5 text-xs">Guardar</button>
+                            </form>
+                            <span class="w-24 text-right text-xs text-slate-500 tabular-nums">15 actividades</span>
+                            <form method="POST" action="https://effective-trout-6vprwgw57qq5c4rgj-8000.app.github.dev/catalogos/comunidades/6">
+                                <input type="hidden" name="_token" value="9cAwU9foD9CrHtJhO5acxUYrPXqanRzxo9KzZWu9" autocomplete="off">                                <input type="hidden" name="_method" value="PATCH">                                <input type="hidden" name="active" value="0">
+                                <button class="badge cursor-pointer bg-emerald-100 text-emerald-800"
+                                        title="Desactivar">Activo</button>
+                            </form>
+                                                    </li>
+                                    </ul>
+            </section>
+            </div>
+    <p class="mt-4 text-sm text-slate-500">Un elemento que ya tiene actividades no se puede borrar; desactívalo para que deje de aparecer al cargar actividades sin perder el historial.</p>
+        </div>
+    </main>
+</div>
+</body>
+</html>
