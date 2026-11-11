@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#1d1d1b">
     <title>Iniciar sesión · {{ config('app.name') }}</title>
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,600;1,8..60,600&display=swap" rel="stylesheet">
@@ -13,8 +14,8 @@
 <body class="grid min-h-screen place-items-center bg-ink px-4 py-10 font-sans antialiased">
     <div class="w-full max-w-sm">
         <div class="mb-8 text-center text-white">
-            <span class="mx-auto mb-4 grid size-12 place-items-center rounded-xl bg-brand-500 text-lg font-bold">AC</span>
-            <h1 class="text-xl font-semibold">{{ config('app.name') }}</h1>
+            <img src="{{ asset('images/logo.svg') }}" alt="WeAdvise" class="mx-auto mb-6 h-16 w-auto">
+            <h1 class="text-2xl font-semibold">{{ config('app.name') }}</h1>
             <p class="mt-1 text-sm text-slate-300">Control de actividades y asistencia</p>
         </div>
 

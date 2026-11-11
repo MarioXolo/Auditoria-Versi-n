@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#1d1d1b">
     <title>@yield('title', 'Panel') · {{ config('app.name') }}</title>
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,600;1,8..60,600&display=swap" rel="stylesheet">
@@ -30,7 +31,7 @@
     <aside class="bg-ink text-white lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-64 lg:shrink-0 lg:flex-col">
         <div class="flex items-center justify-between px-4 py-4 lg:px-5 lg:py-6">
             <a href="{{ route('home') }}" class="flex items-center gap-2">
-                <span class="grid size-8 place-items-center rounded-lg bg-brand-500 text-sm font-bold">AC</span>
+                <img src="{{ asset('images/logo.svg') }}" alt="WeAdvise" class="h-7 w-auto">
                 <span class="text-sm font-semibold leading-tight">{{ config('app.name') }}</span>
             </a>
             <label for="nav-toggle" class="cursor-pointer rounded-md p-2 hover:bg-white/10 lg:hidden" aria-label="Abrir menú">
