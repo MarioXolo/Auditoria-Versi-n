@@ -18,8 +18,9 @@ class AppServiceProvider extends ServiceProvider
         // Fechas en español ("lunes 5 de noviembre")
         Carbon::setLocale(config('app.locale'));
 
-        // En producción, generar todas las URLs con HTTPS (la cámara del celular lo requiere)
-        if ($this->app->environment('production')) {
+        // En producción con HTTPS, generar todas las URLs con https (la cámara del celular lo requiere).
+        // Mientras el servidor solo tenga IP (sin certificado), se respeta http.
+        if ($this->app->environment('production') && str_starts_with((string) config('app.url'), 'https://')) {
             URL::forceScheme('https');
         }
 
