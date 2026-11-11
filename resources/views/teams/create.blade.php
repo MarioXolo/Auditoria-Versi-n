@@ -4,7 +4,7 @@
 
 @section('header')
     <div>
-        <a href="{{ route('teams.index') }}" class="text-sm text-stone-500 hover:text-stone-800">← Equipos</a>
+        <a href="{{ route('teams.index') }}" class="text-sm text-slate-500 hover:text-slate-800">← Equipos</a>
         <h1 class="mt-1 text-2xl font-semibold">Nuevo equipo</h1>
     </div>
 @endsection

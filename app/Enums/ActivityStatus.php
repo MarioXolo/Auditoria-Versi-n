@@ -26,7 +26,7 @@ enum ActivityStatus: string
             self::Pendiente => 'bg-amber-100 text-amber-800',
             self::EnProgreso => 'bg-sky-100 text-sky-800',
             self::Completada => 'bg-emerald-100 text-emerald-800',
-            self::Cancelada => 'bg-stone-200 text-stone-700',
+            self::Cancelada => 'bg-slate-200 text-slate-700',
         };
     }
 

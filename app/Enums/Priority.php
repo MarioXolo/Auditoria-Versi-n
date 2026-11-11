@@ -20,7 +20,7 @@ enum Priority: string
     public function badge(): string
     {
         return match ($this) {
-            self::Baja => 'bg-stone-100 text-stone-700',
+            self::Baja => 'bg-slate-100 text-slate-700',
             self::Media => 'bg-orange-100 text-orange-800',
             self::Alta => 'bg-rose-100 text-rose-800',
         };

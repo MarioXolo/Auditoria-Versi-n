@@ -4,7 +4,7 @@
 
 @section('header')
     <div>
-        <a href="{{ route('teams.index') }}" class="text-sm text-stone-500 hover:text-stone-800">← Equipos</a>
+        <a href="{{ route('teams.index') }}" class="text-sm text-slate-500 hover:text-slate-800">← Equipos</a>
         <h1 class="mt-1 text-2xl font-semibold">{{ $team->name }}</h1>
     </div>
 @endsection
@@ -22,11 +22,11 @@
 
         <aside class="space-y-6">
             <section class="card overflow-hidden">
-                <div class="border-b border-stone-200 px-5 py-4">
+                <div class="border-b border-slate-200 px-5 py-4">
                     <h2 class="font-semibold">Integrantes ({{ $team->members->count() }})</h2>
-                    <p class="text-xs text-stone-500">El administrador los asigna desde la edición de cada usuario.</p>
+                    <p class="text-xs text-slate-500">El administrador los asigna desde la edición de cada usuario.</p>
                 </div>
-                <ul class="divide-y divide-stone-100">
+                <ul class="divide-y divide-slate-100">
                     @forelse ($team->members as $member)
                         <li class="flex justify-between px-5 py-2.5 text-sm">
                             @if (auth()->user()->isAdmin())
@@ -34,10 +34,10 @@
                             @else
                                 <span>{{ $member->name }}</span>
                             @endif
-                            <span class="text-xs text-stone-500">{{ $member->role->label() }}</span>
+                            <span class="text-xs text-slate-500">{{ $member->role->label() }}</span>
                         </li>
                     @empty
-                        <li class="px-5 py-4 text-sm text-stone-500">Sin integrantes.</li>
+                        <li class="px-5 py-4 text-sm text-slate-500">Sin integrantes.</li>
                     @endforelse
                 </ul>
             </section>

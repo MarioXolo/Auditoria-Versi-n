@@ -5,7 +5,7 @@
 @section('header')
     <div>
         <h1 class="text-2xl font-semibold">{{ auth()->user()->isEmpleado() ? 'Mis actividades' : 'Actividades' }}</h1>
-        <p class="text-sm text-stone-500">{{ $activities->total() }} {{ $activities->total() === 1 ? 'actividad' : 'actividades' }}</p>
+        <p class="text-sm text-slate-500">{{ $activities->total() }} {{ $activities->total() === 1 ? 'actividad' : 'actividades' }}</p>
     </div>
     @can('create', \App\Models\Activity::class)
         <a href="{{ route('activities.create') }}" class="btn btn-primary">
@@ -56,7 +56,7 @@
                     <p class="font-medium">{{ $activity->title }}</p>
                     <span class="badge {{ $activity->status->badge() }}">{{ $activity->status->label() }}</span>
                 </div>
-                <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-stone-500">
+                <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
                     <span>{{ $activity->assignee?->name }}</span>
                     @if ($activity->due_date)
                         <span @class(['font-semibold text-rose-600' => $activity->isOverdue()])>Vence {{ $activity->due_date->format('d/m/Y') }}</span>
@@ -68,14 +68,14 @@
                 </div>
             </a>
         @empty
-            <div class="card p-8 text-center text-sm text-stone-500">No hay actividades con estos filtros.</div>
+            <div class="card p-8 text-center text-sm text-slate-500">No hay actividades con estos filtros.</div>
         @endforelse
     </div>
 
     {{-- Tabla en escritorio --}}
     <div class="card hidden overflow-hidden md:block">
-        <table class="min-w-full divide-y divide-stone-200">
-            <thead class="bg-stone-50">
+        <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50">
                 <tr>
                     <th class="table-head">Actividad</th>
                     <th class="table-head">Asignada a</th>
@@ -84,13 +84,13 @@
                     <th class="table-head">Estado</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-stone-100">
+            <tbody class="divide-y divide-slate-100">
                 @forelse ($activities as $activity)
-                    <tr class="hover:bg-stone-50">
+                    <tr class="hover:bg-slate-50">
                         <td class="table-cell">
-                            <a href="{{ route('activities.show', $activity) }}" class="font-medium text-stone-900 hover:text-brand-600">{{ $activity->title }}</a>
+                            <a href="{{ route('activities.show', $activity) }}" class="font-medium text-slate-900 hover:text-brand-600">{{ $activity->title }}</a>
                             @if ($activity->team)
-                                <span class="block text-xs text-stone-500">{{ $activity->team->name }}</span>
+                                <span class="block text-xs text-slate-500">{{ $activity->team->name }}</span>
                             @endif
                         </td>
                         <td class="table-cell">{{ $activity->assignee?->name }}</td>
@@ -121,7 +121,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="5" class="table-cell py-10 text-center text-stone-500">No hay actividades con estos filtros.</td></tr>
+                    <tr><td colspan="5" class="table-cell py-10 text-center text-slate-500">No hay actividades con estos filtros.</td></tr>
                 @endforelse
             </tbody>
         </table>

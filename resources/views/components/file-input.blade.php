@@ -16,12 +16,12 @@
     ];
 @endphp
 <div>
-    <label for="{{ $id }}" class="flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-stone-300 bg-stone-50 p-2 transition hover:border-brand-500 hover:bg-brand-50">
+    <label for="{{ $id }}" class="flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-slate-300 bg-slate-50 p-2 transition hover:border-brand-500 hover:bg-brand-50">
         <span class="btn btn-secondary pointer-events-none shrink-0">
             <svg class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="{{ $paths[$icon] ?? $paths['file'] }}"/></svg>
             {{ $button }}
         </span>
-        <span data-file-name class="min-w-0 truncate text-sm text-stone-500">{{ $empty }}</span>
+        <span data-file-name class="min-w-0 truncate text-sm text-slate-500">{{ $empty }}</span>
     </label>
     <input
         type="file"

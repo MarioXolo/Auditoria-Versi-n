@@ -4,7 +4,7 @@
 
 @section('header')
     <div>
-        <a href="{{ route('users.index') }}" class="text-sm text-stone-500 hover:text-stone-800">← Usuarios</a>
+        <a href="{{ route('users.index') }}" class="text-sm text-slate-500 hover:text-slate-800">← Usuarios</a>
         <h1 class="mt-1 text-2xl font-semibold">Nuevo usuario</h1>
     </div>
 @endsection

@@ -4,7 +4,7 @@
 
 @section('header')
     <div class="min-w-0">
-        <a href="{{ route('activities.index') }}" class="text-sm text-stone-500 hover:text-stone-800">← Actividades</a>
+        <a href="{{ route('activities.index') }}" class="text-sm text-slate-500 hover:text-slate-800">← Actividades</a>
         <h1 class="mt-1 text-2xl font-semibold break-words">{{ $activity->title }}</h1>
         <div class="mt-2 flex flex-wrap gap-2">
             <span class="badge {{ $activity->status->badge() }}">{{ $activity->status->label() }}</span>
@@ -35,29 +35,29 @@
     <div class="grid gap-6 lg:grid-cols-3">
         <div class="space-y-6 lg:col-span-2">
             <section class="card p-6">
-                <h2 class="text-sm font-semibold text-stone-500 uppercase">Descripción</h2>
-                <p class="mt-2 whitespace-pre-line text-stone-800">{{ $activity->description ?: 'Sin descripción.' }}</p>
+                <h2 class="text-sm font-semibold text-slate-500 uppercase">Descripción</h2>
+                <p class="mt-2 whitespace-pre-line text-slate-800">{{ $activity->description ?: 'Sin descripción.' }}</p>
             </section>
 
             @if ($activity->notes)
                 <section class="card p-6">
-                    <h2 class="text-sm font-semibold text-stone-500 uppercase">Notas de seguimiento</h2>
-                    <p class="mt-2 whitespace-pre-line text-stone-800">{{ $activity->notes }}</p>
+                    <h2 class="text-sm font-semibold text-slate-500 uppercase">Notas de seguimiento</h2>
+                    <p class="mt-2 whitespace-pre-line text-slate-800">{{ $activity->notes }}</p>
                 </section>
             @endif
 
             <section class="card p-6">
-                <h2 class="text-sm font-semibold text-stone-500 uppercase">Evidencia</h2>
+                <h2 class="text-sm font-semibold text-slate-500 uppercase">Evidencia</h2>
                 @if ($activity->evidence_path)
                     @if (\Illuminate\Support\Str::endsWith(strtolower($activity->evidence_path), '.pdf'))
                         <a href="{{ route('activities.evidence', $activity) }}" target="_blank" class="btn btn-secondary mt-3">Abrir PDF</a>
                     @else
                         <a href="{{ route('activities.evidence', $activity) }}" target="_blank">
-                            <img src="{{ route('activities.evidence', $activity) }}" alt="Evidencia" class="mt-3 max-h-96 rounded-lg border border-stone-200">
+                            <img src="{{ route('activities.evidence', $activity) }}" alt="Evidencia" class="mt-3 max-h-96 rounded-lg border border-slate-200">
                         </a>
                     @endif
                 @else
-                    <p class="mt-2 text-sm text-stone-500">Aún no se ha cargado evidencia.</p>
+                    <p class="mt-2 text-sm text-slate-500">Aún no se ha cargado evidencia.</p>
                 @endif
             </section>
         </div>
@@ -68,7 +68,7 @@
                 'card p-5',
                 'border-violet-300 ring-2 ring-violet-100' => $activity->isPendingValidation(),
             ])>
-                <h2 class="text-sm font-semibold text-stone-500 uppercase">Validación</h2>
+                <h2 class="text-sm font-semibold text-slate-500 uppercase">Validación</h2>
 
                 @if ($activity->isPendingValidation())
                     <p class="mt-2 text-sm">Se marcó como completada el {{ $activity->completed_at?->format('d/m/Y H:i') }} y espera que se confirme que realmente se concluyó.</p>
@@ -84,7 +84,7 @@
                                 <button name="decision" value="rechazar" class="btn btn-danger">Rechazar</button>
                                 <button name="decision" value="validar" class="btn btn-primary">Validar</button>
                             </div>
-                            <p class="text-xs text-stone-500">Si la rechazas, regresa a "En progreso" con tu comentario.</p>
+                            <p class="text-xs text-slate-500">Si la rechazas, regresa a "En progreso" con tu comentario.</p>
                         </form>
                     @else
                         <p class="mt-3 rounded-lg bg-violet-50 px-3 py-2 text-xs text-violet-800">
@@ -98,7 +98,7 @@
                             <p class="font-medium text-emerald-900">Validada por {{ $activity->validator?->name }}</p>
                             <p class="text-xs text-emerald-800">{{ $activity->validated_at?->format('d/m/Y H:i') }}</p>
                             @if ($activity->validation_notes)
-                                <p class="mt-2 whitespace-pre-line text-stone-700">{{ $activity->validation_notes }}</p>
+                                <p class="mt-2 whitespace-pre-line text-slate-700">{{ $activity->validation_notes }}</p>
                             @endif
                         </div>
                     </div>
@@ -106,15 +106,15 @@
                     <div class="mt-3 rounded-lg bg-rose-50 px-3 py-3 text-sm">
                         <p class="font-medium text-rose-900">Rechazada por {{ $activity->validator?->name }}</p>
                         <p class="text-xs text-rose-800">{{ $activity->validated_at?->format('d/m/Y H:i') }}</p>
-                        <p class="mt-2 whitespace-pre-line text-stone-700">{{ $activity->validation_notes }}</p>
-                        <p class="mt-2 text-xs text-stone-500">Al volver a marcarla como completada, quedará otra vez por validar.</p>
+                        <p class="mt-2 whitespace-pre-line text-slate-700">{{ $activity->validation_notes }}</p>
+                        <p class="mt-2 text-xs text-slate-500">Al volver a marcarla como completada, quedará otra vez por validar.</p>
                     </div>
                 @else
-                    <p class="mt-2 text-sm text-stone-500">Cuando la actividad se marque como completada, quedará pendiente de validación.</p>
+                    <p class="mt-2 text-sm text-slate-500">Cuando la actividad se marque como completada, quedará pendiente de validación.</p>
                 @endif
             </section>
 
-            <dl class="card divide-y divide-stone-100 text-sm">
+            <dl class="card divide-y divide-slate-100 text-sm">
                 @foreach ([
                     'Asignada a' => $activity->assignee?->name,
                     'Asignada por' => $activity->creator?->name,
@@ -124,7 +124,7 @@
                     'Completada' => $activity->completed_at?->format('d/m/Y H:i') ?? '—',
                 ] as $label => $value)
                     <div class="flex justify-between gap-4 px-5 py-3">
-                        <dt class="text-stone-500">{{ $label }}</dt>
+                        <dt class="text-slate-500">{{ $label }}</dt>
                         <dd class="text-right font-medium">{{ $value }}</dd>
                     </div>
                 @endforeach

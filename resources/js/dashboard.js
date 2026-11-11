@@ -7,19 +7,19 @@ Chart.register(BarController, LineController, DoughnutController, BarElement, Li
     CategoryScale, LinearScale, Tooltip, Legend, Filler);
 
 const C = {
-    brand: '#2f7f77',
-    brandSoft: 'rgba(47,127,119,.15)',
-    ink: '#10302c',
+    brand: '#0d60e7',
+    brandSoft: 'rgba(13,96,231,.14)',
+    ink: '#1d1d1b',
     amber: '#d97706',
     sky: '#0284c7',
     green: '#059669',
-    stone: '#a8a29e',
+    stone: '#94a3b8',
     rose: '#e11d48',
-    grid: 'rgba(120,113,108,.15)',
-    text: '#57534e',
+    grid: 'rgba(100,116,139,.15)',
+    text: '#475569',
 };
 
-Chart.defaults.font.family = "'Instrument Sans', ui-sans-serif, system-ui, sans-serif";
+Chart.defaults.font.family = "'Inter', ui-sans-serif, system-ui, sans-serif";
 Chart.defaults.font.size = 11;
 Chart.defaults.color = C.text;
 Chart.defaults.plugins.legend.labels.boxWidth = 10;
@@ -46,7 +46,7 @@ const goalLine = (value, label) => ({
         ctx.lineTo(chartArea.right, y);
         ctx.stroke();
         ctx.fillStyle = C.rose;
-        ctx.font = '600 10px Instrument Sans, sans-serif';
+        ctx.font = '600 10px Inter, sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText(label, chartArea.left + 4, y + 12);
         ctx.restore();
@@ -104,7 +104,7 @@ if (data) {
             datasets: [
                 { label: 'Cumplimiento', data: data.teams.map((t) => t.cumplimiento), backgroundColor: C.brand, borderRadius: 3 },
                 { label: 'A tiempo', data: data.teams.map((t) => t.a_tiempo), backgroundColor: C.ink, borderRadius: 3 },
-                { label: 'Asistencia', data: data.teams.map((t) => t.asistencia), backgroundColor: '#8fd3c8', borderRadius: 3 },
+                { label: 'Asistencia', data: data.teams.map((t) => t.asistencia), backgroundColor: '#93b4f5', borderRadius: 3 },
             ],
         },
         options: { scales: { y: pctAxis, x: noGrid }, plugins: { legend: { position: 'bottom' } } },

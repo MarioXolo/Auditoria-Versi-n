@@ -4,7 +4,7 @@
 
 @section('header')
     <div>
-        <a href="{{ route('activities.index') }}" class="text-sm text-stone-500 hover:text-stone-800">← Actividades</a>
+        <a href="{{ route('activities.index') }}" class="text-sm text-slate-500 hover:text-slate-800">← Actividades</a>
         <h1 class="mt-1 text-2xl font-semibold">Nueva actividad</h1>
     </div>
 @endsection

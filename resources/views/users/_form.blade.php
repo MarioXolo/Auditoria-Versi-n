@@ -23,7 +23,7 @@
         </select>
         @if ($isSelf)
             <input type="hidden" name="role" value="{{ $user->role->value }}">
-            <p class="mt-1 text-xs text-stone-500">No puedes cambiar tu propio rol.</p>
+            <p class="mt-1 text-xs text-slate-500">No puedes cambiar tu propio rol.</p>
         @endif
     </div>
     <div>
@@ -38,7 +38,7 @@
     <div class="flex items-end">
         <label class="flex items-center gap-2 text-sm">
             <input type="hidden" name="active" value="0">
-            <input type="checkbox" name="active" value="1" @checked(old('active', $user->active ?? true)) @disabled($isSelf) class="size-4 rounded border-stone-300">
+            <input type="checkbox" name="active" value="1" @checked(old('active', $user->active ?? true)) @disabled($isSelf) class="size-4 rounded border-slate-300">
             Usuario activo
         </label>
         @if ($isSelf)
@@ -46,10 +46,10 @@
         @endif
     </div>
 
-    <div class="border-t border-stone-200 pt-5 sm:col-span-2">
+    <div class="border-t border-slate-200 pt-5 sm:col-span-2">
         <p class="text-sm font-medium">{{ $user->exists ? 'Cambiar contraseña' : 'Contraseña' }}</p>
         @if ($user->exists)
-            <p class="text-xs text-stone-500">Déjalo vacío para conservar la actual.</p>
+            <p class="text-xs text-slate-500">Déjalo vacío para conservar la actual.</p>
         @endif
     </div>
     <div>

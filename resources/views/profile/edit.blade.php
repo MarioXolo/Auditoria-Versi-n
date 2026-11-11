@@ -5,7 +5,7 @@
 @section('header')
     <div>
         <h1 class="text-2xl font-semibold">Mi perfil</h1>
-        <p class="text-sm text-stone-500">{{ $user->email }} · {{ $user->role->label() }}{{ $user->team ? ' · '.$user->team->name : '' }}</p>
+        <p class="text-sm text-slate-500">{{ $user->email }} · {{ $user->role->label() }}{{ $user->team ? ' · '.$user->team->name : '' }}</p>
     </div>
 @endsection
 
@@ -21,7 +21,7 @@
         <div>
             <label for="password" class="label">Nueva contraseña</label>
             <input id="password" type="password" name="password" required autocomplete="new-password" class="input">
-            <p class="mt-1 text-xs text-stone-500">Mínimo 8 caracteres.</p>
+            <p class="mt-1 text-xs text-slate-500">Mínimo 8 caracteres.</p>
         </div>
         <div>
             <label for="password_confirmation" class="label">Confirmar nueva contraseña</label>

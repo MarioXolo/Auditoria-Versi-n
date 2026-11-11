@@ -63,7 +63,7 @@
         <label for="evidence" class="label">Evidencia (foto o PDF)</label>
         <x-file-input name="evidence" accept="image/*,application/pdf" button="Subir evidencia" />
         @if ($activity->evidence_path)
-            <p class="mt-1 text-xs text-stone-500">Ya tiene evidencia. Si subes otra, la reemplaza.</p>
+            <p class="mt-1 text-xs text-slate-500">Ya tiene evidencia. Si subes otra, la reemplaza.</p>
         @endif
     </div>
 

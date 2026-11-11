@@ -3,18 +3,19 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#10302c">
+    <meta name="theme-color" content="#1d1d1b">
     <title>Iniciar sesión · {{ config('app.name') }}</title>
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,600;1,8..60,600&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="grid min-h-screen place-items-center bg-brand-900 px-4 py-10 font-sans antialiased">
+<body class="grid min-h-screen place-items-center bg-ink px-4 py-10 font-sans antialiased">
     <div class="w-full max-w-sm">
         <div class="mb-8 text-center text-white">
             <span class="mx-auto mb-4 grid size-12 place-items-center rounded-xl bg-brand-500 text-lg font-bold">AC</span>
             <h1 class="text-xl font-semibold">{{ config('app.name') }}</h1>
-            <p class="mt-1 text-sm text-stone-300">Control de actividades y asistencia</p>
+            <p class="mt-1 text-sm text-slate-300">Control de actividades y asistencia</p>
         </div>
 
         <form method="POST" action="{{ route('login.attempt') }}" class="card space-y-4 p-6">
@@ -36,8 +37,8 @@
                 <input id="password" name="password" type="password" required autocomplete="current-password" class="input">
             </div>
 
-            <label class="flex items-center gap-2 text-sm text-stone-600">
-                <input type="checkbox" name="remember" class="size-4 rounded border-stone-300 text-brand-600">
+            <label class="flex items-center gap-2 text-sm text-slate-600">
+                <input type="checkbox" name="remember" class="size-4 rounded border-slate-300 text-brand-600">
                 Mantener sesión iniciada
             </label>
 

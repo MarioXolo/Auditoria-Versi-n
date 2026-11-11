@@ -5,7 +5,7 @@
 @section('header')
     <div>
         <h1 class="text-2xl font-semibold">Asistencia</h1>
-        <p class="text-sm text-stone-500">{{ now()->translatedFormat('l j \d\e F \d\e Y') }}</p>
+        <p class="text-sm text-slate-500">{{ now()->translatedFormat('l j \d\e F \d\e Y') }}</p>
     </div>
 @endsection
 
@@ -16,7 +16,7 @@
             <h2 class="font-semibold">Mi registro de hoy</h2>
 
             @if (! $today)
-                <p class="mt-1 text-sm text-stone-500">Toma una foto para registrar tu entrada.</p>
+                <p class="mt-1 text-sm text-slate-500">Toma una foto para registrar tu entrada.</p>
                 <form method="POST" action="{{ route('attendance.check-in') }}" enctype="multipart/form-data" class="mt-4 space-y-4">
                     @csrf
                     <div>
@@ -36,11 +36,11 @@
                         <span class="font-semibold text-emerald-900 tabular-nums">{{ $today->check_in_at->format('H:i') }}</span>
                     </div>
                     @if ($today->check_out_at)
-                        <div class="flex justify-between rounded-lg bg-stone-100 px-4 py-3">
+                        <div class="flex justify-between rounded-lg bg-slate-100 px-4 py-3">
                             <span>Salida</span>
                             <span class="font-semibold tabular-nums">{{ $today->check_out_at->format('H:i') }}</span>
                         </div>
-                        <p class="text-center text-stone-500">Jornada de {{ $today->workedTime() }}</p>
+                        <p class="text-center text-slate-500">Jornada de {{ $today->workedTime() }}</p>
                     @else
                         <form method="POST" action="{{ route('attendance.check-out') }}" enctype="multipart/form-data" class="space-y-4 pt-2">
                             @csrf
@@ -57,12 +57,12 @@
 
         {{-- Historial propio --}}
         <section class="card overflow-hidden lg:col-span-2">
-            <div class="border-b border-stone-200 px-5 py-4">
+            <div class="border-b border-slate-200 px-5 py-4">
                 <h2 class="font-semibold">Mis últimos registros</h2>
             </div>
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-stone-200">
-                    <thead class="bg-stone-50">
+                <table class="min-w-full divide-y divide-slate-200">
+                    <thead class="bg-slate-50">
                         <tr>
                             <th class="table-head">Fecha</th>
                             <th class="table-head">Entrada</th>
@@ -70,7 +70,7 @@
                             <th class="table-head">Tiempo</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-stone-100">
+                    <tbody class="divide-y divide-slate-100">
                         @forelse ($history as $row)
                             <tr>
                                 <td class="table-cell">{{ $row->work_date->translatedFormat('D j M') }}</td>
@@ -79,7 +79,7 @@
                                 <td class="table-cell">{{ $row->workedTime() ?? '—' }}</td>
                             </tr>
                         @empty
-                            <tr><td colspan="4" class="table-cell py-6 text-center text-stone-500">Aún no tienes registros.</td></tr>
+                            <tr><td colspan="4" class="table-cell py-6 text-center text-slate-500">Aún no tienes registros.</td></tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -91,10 +91,10 @@
     @if ($roster !== null)
         @php $present = $roster->filter(fn ($r) => $r['record'])->count(); @endphp
         <section class="card mt-6 overflow-hidden">
-            <div class="flex flex-col gap-3 border-b border-stone-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex flex-col gap-3 border-b border-slate-200 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                     <h2 class="font-semibold">Asistencia del personal</h2>
-                    <p class="text-xs text-stone-500">{{ $present }} de {{ $roster->count() }} con entrada registrada</p>
+                    <p class="text-xs text-slate-500">{{ $present }} de {{ $roster->count() }} con entrada registrada</p>
                 </div>
                 <form method="GET" class="flex gap-2">
                     <input type="date" name="date" value="{{ $date->format('Y-m-d') }}" max="{{ today()->format('Y-m-d') }}" class="input w-auto" onchange="this.form.submit()">
@@ -102,8 +102,8 @@
                 </form>
             </div>
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-stone-200">
-                    <thead class="bg-stone-50">
+                <table class="min-w-full divide-y divide-slate-200">
+                    <thead class="bg-slate-50">
                         <tr>
                             <th class="table-head">Persona</th>
                             <th class="table-head">Entrada</th>
@@ -112,13 +112,13 @@
                             <th class="table-head">Fotos</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-stone-100">
+                    <tbody class="divide-y divide-slate-100">
                         @forelse ($roster as $row)
                             @php $record = $row['record']; @endphp
                             <tr @class(['bg-rose-50/50' => ! $record])>
                                 <td class="table-cell">
-                                    <span class="font-medium text-stone-900">{{ $row['user']->name }}</span>
-                                    <span class="block text-xs text-stone-500">{{ $row['user']->role->label() }}</span>
+                                    <span class="font-medium text-slate-900">{{ $row['user']->name }}</span>
+                                    <span class="block text-xs text-slate-500">{{ $row['user']->role->label() }}</span>
                                 </td>
                                 @if ($record)
                                     <td class="table-cell tabular-nums">{{ $record->check_in_at?->format('H:i') ?? '—' }}</td>
@@ -139,7 +139,7 @@
                                 @endif
                             </tr>
                         @empty
-                            <tr><td colspan="5" class="table-cell py-6 text-center text-stone-500">No hay personal a tu cargo.</td></tr>
+                            <tr><td colspan="5" class="table-cell py-6 text-center text-slate-500">No hay personal a tu cargo.</td></tr>
                         @endforelse
                     </tbody>
                 </table>

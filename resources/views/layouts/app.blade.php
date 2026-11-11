@@ -3,13 +3,14 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#10302c">
+    <meta name="theme-color" content="#1d1d1b">
     <title>@yield('title', 'Panel') · {{ config('app.name') }}</title>
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600,700" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,600;1,8..60,600&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen bg-stone-100 font-sans text-stone-900 antialiased">
+<body class="min-h-screen bg-slate-100 font-sans text-slate-900 antialiased">
 @php
     $me = auth()->user();
     $nav = [];
@@ -26,7 +27,7 @@
 
 <div class="lg:flex">
     {{-- Barra lateral (escritorio) / barra superior (móvil) --}}
-    <aside class="bg-brand-900 text-white lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-64 lg:shrink-0 lg:flex-col">
+    <aside class="bg-ink text-white lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-64 lg:shrink-0 lg:flex-col">
         <div class="flex items-center justify-between px-4 py-4 lg:px-5 lg:py-6">
             <a href="{{ route('home') }}" class="flex items-center gap-2">
                 <span class="grid size-8 place-items-center rounded-lg bg-brand-500 text-sm font-bold">AC</span>
@@ -51,7 +52,7 @@
                     <span class="grid size-8 place-items-center rounded-full bg-white/15 text-xs font-semibold">{{ $me->initials() }}</span>
                     <span class="min-w-0">
                         <span class="block truncate text-sm font-medium">{{ $me->name }}</span>
-                        <span class="block text-xs text-stone-300">{{ $me->role->label() }}</span>
+                        <span class="block text-xs text-slate-300">{{ $me->role->label() }}</span>
                     </span>
                 </a>
                 <form method="POST" action="{{ route('logout') }}" class="mt-1">
