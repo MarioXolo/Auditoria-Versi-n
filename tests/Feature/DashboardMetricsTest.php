@@ -53,10 +53,10 @@ class DashboardMetricsTest extends TestCase
         $emp = User::factory()->create(['team_id' => $team->id]);
 
         // 2 completadas (1 a tiempo, 1 tarde), 1 vencida, 1 cancelada
-        $this->act($emp, $leader, 'completada', '2026-11-10', '2026-11-09 10:00:00');
-        $this->act($emp, $leader, 'completada', '2026-11-09', '2026-11-10 10:00:00');
-        $this->act($emp, $leader, 'pendiente', '2026-11-10');
-        $this->act($emp, $leader, 'cancelada', null);
+        $this->act($emp, $leader, 'concluido', '2026-11-10', '2026-11-09 10:00:00');
+        $this->act($emp, $leader, 'concluido', '2026-11-09', '2026-11-10 10:00:00');
+        $this->act($emp, $leader, 'no_iniciado', '2026-11-10');
+        $this->act($emp, $leader, 'suspendida', null);
 
         // Lunes 9 y martes 10: el empleado llega a las 8:55 y 9:30 (retardo). El encargado solo el lunes.
         Attendance::create(['user_id' => $emp->id, 'work_date' => '2026-11-09', 'check_in_at' => '2026-11-09 08:55:00', 'check_out_at' => '2026-11-09 17:55:00']);

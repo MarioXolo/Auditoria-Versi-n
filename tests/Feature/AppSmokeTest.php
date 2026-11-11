@@ -164,8 +164,8 @@ class AppSmokeTest extends TestCase
             ->assertDontSee($paraEncargado->code);
 
         // El encargado no edita lo que no asignó
-        $this->actingAs($this->encargado)->post("/activities/{$delGerente->id}/marcar", ['marca' => 'completada'])->assertForbidden();
-        $this->actingAs($this->encargado)->post("/activities/{$suya->id}/marcar", ['marca' => 'completada'])->assertRedirect();
+        $this->actingAs($this->encargado)->post("/activities/{$delGerente->id}/marcar", ['marca' => 'concluido'])->assertForbidden();
+        $this->actingAs($this->encargado)->post("/activities/{$suya->id}/marcar", ['marca' => 'concluido'])->assertRedirect();
     }
 
     public function test_encargado_assigns_only_to_own_team(): void

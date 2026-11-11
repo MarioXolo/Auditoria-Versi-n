@@ -69,7 +69,7 @@ if (data) {
             labels: data.trend.map((d) => d.label),
             datasets: [
                 { label: 'Creadas', data: data.trend.map((d) => d.created), backgroundColor: C.brandSoft, borderColor: C.brand, borderWidth: 1, borderRadius: 3 },
-                { label: 'Completadas', type: 'line', data: data.trend.map((d) => d.completed), borderColor: C.ink, backgroundColor: C.ink, tension: 0.3, pointRadius: 2.5 },
+                { label: 'Concluidas', type: 'line', data: data.trend.map((d) => d.completed), borderColor: C.ink, backgroundColor: C.ink, tension: 0.3, pointRadius: 2.5 },
             ],
         },
         options: { scales: { y: countAxis, x: { ...noGrid, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 10 } } }, plugins: { legend: { position: 'bottom' } } },
@@ -79,7 +79,7 @@ if (data) {
         type: 'doughnut',
         data: {
             labels: data.status.map((d) => d.label),
-            datasets: [{ data: data.status.map((d) => d.value), backgroundColor: [C.amber, C.sky, C.green, C.rose, C.stone], borderWidth: 2, borderColor: '#fff' }],
+            datasets: [{ data: data.status.map((d) => d.value), backgroundColor: [C.amber, C.sky, C.stone, C.green, C.rose], borderWidth: 2, borderColor: '#fff' }],
         },
         options: { cutout: '68%', plugins: { legend: { position: 'bottom' } } },
     });
@@ -111,9 +111,9 @@ if (data) {
     });
 
     const progress = (rows) => [
-        { label: 'Completadas', data: rows.map((r) => r.completadas), backgroundColor: C.green, borderRadius: 3 },
-        { label: 'Incompletas', data: rows.map((r) => r.incompletas), backgroundColor: C.rose, borderRadius: 3 },
-        { label: 'Sin marcar', data: rows.map((r) => r.sin_marcar), backgroundColor: C.amber, borderRadius: 3 },
+        { label: 'Concluidas', data: rows.map((r) => r.completadas), backgroundColor: C.green, borderRadius: 3 },
+        { label: 'No completadas', data: rows.map((r) => r.incompletas), backgroundColor: C.rose, borderRadius: 3 },
+        { label: 'Sin revisar', data: rows.map((r) => r.sin_marcar), backgroundColor: C.amber, borderRadius: 3 },
     ];
 
     make('chart-types', {

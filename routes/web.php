@@ -36,6 +36,7 @@ Route::middleware(['auth', 'active'])->group(function () {
     // Actividades (los permisos finos están en ActivityPolicy)
     Route::resource('activities', ActivityController::class);
     Route::post('/activities/{activity}/marcar', [ActivityController::class, 'mark'])->name('activities.mark');
+    Route::patch('/activities/{activity}/estado', [ActivityController::class, 'updateStatus'])->name('activities.status');
     Route::get('/activities/{activity}/evidence', [ActivityController::class, 'evidence'])->name('activities.evidence');
 
     // Asistencia

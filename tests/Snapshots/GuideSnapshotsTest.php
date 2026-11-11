@@ -65,7 +65,7 @@ class GuideSnapshotsTest extends TestCase
         $this->snap('12-encargado-actividad-creada', $created);
         $this->snap('13-encargado-asistencia', $this->get('/asistencia'));
         $nueva = Activity::latest('id')->first();
-        $this->post('/activities/'.$nueva->id.'/marcar', ['marca' => 'incompleta', 'mark_notes' => 'Falta la foto de la reunión.']);
+        $this->post('/activities/'.$nueva->id.'/marcar', ['marca' => 'no_completada', 'mark_notes' => 'Falta la foto de la reunión.']);
         $this->snap('19-encargado-marcada-incompleta', $this->get('/activities/'.$nueva->id));
         $this->snap('20-encargado-lista-marcado', $this->get('/activities'));
 

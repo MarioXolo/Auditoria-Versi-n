@@ -65,8 +65,8 @@
     {{-- KPI principales con meta y semáforo --}}
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         @foreach ([
-            ['key' => 'cumplimiento', 'label' => 'Cumplimiento', 'hint' => $kpi['completed'].' de '.($kpi['total'] - $kpi['cancelled']).' marcadas como completadas'],
-            ['key' => 'a_tiempo', 'label' => 'Entrega a tiempo', 'hint' => 'de las completadas, antes de su fecha de fin'],
+            ['key' => 'cumplimiento', 'label' => 'Cumplimiento', 'hint' => $kpi['completed'].' de '.($kpi['total'] - $kpi['cancelled']).' marcadas «Concluido»'],
+            ['key' => 'a_tiempo', 'label' => 'Entrega a tiempo', 'hint' => 'de las concluidas, antes de su fecha de fin'],
             ['key' => 'asistencia', 'label' => 'Asistencia', 'hint' => $kpi['present'].' de '.$kpi['expected'].' jornadas esperadas'],
             ['key' => 'puntualidad', 'label' => 'Puntualidad', 'hint' => $kpi['late'].' retardos (entrada después de '.config('auditoria.hora_entrada').' + '.config('auditoria.tolerancia_minutos').' min)'],
         ] as $card)
@@ -96,8 +96,8 @@
     {{-- KPI de volumen --}}
     <div class="mt-4 grid grid-cols-2 gap-4 xl:grid-cols-4">
         @foreach ([
-            ['label' => 'Actividades', 'value' => $kpi['total'], 'sub' => $kpi['sin_marcar'].' sin marcar · '.$kpi['incompletas'].' incompletas', 'delta' => $deltaHtml($delta['total'], ''), 'link' => route('activities.index')],
-            ['label' => 'Vencidas', 'value' => $kpi['overdue'], 'sub' => 'pendientes con fecha de fin pasada', 'delta' => $deltaHtml($delta['overdue'], '', true), 'link' => route('activities.index', ['status' => 'vencida']), 'alert' => $kpi['overdue'] > 0],
+            ['label' => 'Actividades', 'value' => $kpi['total'], 'sub' => $kpi['sin_marcar'].' sin revisar · '.$kpi['incompletas'].' no completadas', 'delta' => $deltaHtml($delta['total'], ''), 'link' => route('activities.index')],
+            ['label' => 'Vencidas', 'value' => $kpi['overdue'], 'sub' => 'abiertas con fecha de fin pasada', 'delta' => $deltaHtml($delta['overdue'], '', true), 'link' => route('activities.index', ['status' => 'vencida']), 'alert' => $kpi['overdue'] > 0],
             ['label' => 'Tiempo de cierre', 'value' => $fmt($kpi['dias_cierre'], ' días'), 'sub' => 'promedio de creación a completado', 'delta' => $deltaHtml($delta['dias_cierre'], 'días', true)],
             ['label' => 'Horas por jornada', 'value' => $fmt($kpi['horas'], ' h'), 'sub' => 'promedio entre entrada y salida', 'delta' => $deltaHtml($delta['horas'], 'h')],
         ] as $card)
@@ -143,9 +143,9 @@
     {{-- Gráficas --}}
     <div class="mt-6 grid gap-6 lg:grid-cols-3">
         <section class="card p-5 lg:col-span-2">
-            <h2 class="font-semibold">Actividades creadas vs completadas</h2>
+            <h2 class="font-semibold">Actividades creadas vs concluidas</h2>
             <p class="text-xs text-slate-500">{{ $metrics->from->diffInDays($metrics->to) > 45 ? 'Por semana' : 'Por día' }} en el periodo</p>
-            <div class="mt-4 h-64"><canvas id="chart-trend" role="img" aria-label="Gráfica de actividades creadas y completadas"></canvas></div>
+            <div class="mt-4 h-64"><canvas id="chart-trend" role="img" aria-label="Gráfica de actividades creadas y concluidas"></canvas></div>
         </section>
         <section class="card p-5">
             <h2 class="font-semibold">Distribución por estado</h2>
@@ -167,7 +167,7 @@
         </section>
         <section class="card p-5">
             <h2 class="font-semibold">Por tipo de actividad</h2>
-            <p class="text-xs text-slate-500">Completadas, incompletas y sin marcar de cada tipo</p>
+            <p class="text-xs text-slate-500">Concluidas, no completadas y sin revisar de cada tipo</p>
             <div class="mt-4 h-60"><canvas id="chart-types" role="img" aria-label="Gráfica de actividades por tipo"></canvas></div>
         </section>
     </div>
@@ -193,8 +193,8 @@
                     <tr>
                         <th class="table-head">Persona</th>
                         <th class="table-head text-right">Asignadas</th>
-                        <th class="table-head text-right">Completadas</th>
-                        <th class="table-head text-right">Incompletas</th>
+                        <th class="table-head text-right">Concluidas</th>
+                        <th class="table-head text-right">No completadas</th>
                         <th class="table-head text-right">Vencidas</th>
                         <th class="table-head text-right">Cumplimiento</th>
                         <th class="table-head text-right">A tiempo</th>
@@ -244,7 +244,7 @@
                         <th class="table-head">Encargado</th>
                         <th class="table-head text-right">Integrantes</th>
                         <th class="table-head text-right">Asignó</th>
-                        <th class="table-head text-right">Completadas</th>
+                        <th class="table-head text-right">Concluidas</th>
                         <th class="table-head text-right">Vencidas</th>
                         <th class="table-head text-right">Cumplimiento</th>
                         <th class="table-head text-right">A tiempo</th>

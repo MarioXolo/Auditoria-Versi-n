@@ -128,12 +128,12 @@ class DashboardMetrics
     {
         return $a->end_date !== null
             && $a->end_date->lt(today())
-            && in_array($a->status, [ActivityStatus::Pendiente, ActivityStatus::EnProgreso], true);
+            && in_array($a->status, [ActivityStatus::NoIniciado, ActivityStatus::EnProceso], true);
     }
 
     private function isOnTime(Activity $a): bool
     {
-        return $a->status === ActivityStatus::Completada
+        return $a->status === ActivityStatus::Concluido
             && ($a->end_date === null || ($a->completed_at && $a->completed_at->copy()->startOfDay()->lte($a->end_date)));
     }
 
@@ -150,8 +150,8 @@ class DashboardMetrics
     public function activityKpis(Carbon $from, Carbon $to): array
     {
         $acts = $this->activities($from, $to);
-        $completed = $acts->filter(fn ($a) => $a->status === ActivityStatus::Completada);
-        $cancelled = $acts->filter(fn ($a) => $a->status === ActivityStatus::Cancelada)->count();
+        $completed = $acts->filter(fn ($a) => $a->status === ActivityStatus::Concluido);
+        $cancelled = $acts->filter(fn ($a) => $a->status === ActivityStatus::Suspendida)->count();
         $effective = $acts->count() - $cancelled;
 
         $closeDays = $completed
@@ -161,13 +161,13 @@ class DashboardMetrics
         return [
             'total' => $acts->count(),
             'completed' => $completed->count(),
-            'open' => $acts->filter(fn ($a) => in_array($a->status, [ActivityStatus::Pendiente, ActivityStatus::EnProgreso], true))->count(),
+            'open' => $acts->filter(fn ($a) => in_array($a->status, [ActivityStatus::NoIniciado, ActivityStatus::EnProceso], true))->count(),
             'cancelled' => $cancelled,
             'overdue' => $acts->filter(fn ($a) => $this->isOverdue($a))->count(),
             'cumplimiento' => self::pct($completed->count(), $effective),
             'a_tiempo' => self::pct($completed->filter(fn ($a) => $this->isOnTime($a))->count(), $completed->count()),
             'dias_cierre' => $closeDays->isEmpty() ? null : round($closeDays->avg(), 1),
-            'incompletas' => $acts->filter(fn ($a) => $a->status === ActivityStatus::Incompleta)->count(),
+            'incompletas' => $acts->filter(fn ($a) => $a->status === ActivityStatus::NoCompletada)->count(),
             'sin_marcar' => $acts->filter(fn ($a) => $a->status->isOpen())->count(),
         ];
     }
@@ -243,7 +243,7 @@ class DashboardMetrics
     // Series para gráficas
     // ------------------------------------------------------------------
 
-    /** Actividades creadas vs completadas por día (o por semana en rangos largos). */
+    /** Actividades creadas vs concluidas por día (o por semana en rangos largos). */
     public function activityTrend(): array
     {
         $weekly = $this->from->diffInDays($this->to) > 45;
@@ -262,7 +262,7 @@ class DashboardMetrics
         }
 
         $completed = Activity::query()
-            ->where('status', ActivityStatus::Completada->value)
+            ->where('status', ActivityStatus::Concluido->value)
             ->whereBetween('completed_at', [$this->from, $this->to])
             ->when($this->teamId, fn ($q) => $q->where('team_id', $this->teamId))
             ->pluck('completed_at');
@@ -322,13 +322,13 @@ class DashboardMetrics
     private function groupedBy(string $column, Collection $names, int $limit): array
     {
         return $this->activities($this->from, $this->to)
-            ->where('status', '!=', ActivityStatus::Cancelada)
+            ->where('status', '!=', ActivityStatus::Suspendida)
             ->groupBy($column)
             ->map(fn (Collection $group, $id) => [
                 'label' => $names[$id] ?? '—',
                 'total' => $group->count(),
-                'completadas' => $group->where('status', ActivityStatus::Completada)->count(),
-                'incompletas' => $group->where('status', ActivityStatus::Incompleta)->count(),
+                'completadas' => $group->where('status', ActivityStatus::Concluido)->count(),
+                'incompletas' => $group->where('status', ActivityStatus::NoCompletada)->count(),
                 'sin_marcar' => $group->filter(fn ($a) => $a->status->isOpen())->count(),
             ])
             ->sortByDesc('total')
@@ -354,8 +354,8 @@ class DashboardMetrics
 
         return $this->staff->map(function (User $u) use ($acts, $att) {
             $mine = $acts->get($u->id, collect());
-            $completed = $mine->filter(fn ($a) => $a->status === ActivityStatus::Completada);
-            $effective = $mine->filter(fn ($a) => $a->status !== ActivityStatus::Cancelada)->count();
+            $completed = $mine->filter(fn ($a) => $a->status === ActivityStatus::Concluido);
+            $effective = $mine->filter(fn ($a) => $a->status !== ActivityStatus::Suspendida)->count();
             $close = $completed->filter(fn ($a) => $a->completed_at)->map(fn ($a) => $a->created_at->diffInMinutes($a->completed_at) / 1440);
             $a = $att[$u->id];
 
@@ -363,8 +363,8 @@ class DashboardMetrics
                 'user' => $u,
                 'assigned' => $mine->count(),
                 'completed' => $completed->count(),
-                'open' => $mine->filter(fn ($x) => in_array($x->status, [ActivityStatus::Pendiente, ActivityStatus::EnProgreso], true))->count(),
-                'incompletas' => $mine->filter(fn ($x) => $x->status === ActivityStatus::Incompleta)->count(),
+                'open' => $mine->filter(fn ($x) => in_array($x->status, [ActivityStatus::NoIniciado, ActivityStatus::EnProceso], true))->count(),
+                'incompletas' => $mine->filter(fn ($x) => $x->status === ActivityStatus::NoCompletada)->count(),
                 'overdue' => $mine->filter(fn ($x) => $this->isOverdue($x))->count(),
                 'cumplimiento' => self::pct($completed->count(), $effective),
                 'a_tiempo' => self::pct($completed->filter(fn ($x) => $this->isOnTime($x))->count(), $completed->count()),
@@ -423,8 +423,8 @@ class DashboardMetrics
             ->get()
             ->map(function (User $leader) use ($acts, $att) {
                 $assigned = $acts->get($leader->id, collect());
-                $completed = $assigned->filter(fn ($a) => $a->status === ActivityStatus::Completada);
-                $effective = $assigned->filter(fn ($a) => $a->status !== ActivityStatus::Cancelada)->count();
+                $completed = $assigned->filter(fn ($a) => $a->status === ActivityStatus::Concluido);
+                $effective = $assigned->filter(fn ($a) => $a->status !== ActivityStatus::Suspendida)->count();
                 $memberIds = User::whereIn('team_id', $leader->ledTeams->pluck('id'))->pluck('id');
                 $teamAtt = collect($att)->only($memberIds->all());
                 $present = $teamAtt->sum('present');
@@ -458,8 +458,8 @@ class DashboardMetrics
             ->get(['id', 'name'])
             ->map(function (Team $team) use ($acts, $att) {
                 $mine = $acts->get($team->id, collect());
-                $completed = $mine->filter(fn ($a) => $a->status === ActivityStatus::Completada);
-                $effective = $mine->filter(fn ($a) => $a->status !== ActivityStatus::Cancelada)->count();
+                $completed = $mine->filter(fn ($a) => $a->status === ActivityStatus::Concluido);
+                $effective = $mine->filter(fn ($a) => $a->status !== ActivityStatus::Suspendida)->count();
                 $members = $this->staff->where('team_id', $team->id)->pluck('id');
                 $teamAtt = collect($att)->only($members->all());
                 $present = $teamAtt->sum('present');
@@ -516,7 +516,7 @@ class DashboardMetrics
 
         // Actividades marcadas como incompletas en el periodo
         $failed = $this->activities($this->from, $this->to)
-            ->filter(fn ($a) => $a->status === ActivityStatus::Incompleta);
+            ->filter(fn ($a) => $a->status === ActivityStatus::NoCompletada);
 
         if ($failed->isNotEmpty()) {
             $names = User::whereIn('id', $failed->pluck('assigned_to')->unique())->pluck('name', 'id');
@@ -524,9 +524,9 @@ class DashboardMetrics
 
             $alerts[] = [
                 'level' => 'bad',
-                'title' => $failed->count().' '.($failed->count() === 1 ? 'actividad marcada' : 'actividades marcadas').' como incompleta en el periodo',
+                'title' => $failed->count().' '.($failed->count() === 1 ? 'actividad marcada' : 'actividades marcadas').' como No completada en el periodo',
                 'detail' => $byPerson->take(5)->map(fn ($n, $id) => ($names[$id] ?? '—')." ({$n})")->join(', '),
-                'link' => route('activities.index', ['status' => 'incompleta']),
+                'link' => route('activities.index', ['status' => 'no_completada']),
             ];
         }
 
@@ -540,7 +540,7 @@ class DashboardMetrics
         if ($unmarked > 0) {
             $alerts[] = [
                 'level' => 'info',
-                'title' => "{$unmarked} ".($unmarked === 1 ? 'actividad vencida' : 'actividades vencidas').' sin marcar',
+                'title' => "{$unmarked} ".($unmarked === 1 ? 'actividad vencida' : 'actividades vencidas').' sin revisar',
                 'detail' => 'Revisa si se completaron y márcalas con ✓ o ✗.',
                 'link' => route('activities.index', ['status' => 'sin_marcar']),
             ];
@@ -617,13 +617,13 @@ class DashboardMetrics
         $tol = config('auditoria.tolerancia_minutos');
 
         return [
-            ['Cumplimiento', 'Marcadas como completadas por un superior ÷ (asignadas − canceladas) × 100', "≥ {$m['cumplimiento']}%", 'Actividades creadas en el periodo'],
-            ['Entrega a tiempo', 'Completadas en o antes de su fecha de fin ÷ completadas × 100', "≥ {$m['a_tiempo']}%", 'Actividades completadas del periodo'],
+            ['Cumplimiento', 'Marcadas «Concluido» por un superior ÷ (asignadas − suspendidas) × 100', "≥ {$m['cumplimiento']}%", 'Actividades creadas en el periodo'],
+            ['Entrega a tiempo', 'Concluidas en o antes de su fecha de fin ÷ concluidas × 100', "≥ {$m['a_tiempo']}%", 'Actividades concluidas del periodo'],
             ['Asistencia', "Entradas registradas ÷ (personal activo × días laborales) × 100. Hoy cuenta a partir de las {$hora} + {$tol} min", "≥ {$m['asistencia']}%", 'Registros de asistencia en días laborales'],
             ['Puntualidad', "Entradas hasta las {$hora} + {$tol} min ÷ entradas registradas × 100", "≥ {$m['puntualidad']}%", 'Hora de entrada de cada registro'],
-            ['Incompletas', 'Actividades que un superior marcó con ✗ en el periodo', 'Lo más bajo posible', 'Marcado de actividades'],
-            ['Vencidas', 'Pendientes o en progreso con fecha de fin anterior a hoy', 'Lo más bajo posible', 'Actividades creadas en el periodo'],
-            ['Tiempo de cierre', 'Promedio de días entre la creación y el completado', 'Tendencia a la baja', 'Actividades completadas del periodo'],
+            ['No completadas', 'Actividades que un superior marcó en rojo (✗) en el periodo', 'Lo más bajo posible', 'Marcado de actividades'],
+            ['Vencidas', 'No iniciadas o en proceso con fecha de fin anterior a hoy', 'Lo más bajo posible', 'Actividades creadas en el periodo'],
+            ['Tiempo de cierre', 'Promedio de días entre la creación y la marca «Concluido»', 'Tendencia a la baja', 'Actividades concluidas del periodo'],
             ['Horas por jornada', 'Promedio de horas entre entrada y salida', 'Referencia', 'Registros con entrada y salida'],
             ['Comparativo', 'Valor actual − valor del periodo anterior de la misma duración', 'Positivo', 'Mismo cálculo en el periodo previo'],
         ];

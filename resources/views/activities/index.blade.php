@@ -24,7 +24,7 @@
                 <option value="{{ $value }}" @selected(request('status') === $value)>{{ $label }}</option>
             @endforeach
             <option value="vencida" @selected(request('status') === 'vencida')>Vencidas</option>
-            <option value="sin_marcar" @selected(request('status') === 'sin_marcar')>Sin marcar</option>
+            <option value="sin_marcar" @selected(request('status') === 'sin_marcar')>Sin revisar (no iniciado o en proceso)</option>
         </select>
         <select name="activity_type_id" class="input">
             <option value="">Todos los tipos</option>
@@ -63,7 +63,7 @@
     {{-- Tarjetas en móvil --}}
     <div class="space-y-3 md:hidden">
         @forelse ($activities as $activity)
-            @php $failed = $activity->status === \App\Enums\ActivityStatus::Incompleta; @endphp
+            @php $failed = $activity->status === \App\Enums\ActivityStatus::NoCompletada; @endphp
             <div @class(['card flex items-start gap-3 p-4', 'border-rose-300 bg-rose-50' => $failed])>
                 @can('mark', $activity)
                     <x-mark-controls :activity="$activity" />
@@ -108,7 +108,7 @@
             </thead>
             <tbody class="divide-y divide-slate-100">
                 @forelse ($activities as $activity)
-                    @php $failed = $activity->status === \App\Enums\ActivityStatus::Incompleta; @endphp
+                    @php $failed = $activity->status === \App\Enums\ActivityStatus::NoCompletada; @endphp
                     <tr @class([
                         'bg-rose-100 shadow-[inset_4px_0_0_var(--color-rose-600)] hover:bg-rose-100' => $failed,
                         'hover:bg-slate-50' => ! $failed,

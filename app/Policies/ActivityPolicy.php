@@ -10,7 +10,8 @@ use App\Models\User;
  * - Administrador y gerente: ven, editan y marcan todas.
  * - Encargado: ve las que asignó, las que le asignaron y las que sus empleados se cargaron;
  *   edita las que él asignó y marca las de su equipo.
- * - Empleado: ve solo las suyas y puede cargarse actividades a sí mismo; no edita ni marca.
+ * - Empleado: ve solo las suyas, puede cargarse actividades a sí mismo y cambiar el estado
+ *   (No iniciado, En proceso, Suspendida) de las que tiene asignadas; no edita ni marca.
  * - Nadie marca una actividad asignada a sí mismo: siempre la marca alguien con más privilegios.
  */
 class ActivityPolicy
@@ -52,10 +53,24 @@ class ActivityPolicy
         return $this->update($user, $activity);
     }
 
-    /** Marcar como completada o incompleta (checkbox). */
+    /**
+     * Cambiar solo el estado manual (No iniciado, En proceso, Suspendida).
+     * Lo puede hacer quien edita la actividad y también la persona asignada,
+     * mientras un superior no la haya marcado como Concluido o No completada.
+     */
+    public function changeStatus(User $user, Activity $activity): bool
+    {
+        if ($activity->status->isMarked()) {
+            return false;
+        }
+
+        return $activity->assigned_to === $user->id || $this->update($user, $activity);
+    }
+
+    /** Checkbox de un superior: ✓ Concluido (verde) o ✗ No completada (rojo). */
     public function mark(User $user, Activity $activity): bool
     {
-        if ($activity->assigned_to === $user->id || $activity->status === \App\Enums\ActivityStatus::Cancelada) {
+        if ($activity->assigned_to === $user->id || $activity->status === \App\Enums\ActivityStatus::Suspendida) {
             return false;
         }
 

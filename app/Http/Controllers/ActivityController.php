@@ -44,7 +44,7 @@ class ActivityController extends Controller
                     return $q->overdue();
                 }
                 if ($request->input('status') === 'sin_marcar') {
-                    return $q->whereIn('status', [ActivityStatus::Pendiente->value, ActivityStatus::EnProgreso->value]);
+                    return $q->whereIn('status', [ActivityStatus::NoIniciado->value, ActivityStatus::EnProceso->value]);
                 }
 
                 return $q->where('status', $request->input('status'));
@@ -53,7 +53,7 @@ class ActivityController extends Controller
             ->when($request->filled('team_id'), fn ($q) => $q->where('team_id', $request->integer('team_id')));
 
         $activities = $query
-            ->orderByRaw("CASE WHEN status IN ('pendiente','en_progreso') THEN 0 WHEN status = 'incompleta' THEN 1 ELSE 2 END")
+            ->orderByRaw("CASE WHEN status IN ('no_iniciado','en_proceso') THEN 0 WHEN status = 'no_completada' THEN 1 WHEN status = 'suspendida' THEN 2 ELSE 3 END")
             ->orderBy('end_date')
             ->latest('id')
             ->paginate(15)
@@ -75,7 +75,7 @@ class ActivityController extends Controller
         $this->authorize('create', Activity::class);
 
         return view('activities.create', $this->formData($request->user(), new Activity([
-            'status' => ActivityStatus::Pendiente->value,
+            'status' => ActivityStatus::NoIniciado->value,
             'assigned_to' => $request->integer('assigned_to') ?: null,
             'start_date' => today(),
         ])));
@@ -94,8 +94,8 @@ class ActivityController extends Controller
         $data = $this->validated($request, $user);
         $data['created_by'] = $user->id;
         $data['team_id'] = User::find($data['assigned_to'])?->team_id;
-        // Toda actividad nace sin marcar; solo un superior la marca como completada o incompleta
-        $data['status'] = ActivityStatus::Pendiente->value;
+        // Toda actividad nace «No iniciado»; Concluido y No completada solo los pone un superior
+        $data['status'] = ActivityStatus::NoIniciado->value;
 
         if ($request->hasFile('evidence')) {
             $data['evidence_path'] = $request->file('evidence')->store('evidencias', 'local');
@@ -134,7 +134,7 @@ class ActivityController extends Controller
             $data['team_id'] = User::find($data['assigned_to'])?->team_id;
         }
 
-        // El estado solo se edita entre pendiente, en progreso y cancelada; completada e incompleta se marcan
+        // A mano solo se elige No iniciado, En proceso o Suspendida; los otros dos se ponen con el checkbox
         $status = $request->validate([
             'status' => ['nullable', Rule::in(array_keys(ActivityStatus::editableOptions()))],
         ])['status'] ?? null;
@@ -162,40 +162,54 @@ class ActivityController extends Controller
     }
 
     /**
-     * Marcado por un superior: ✓ completada, ✗ incompleta o quitar la marca.
+     * Checkbox de un superior: ✓ Concluido (verde), ✗ No completada (rojo) o quitar la marca.
      */
     public function mark(Request $request, Activity $activity): RedirectResponse
     {
         $this->authorize('mark', $activity);
 
         $data = $request->validate([
-            'marca' => ['required', 'in:completada,incompleta,sin_marcar'],
+            'marca' => ['required', 'in:concluido,no_completada,sin_marcar'],
             'mark_notes' => ['nullable', 'string', 'max:2000'],
         ], [], ['mark_notes' => 'comentario']);
 
         if ($data['marca'] === 'sin_marcar') {
-            $activity->status = ActivityStatus::Pendiente;
+            $activity->status = ActivityStatus::EnProceso;
             $activity->completed_at = null;
             $activity->marked_by = null;
             $activity->marked_at = null;
             $activity->mark_notes = null;
-            $message = 'Se quitó la marca de la actividad.';
+            $message = 'Se quitó la marca; la actividad regresó a «En proceso».';
         } else {
-            $activity->status = $data['marca'] === 'completada' ? ActivityStatus::Completada : ActivityStatus::Incompleta;
-            $activity->completed_at = $data['marca'] === 'completada' ? now() : null;
+            $activity->status = $data['marca'] === 'concluido' ? ActivityStatus::Concluido : ActivityStatus::NoCompletada;
+            $activity->completed_at = $data['marca'] === 'concluido' ? now() : null;
             $activity->marked_by = $request->user()->id;
             $activity->marked_at = now();
             if ($request->has('mark_notes')) {
                 $activity->mark_notes = $data['mark_notes'] ?? null;
             }
-            $message = $data['marca'] === 'completada'
-                ? 'Actividad marcada como completada.'
-                : 'Actividad marcada como incompleta.';
+            $message = $data['marca'] === 'concluido'
+                ? 'Actividad marcada como Concluido.'
+                : 'Actividad marcada como No completada.';
         }
 
         $activity->save();
 
         return back()->with('status', $message);
+    }
+
+    /** Cambio rápido de estado manual; también lo usa el empleado asignado. */
+    public function updateStatus(Request $request, Activity $activity): RedirectResponse
+    {
+        $this->authorize('changeStatus', $activity);
+
+        $data = $request->validate([
+            'status' => ['required', Rule::in(array_keys(ActivityStatus::editableOptions()))],
+        ], [], ['status' => 'estado']);
+
+        $activity->update(['status' => $data['status']]);
+
+        return back()->with('status', 'Estado actualizado a «'.$activity->status->label().'».');
     }
 
     public function destroy(Activity $activity): RedirectResponse

@@ -91,7 +91,7 @@ class Activity extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    /** Superior que marcó la actividad como completada o incompleta. */
+    /** Superior que marcó la actividad como Concluido o No completada. */
     public function marker(): BelongsTo
     {
         return $this->belongsTo(User::class, 'marked_by');
@@ -136,11 +136,11 @@ class Activity extends Model
         return $this->created_by === $this->assigned_to;
     }
 
-    /** Vencidas: con fecha de fin pasada y sin marcar ni cancelar. */
+    /** Vencidas: con fecha de fin pasada y sin marcar ni suspender. */
     public function scopeOverdue(Builder $query): Builder
     {
         return $query->whereDate('end_date', '<', today())
-            ->whereIn('status', [ActivityStatus::Pendiente->value, ActivityStatus::EnProgreso->value]);
+            ->whereIn('status', [ActivityStatus::NoIniciado->value, ActivityStatus::EnProceso->value]);
     }
 
     public function isOverdue(): bool

@@ -2,22 +2,27 @@
 
 namespace App\Enums;
 
+/**
+ * Estado de la actividad.
+ * - No iniciado, En proceso y Suspendida se eligen a mano (también el empleado asignado).
+ * - Concluido y No completada solo los pone un superior con el checkbox (✓ verde / ✗ rojo).
+ */
 enum ActivityStatus: string
 {
-    case Pendiente = 'pendiente';
-    case EnProgreso = 'en_progreso';
-    case Completada = 'completada';
-    case Incompleta = 'incompleta';
-    case Cancelada = 'cancelada';
+    case NoIniciado = 'no_iniciado';
+    case EnProceso = 'en_proceso';
+    case Suspendida = 'suspendida';
+    case Concluido = 'concluido';
+    case NoCompletada = 'no_completada';
 
     public function label(): string
     {
         return match ($this) {
-            self::Pendiente => 'Pendiente',
-            self::EnProgreso => 'En progreso',
-            self::Completada => 'Completada',
-            self::Incompleta => 'Incompleta',
-            self::Cancelada => 'Cancelada',
+            self::NoIniciado => 'No iniciado',
+            self::EnProceso => 'En proceso',
+            self::Suspendida => 'Suspendida',
+            self::Concluido => 'Concluido',
+            self::NoCompletada => 'No completada',
         };
     }
 
@@ -25,24 +30,24 @@ enum ActivityStatus: string
     public function badge(): string
     {
         return match ($this) {
-            self::Pendiente => 'bg-amber-100 text-amber-800',
-            self::EnProgreso => 'bg-sky-100 text-sky-800',
-            self::Completada => 'bg-emerald-100 text-emerald-800',
-            self::Incompleta => 'bg-rose-600 text-white',
-            self::Cancelada => 'bg-slate-200 text-slate-700',
+            self::NoIniciado => 'bg-amber-100 text-amber-800',
+            self::EnProceso => 'bg-sky-100 text-sky-800',
+            self::Suspendida => 'bg-slate-200 text-slate-700',
+            self::Concluido => 'bg-emerald-600 text-white',
+            self::NoCompletada => 'bg-rose-600 text-white',
         };
     }
 
-    /** Completada e Incompleta solo se asignan al marcar (checkbox de un superior). */
+    /** Concluido y No completada solo se asignan con el checkbox de un superior. */
     public function isMarked(): bool
     {
-        return in_array($this, [self::Completada, self::Incompleta], true);
+        return in_array($this, [self::Concluido, self::NoCompletada], true);
     }
 
-    /** Sin marcar todavía: cuentan como abiertas. */
+    /** Sin marcar todavía y sin suspender: cuentan como abiertas. */
     public function isOpen(): bool
     {
-        return in_array($this, [self::Pendiente, self::EnProgreso], true);
+        return in_array($this, [self::NoIniciado, self::EnProceso], true);
     }
 
     /** @return array<string, string> */
@@ -56,13 +61,13 @@ enum ActivityStatus: string
         return $options;
     }
 
-    /** Estados que se pueden elegir al editar (los demás se ponen marcando). */
+    /** Estados que se eligen a mano (los otros dos se ponen con el checkbox). */
     public static function editableOptions(): array
     {
         return [
-            self::Pendiente->value => self::Pendiente->label(),
-            self::EnProgreso->value => self::EnProgreso->label(),
-            self::Cancelada->value => self::Cancelada->label(),
+            self::NoIniciado->value => self::NoIniciado->label(),
+            self::EnProceso->value => self::EnProceso->label(),
+            self::Suspendida->value => self::Suspendida->label(),
         ];
     }
 }

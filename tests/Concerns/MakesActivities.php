@@ -36,7 +36,7 @@ trait MakesActivities
         return Activity::create(array_merge([
             'activity_type_id' => $this->typeId(),
             'community_id' => $this->communityId($community),
-            'status' => 'pendiente',
+            'status' => 'no_iniciado',
             'start_date' => today()->subDays(5)->toDateString(),
             'end_date' => today()->subDay()->toDateString(),
         ], $attributes));

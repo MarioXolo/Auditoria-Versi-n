@@ -120,9 +120,9 @@ class DemoSeeder extends Seeder
 
         // Reparto realista: la mayoría ya revisadas por un superior
         $status = fake()->randomElement([
-            ActivityStatus::Completada, ActivityStatus::Completada, ActivityStatus::Completada, ActivityStatus::Completada,
-            ActivityStatus::Incompleta, ActivityStatus::Incompleta,
-            ActivityStatus::Pendiente, ActivityStatus::Pendiente, ActivityStatus::EnProgreso, ActivityStatus::Cancelada,
+            ActivityStatus::Concluido, ActivityStatus::Concluido, ActivityStatus::Concluido, ActivityStatus::Concluido,
+            ActivityStatus::NoCompletada, ActivityStatus::NoCompletada,
+            ActivityStatus::NoIniciado, ActivityStatus::NoIniciado, ActivityStatus::EnProceso, ActivityStatus::Suspendida,
         ]);
 
         // 1 de cada 4 la carga el propio empleado; el resto su encargado o el gerente
@@ -141,12 +141,12 @@ class DemoSeeder extends Seeder
 
         if ($status->isMarked()) {
             $markedAt = now()->setTimestamp(rand($created->timestamp, now()->subHour()->timestamp));
-            $completed = $status === ActivityStatus::Completada ? $markedAt : null;
+            $completed = $status === ActivityStatus::Concluido ? $markedAt : null;
             $updated = $markedAt;
             $mark = [
                 'marked_by' => $marker,
                 'marked_at' => $markedAt,
-                'mark_notes' => $status === ActivityStatus::Incompleta ? fake()->randomElement([
+                'mark_notes' => $status === ActivityStatus::NoCompletada ? fake()->randomElement([
                     'Falta la foto de evidencia.',
                     'El reporte está incompleto, faltan los hallazgos de la revisión.',
                     'Los datos del inventario no coinciden con el sistema.',
@@ -161,7 +161,7 @@ class DemoSeeder extends Seeder
 
         // Las revisadas casi siempre traen evidencia: texto o foto (las fotos demo no existen, se omiten)
         $evidenceText = $status->isMarked() || rand(1, 3) === 1 ? fake()->randomElement(self::EVIDENCE) : null;
-        if ($status === ActivityStatus::Incompleta && rand(1, 2) === 1) {
+        if ($status === ActivityStatus::NoCompletada && rand(1, 2) === 1) {
             $evidenceText = null;
         }
 

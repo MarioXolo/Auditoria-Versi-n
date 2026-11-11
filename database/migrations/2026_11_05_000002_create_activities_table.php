@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('assigned_to')->constrained('users')->cascadeOnDelete();
             $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
             $table->foreignId('team_id')->nullable()->constrained('teams')->nullOnDelete();
-            $table->string('status', 20)->default('pendiente')->index();
+            $table->string('status', 20)->default('no_iniciado')->index();
             $table->date('start_date')->index();
             $table->date('end_date')->index();
             $table->timestamp('completed_at')->nullable();

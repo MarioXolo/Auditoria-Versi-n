@@ -47,7 +47,7 @@
     <div class="sm:col-span-2">
         @if (auth()->user()->isEmpleado())
             <div class="rounded-lg bg-brand-50 px-4 py-3 text-sm text-brand-700">
-                La actividad quedará a tu nombre. Tu encargado la revisará y la marcará como completada o incompleta.
+                La actividad quedará a tu nombre. Tu encargado la revisará: verde la pone en «Concluido» y rojo en «No completada».
             </div>
         @else
             <label for="assigned_to" class="label">Asignar a *</label>
@@ -112,7 +112,7 @@
         <div>
             <label for="status" class="label">Estado</label>
             @if ($activity->status->isMarked())
-                <p class="input bg-slate-50 text-slate-600">{{ $activity->status->label() }} (se cambia desde la revisión)</p>
+                <p class="input bg-slate-50 text-slate-600">{{ $activity->status->label() }} (lo pone la revisión con el checkbox)</p>
             @else
                 <select id="status" name="status" class="input">
                     @foreach ($statuses as $value => $label)
