@@ -77,3 +77,22 @@
         @apply bg-white/10 text-white shadow-[inset_3px_0_0_var(--color-brand-500)];
     }
 }
+
+/* ---------- Impresión (calendario a PDF) ---------- */
+@media print {
+    @page {
+        size: letter landscape;
+        margin: 9mm;
+    }
+
+    html,
+    body {
+        background: #fff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    .card {
+        box-shadow: none !important;
+    }
+}

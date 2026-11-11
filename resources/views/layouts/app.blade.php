@@ -19,6 +19,7 @@
         $nav[] = ['route' => 'dashboard', 'match' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z'];
     }
     $nav[] = ['route' => 'activities.index', 'match' => 'activities.*', 'label' => 'Actividades', 'icon' => 'M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11'];
+    $nav[] = ['route' => 'calendar.index', 'match' => 'calendar.*', 'label' => 'Calendario', 'icon' => 'M8 3v3m8-3v3M4 9h16M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1zm3 8h2m3 0h2m-7 3h2'];
     $nav[] = ['route' => 'attendance.index', 'match' => 'attendance.*', 'label' => 'Asistencia', 'icon' => 'M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z'];
     if ($me->seesEverything()) {
         $nav[] = ['route' => 'users.index', 'match' => 'users.*', 'label' => 'Usuarios', 'icon' => 'M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m22 0v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75M13 7a4 4 0 11-8 0 4 4 0 018 0z'];
@@ -29,7 +30,7 @@
 
 <div class="lg:flex">
     {{-- Barra lateral (escritorio) / barra superior (móvil) --}}
-    <aside class="bg-ink text-white lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-64 lg:shrink-0 lg:flex-col">
+    <aside class="bg-ink text-white print:hidden lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-64 lg:shrink-0 lg:flex-col">
         <div class="flex items-center justify-between px-4 py-4 lg:px-5 lg:py-6">
             <a href="{{ route('home') }}" class="flex items-center gap-2">
                 <img src="{{ asset('images/logo.svg') }}" alt="WeAdvise" class="h-7 w-auto">
@@ -68,16 +69,16 @@
         </nav>
     </aside>
 
-    <main class="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-10 lg:py-8">
-        <div class="mx-auto max-w-7xl">
+    <main class="min-w-0 flex-1 px-4 py-6 sm:px-6 lg:px-10 lg:py-8 print:p-0">
+        <div class="mx-auto max-w-7xl print:max-w-none">
             @hasSection('header')
-                <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between print:hidden">
                     @yield('header')
                 </div>
             @endif
 
             @if (session('status'))
-                <div class="mb-5 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+                <div class="mb-5 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 print:hidden">
                     {{ session('status') }}
                 </div>
             @endif

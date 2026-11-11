@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
@@ -38,6 +39,9 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::post('/activities/{activity}/marcar', [ActivityController::class, 'mark'])->name('activities.mark');
     Route::patch('/activities/{activity}/estado', [ActivityController::class, 'updateStatus'])->name('activities.status');
     Route::get('/activities/{activity}/evidence', [ActivityController::class, 'evidence'])->name('activities.evidence');
+
+    // Calendario de actividades (cada quien ve lo que su rol le permite); se imprime a PDF desde el navegador
+    Route::get('/calendario', CalendarController::class)->name('calendar.index');
 
     // Asistencia
     Route::get('/asistencia', [AttendanceController::class, 'index'])->name('attendance.index');

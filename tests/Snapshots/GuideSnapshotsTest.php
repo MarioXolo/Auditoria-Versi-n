@@ -50,6 +50,7 @@ class GuideSnapshotsTest extends TestCase
         $this->snap('07-gerente-dashboard', $this->get('/dashboard?period=30'));
         $this->snap('08-gerente-actividades', $this->get('/activities'));
         $this->snap('09-gerente-vencidas', $this->get('/activities?status=vencida'));
+        $this->snap('23-gerente-calendario', $this->get('/calendario'));
 
         $this->actingAs($encargado);
         $this->snap('10-encargado-actividades', $this->get('/activities'));
