@@ -235,7 +235,7 @@ class DemoSeeder extends Seeder
         foreach (array_slice($communityIds, 0, 6) as $i => $communityId) {
             $campaign->territories()->create([
                 'community_id' => $communityId,
-                'responsable' => fake('es_MX')->name(),
+                'responsable' => fake('es_ES')->name(),
                 'listado_nominal' => $metas[$i] * 2 + rand(0, 400),
                 'meta_votos' => $metas[$i],
             ]);
@@ -244,11 +244,11 @@ class DemoSeeder extends Seeder
         $promoters = collect();
         foreach (range(1, 24) as $i) {
             $promoters->push($campaign->promoters()->create([
-                'name' => fake('es_MX')->name(),
+                'name' => fake('es_ES')->name(),
                 'phone' => '442-'.rand(100, 999).'-'.rand(1000, 9999),
                 'community_id' => $communityIds[$i % 6],
                 'secciones' => str_pad((string) (500 + $i % 9), 4, '0', STR_PAD_LEFT),
-                'coordinador' => fake('es_MX')->name(),
+                'coordinador' => fake('es_ES')->name(),
                 'meta_votos' => 10,
                 'verificado' => $i % 3 !== 0,
             ]));
@@ -257,10 +257,10 @@ class DemoSeeder extends Seeder
         foreach (range(1, 180) as $i) {
             $promoter = rand(1, 10) > 1 ? $promoters->random() : null;
             $campaign->voters()->create([
-                'nombre' => fake('es_MX')->name(),
+                'nombre' => fake('es_ES')->name(),
                 'seccion' => $promoter?->secciones ?? str_pad((string) rand(500, 508), 4, '0', STR_PAD_LEFT),
                 'casilla' => fake()->randomElement(['B1', 'C1', 'C2']),
-                'domicilio' => fake('es_MX')->streetAddress(),
+                'domicilio' => fake('es_ES')->streetAddress(),
                 'telefono' => '442-'.rand(100, 999).'-'.rand(1000, 9999),
                 'community_id' => $promoter?->community_id ?? fake()->randomElement(array_slice($communityIds, 0, 6)),
                 'promoter_id' => $promoter?->id,

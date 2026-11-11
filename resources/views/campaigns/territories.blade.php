@@ -52,7 +52,7 @@
                     <th class="table-head text-right">Meta</th>
                     <th class="table-head text-right">Identificados</th>
                     <th class="table-head">% avance</th>
-                    <th class="table-head text-right">Promotores nec.</th>
+                    <th class="table-head text-right">Prom. nec.</th>
                     <th class="table-head text-right">Reclutados</th>
                     <th class="table-head text-right">Faltan</th>
                     <th class="table-head"></th>
@@ -63,9 +63,9 @@
                     @php $t = $row->model; $formId = 'territory-'.$t->id; @endphp
                     <tr>
                         <td class="table-cell font-medium text-slate-900">{{ $t->community?->name }}</td>
-                        <td class="table-cell"><input form="{{ $formId }}" name="responsable" value="{{ $t->responsable }}" maxlength="150" class="input min-w-36 py-1.5 text-sm" aria-label="Responsable de {{ $t->community?->name }}"></td>
-                        <td class="table-cell text-right"><input form="{{ $formId }}" type="number" min="0" name="listado_nominal" value="{{ $t->listado_nominal }}" class="input w-28 py-1.5 text-right text-sm tabular-nums" aria-label="Listado nominal"></td>
-                        <td class="table-cell text-right"><input form="{{ $formId }}" type="number" min="0" name="meta_votos" value="{{ $t->meta_votos }}" class="input w-24 py-1.5 text-right text-sm tabular-nums" aria-label="Meta de votos"></td>
+                        <td class="table-cell"><input form="{{ $formId }}" name="responsable" value="{{ $t->responsable }}" maxlength="150" class="input w-36 py-1.5 text-sm" aria-label="Responsable de {{ $t->community?->name }}"></td>
+                        <td class="table-cell text-right"><input form="{{ $formId }}" type="number" min="0" name="listado_nominal" value="{{ $t->listado_nominal }}" class="input w-24 py-1.5 text-right text-sm tabular-nums" aria-label="Listado nominal"></td>
+                        <td class="table-cell text-right"><input form="{{ $formId }}" type="number" min="0" name="meta_votos" value="{{ $t->meta_votos }}" class="input w-20 py-1.5 text-right text-sm tabular-nums" aria-label="Meta de votos"></td>
                         <td class="table-cell text-right tabular-nums">
                             <a href="{{ route('campaigns.voters.index', [$campaign, 'community_id' => $t->community_id]) }}" class="hover:text-brand-600 hover:underline">{{ $n($row->identificados) }}</a>
                         </td>
