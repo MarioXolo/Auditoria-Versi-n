@@ -10,7 +10,7 @@
 @endsection
 
 @section('content')
-    <div class="grid gap-6 lg:grid-cols-2">
+    <div class="grid gap-6 xl:grid-cols-2">
         @foreach ([
             ['key' => 'tipos', 'title' => 'Tipos de actividad', 'items' => $types, 'placeholder' => 'Ej. Visita domiciliaria'],
             ['key' => 'comunidades', 'title' => 'Comunidades', 'items' => $communities, 'placeholder' => 'Ej. San Isidro'],

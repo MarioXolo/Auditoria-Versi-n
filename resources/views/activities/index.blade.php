@@ -16,7 +16,7 @@
 @endsection
 
 @section('content')
-    <form method="GET" class="card mb-5 grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-6">
+    <form method="GET" class="card mb-5 grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
         <input type="search" name="q" value="{{ request('q') }}" placeholder="Buscar por ID, tipo o comunidad" class="input lg:col-span-2">
         <select name="status" class="input">
             <option value="">Todos los estados</option>
@@ -54,7 +54,7 @@
                 @endforeach
             </select>
         @endif
-        <div class="flex gap-2 sm:col-span-2 lg:col-span-6 lg:justify-end">
+        <div class="flex gap-2 sm:col-span-2 lg:col-span-4 lg:justify-end">
             <a href="{{ route('activities.index') }}" class="btn btn-secondary">Limpiar</a>
             <button class="btn btn-primary">Filtrar</button>
         </div>
