@@ -109,8 +109,10 @@ class ActivityFormTest extends TestCase
         $uno = $this->makeActivity(['assigned_to' => $this->empleado->id, 'created_by' => $this->encargado->id], 'El Mirador');
         $dos = $this->makeActivity(['assigned_to' => $this->empleado->id, 'created_by' => $this->encargado->id], 'Los Pinos');
 
-        $this->actingAs($this->gerente)->get('/activities?q=ACT-0002')->assertSee('Los Pinos')->assertDontSee('El Mirador');
-        $this->actingAs($this->gerente)->get('/activities?q=mirador')->assertSee('El Mirador')->assertDontSee('Los Pinos');
+        // Los filtros listan todas las comunidades, así que se compara por folio
+        $this->actingAs($this->gerente)->get('/activities?q=ACT-0002')->assertSee('ACT-0002')->assertDontSee('ACT-0001');
+        $this->actingAs($this->gerente)->get('/activities?q=2')->assertSee('ACT-0002')->assertDontSee('ACT-0001');
+        $this->actingAs($this->gerente)->get('/activities?q=mirador')->assertSee('ACT-0001')->assertDontSee('ACT-0002');
         $this->actingAs($this->gerente)->get('/activities?community_id='.$uno->community_id)->assertSee('ACT-0001')->assertDontSee('ACT-0002');
     }
 
@@ -126,7 +128,7 @@ class ActivityFormTest extends TestCase
 
         // Desactivado: ya no sale en el formulario
         $this->actingAs($this->gerente)->patch("/catalogos/tipos/{$type->id}", ['active' => 0])->assertRedirect();
-        $this->actingAs($this->encargado)->get('/activities/create')->assertDontSee('Reunión con vecinos');
+        $this->actingAs($this->encargado)->get('/activities/create')->assertDontSee('>Reunión con vecinos</option>', false);
 
         // Con actividades no se borra; sin actividades sí
         $community = Community::where('name', 'La Joya')->firstOrFail();

@@ -127,12 +127,12 @@ class AppSmokeTest extends TestCase
         $mia = $this->activityFor($this->empleado, $this->encargado, 'Actividad de Ana');
         $deEl = $this->activityFor($companero, $this->encargado, 'Actividad de Beto');
 
-        $this->actingAs($this->empleado)->get('/activities')->assertSee('Actividad de Ana')->assertDontSee('Actividad de Beto');
+        $this->actingAs($this->empleado)->get('/activities')->assertSee($mia->code)->assertDontSee($deEl->code);
         $this->actingAs($this->empleado)->get("/activities/{$deEl->id}")->assertForbidden();
 
         // Otro encargado no ve lo que asignó este encargado
         $otroEncargado = User::factory()->role('encargado')->create();
-        $this->actingAs($otroEncargado)->get('/activities')->assertDontSee('Actividad de Ana');
+        $this->actingAs($otroEncargado)->get('/activities')->assertDontSee($mia->code);
         $this->actingAs($otroEncargado)->get("/activities/{$mia->id}")->assertForbidden();
 
         // Un encargado no puede asignar a empleados que no son de su equipo
@@ -153,15 +153,15 @@ class AppSmokeTest extends TestCase
         $this->actingAs($this->encargado)->get("/activities/{$delGerente->id}")->assertForbidden();
 
         $this->actingAs($this->encargado)->get('/activities')
-            ->assertSee('Asignada por encargado')
-            ->assertSee('Tarea del encargado')
-            ->assertDontSee('Asignada por gerente');
+            ->assertSee($suya->code)
+            ->assertSee($paraEncargado->code)
+            ->assertDontSee($delGerente->code);
 
         // El empleado ve todas las suyas, sin importar quién las asignó
         $this->actingAs($this->empleado)->get('/activities')
-            ->assertSee('Asignada por encargado')
-            ->assertSee('Asignada por gerente')
-            ->assertDontSee('Tarea del encargado');
+            ->assertSee($suya->code)
+            ->assertSee($delGerente->code)
+            ->assertDontSee($paraEncargado->code);
 
         // El encargado no edita lo que no asignó
         $this->actingAs($this->encargado)->post("/activities/{$delGerente->id}/marcar", ['marca' => 'completada'])->assertForbidden();
