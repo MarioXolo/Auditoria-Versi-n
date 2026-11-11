@@ -29,15 +29,18 @@
         <a href="{{ route('campaigns.promoters.create', $campaign) }}" class="btn btn-primary">Registrar promotor</a>
     </form>
 
+    {{-- Mismas columnas que la pestaña «Padrón de Promotores» del Excel --}}
     <div class="card overflow-x-auto">
         <table class="min-w-full divide-y divide-slate-200 text-sm">
             <thead class="bg-slate-50">
                 <tr>
-                    <th class="table-head">Promotor</th>
+                    <th class="table-head">#</th>
+                    <th class="table-head">Nombre del promotor</th>
+                    <th class="table-head">Tel / WhatsApp</th>
                     <th class="table-head">Comunidad</th>
                     <th class="table-head">Sección(es)</th>
-                    <th class="table-head">Coordinador</th>
-                    <th class="table-head text-right">Meta</th>
+                    <th class="table-head">Coordinador seccional</th>
+                    <th class="table-head text-right">Meta (votos)</th>
                     <th class="table-head text-right">Identificados</th>
                     <th class="table-head">% avance</th>
                     <th class="table-head">¿Verificado?</th>
@@ -48,16 +51,15 @@
                 @forelse ($promoters as $promoter)
                     @php $avance = $promoter->avance(); @endphp
                     <tr>
-                        <td class="table-cell">
-                            <span class="font-medium text-slate-900">{{ $promoter->name }}</span>
-                            @if ($promoter->phone)<span class="block text-xs text-slate-500">{{ $promoter->phone }}</span>@endif
-                        </td>
+                        <td class="table-cell text-slate-400 tabular-nums">{{ $promoters->firstItem() + $loop->index }}</td>
+                        <td class="table-cell font-medium text-slate-900">{{ $promoter->name }}</td>
+                        <td class="table-cell"><x-whatsapp :phone="$promoter->phone" /></td>
                         <td class="table-cell">{{ $promoter->community?->name ?? '—' }}</td>
                         <td class="table-cell tabular-nums">{{ $promoter->secciones ?? '—' }}</td>
                         <td class="table-cell">{{ $promoter->coordinador ?? '—' }}</td>
                         <td class="table-cell text-right tabular-nums">{{ number_format($promoter->meta_votos) }}</td>
                         <td class="table-cell text-right tabular-nums">
-                            <a href="{{ route('campaigns.voters.index', [$campaign, 'promoter_id' => $promoter->id]) }}" class="hover:text-brand-600 hover:underline">{{ number_format($promoter->voters_count) }}</a>
+                            <a href="{{ route('campaigns.voters.index', [$campaign, 'promoter_id' => $promoter->id]) }}" class="hover:text-brand-600 hover:underline" title="Ver sus votantes">{{ number_format($promoter->voters_count) }}</a>
                         </td>
                         <td class="table-cell">
                             <div class="flex items-center gap-2">
@@ -69,9 +71,21 @@
                         <td class="table-cell text-right"><a href="{{ route('campaigns.promoters.edit', [$campaign, $promoter]) }}" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
                     </tr>
                 @empty
-                    <tr><td colspan="9" class="table-cell py-10 text-center text-slate-500">Aún no hay promotores registrados.</td></tr>
+                    <tr><td colspan="11" class="table-cell py-10 text-center text-slate-500">Aún no hay promotores registrados.</td></tr>
                 @endforelse
             </tbody>
+            @if ($totals->total > 0)
+                <tfoot class="bg-slate-50 font-semibold">
+                    <tr>
+                        <td class="table-cell" colspan="6">TOTALES →</td>
+                        <td class="table-cell text-right tabular-nums">{{ number_format($totals->meta) }}</td>
+                        <td class="table-cell text-right tabular-nums">{{ number_format($totals->identificados) }}</td>
+                        <td class="table-cell tabular-nums">{{ $totals->meta > 0 ? number_format($totals->identificados / $totals->meta * 100, 1) : '0.0' }}%</td>
+                        <td class="table-cell tabular-nums">{{ number_format($totals->verificados) }} de {{ number_format($totals->total) }}</td>
+                        <td class="table-cell"></td>
+                    </tr>
+                </tfoot>
+            @endif
         </table>
     </div>
 

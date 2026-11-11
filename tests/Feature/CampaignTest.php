@@ -205,4 +205,42 @@ class CampaignTest extends TestCase
         $this->actingAs($this->gerente)->delete("/campanas/{$vacia->id}")->assertRedirect('/campanas');
         $this->assertNull($vacia->fresh());
     }
+
+    public function test_layout_follows_the_excel_and_adds_helpers(): void
+    {
+        $c = $this->excelCampaign();
+
+        // Pestañas con la numeración del Excel; las de la etapa 2 se ven deshabilitadas
+        $this->actingAs($this->gerente)->get("/campanas/{$c->id}")
+            ->assertSeeInOrder(['1. Meta de Votos', '2. Estructura Territorial', '3. Base de Votantes', '4. Padrón de Promotores', '5. Mapeo de Actores', '9. Tablero KPI', '10. Logros Comunicables'])
+            ->assertSee('Pestañas del cuaderno');
+
+        // Tablero KPI en el orden del Excel
+        $this->actingAs($this->gerente)->get("/campanas/{$c->id}/kpi")->assertSeeInOrder([
+            'Votos identificados (base de votantes)', 'Comunidades con estructura completa', 'Promotores reclutados y verificados',
+            '% casillas con RC propietario + suplente', 'Aprobación del candidato (encuesta)', 'Gasto ejercido (% del tope)',
+            'Alcance digital semanal', 'Incidencias jurídicas abiertas',
+        ]);
+
+        // Columnas de la Base de Votantes iguales al Excel, con liga de WhatsApp
+        CampaignVoter::create(['campaign_id' => $c->id, 'nombre' => 'María López García', 'telefono' => '442-123-4567', 'notas' => 'Vecina activa']);
+        $this->actingAs($this->gerente)->get("/campanas/{$c->id}/votantes")
+            ->assertSeeInOrder(['Nombre completo', 'Sección', 'Casilla', 'Domicilio', 'Tel / WhatsApp', 'Comunidad', 'Promotor responsable', 'Afinidad', '¿Recibe apoyo gob?', 'Notas'])
+            ->assertSee('https://wa.me/524421234567', false)
+            ->assertSee('Vecina activa');
+        $this->assertNull(CampaignVoter::whatsappUrl('123'));
+
+        // Aviso de duplicado por teléfono; se puede confirmar si es otra persona
+        $this->actingAs($this->gerente)->post("/campanas/{$c->id}/votantes", ['nombre' => 'Otra María', 'telefono' => '442-123-4567'])
+            ->assertSessionHasErrors('duplicado');
+        $this->assertSame(1, CampaignVoter::count());
+        $this->actingAs($this->gerente)->post("/campanas/{$c->id}/votantes", ['nombre' => 'Otra María', 'telefono' => '442-123-4567', 'confirmar_duplicado' => '1'])
+            ->assertSessionHasNoErrors();
+        $this->assertSame(2, CampaignVoter::count());
+
+        // Mismo nombre en la misma sección también avisa
+        CampaignVoter::create(['campaign_id' => $c->id, 'nombre' => 'Pedro Ruiz', 'seccion' => '0512']);
+        $this->actingAs($this->gerente)->post("/campanas/{$c->id}/votantes", ['nombre' => 'pedro ruiz', 'seccion' => '0512'])
+            ->assertSessionHasErrors('duplicado');
+    }
 }

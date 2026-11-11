@@ -94,6 +94,34 @@
         </section>
     </div>
 
+    {{-- Índice del cuaderno --}}
+    <section class="card mt-6 overflow-hidden">
+        <div class="border-b border-slate-200 px-5 py-3">
+            <h2 class="font-semibold">Pestañas del cuaderno</h2>
+            <p class="text-xs text-slate-500">Es tu documento vivo: ve llenando cada pestaña conforme llega la información; los cálculos se hacen solos.</p>
+        </div>
+        <ul class="grid divide-y divide-slate-100 sm:grid-cols-2 sm:divide-y-0">
+            @foreach ($steps as [$label, $desc, $route, $done])
+                <li class="flex items-start gap-3 px-5 py-3 sm:border-b sm:border-slate-100">
+                    <span @class([
+                        'mt-0.5 grid size-5 shrink-0 place-items-center rounded-full text-[11px] font-bold',
+                        'bg-emerald-600 text-white' => $done,
+                        'border-2 border-slate-300' => ! $done && $route,
+                        'bg-slate-100 text-slate-300' => ! $route,
+                    ])>@if ($done)✓@endif</span>
+                    <div class="min-w-0 text-sm">
+                        @if ($route)
+                            <a href="{{ route($route, $campaign) }}" class="font-medium text-slate-900 hover:text-brand-600">{{ $label }}</a>
+                        @else
+                            <span class="font-medium text-slate-400">{{ $label }}</span> <span class="badge bg-slate-100 text-slate-500">Etapa 2</span>
+                        @endif
+                        <p @class(['text-xs', 'text-slate-500' => $route, 'text-slate-400' => ! $route])>{{ $desc }}</p>
+                    </div>
+                </li>
+            @endforeach
+        </ul>
+    </section>
+
     @if ($summary->metaTerritorial > 0 && $summary->metaTerritorial < round($summary->meta))
         <div class="mt-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
             La suma de metas por comunidad ({{ $n($summary->metaTerritorial) }}) es menor que la meta municipal con colchón ({{ $n($summary->meta) }}). Reparte la diferencia en <a class="font-medium underline" href="{{ route('campaigns.territories.index', $campaign) }}">Estructura territorial</a>.

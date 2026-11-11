@@ -21,7 +21,7 @@
                     <th class="table-head text-right">Valor actual</th>
                     <th class="table-head text-right">% cumplimiento</th>
                     <th class="table-head">Estatus</th>
-                    <th class="table-head">Fuente / fecha de corte</th>
+                    <th class="table-head">Fecha de corte</th>
                     <th class="table-head"></th>
                 </tr>
             </thead>
@@ -29,12 +29,15 @@
                 @foreach ($kpis as $kpi)
                     @if ($kpi->auto)
                         <tr @class(['text-slate-400' => $kpi->meta === null])>
-                            <td class="table-cell font-medium {{ $kpi->meta === null ? '' : 'text-slate-900' }}">{{ $kpi->nombre }} <span class="badge ml-1 bg-brand-50 text-brand-700">Automático</span></td>
+                            <td class="table-cell">
+                                <span class="font-medium {{ $kpi->meta === null ? '' : 'text-slate-900' }}">{{ $kpi->nombre }}</span>
+                                <span class="block text-xs {{ $kpi->meta === null ? '' : 'text-slate-500' }}">{{ $kpi->fuente }}</span>
+                            </td>
                             <td class="table-cell text-right tabular-nums">{{ $fmt($kpi->meta, false) }}</td>
                             <td class="table-cell text-right tabular-nums">{{ $fmt($kpi->valor, false) }}</td>
                             <td class="table-cell text-right tabular-nums">{{ $kpi->status && $kpi->status['ratio'] !== null ? number_format($kpi->status['ratio'] * 100, 1).'%' : '—' }}</td>
                             <td class="table-cell">@if ($kpi->status)<span class="badge {{ $kpi->status['class'] }}">{{ $kpi->status['label'] }}</span>@else — @endif</td>
-                            <td class="table-cell text-xs">{{ $kpi->fuente }}</td>
+                            <td class="table-cell text-xs">@if ($kpi->meta !== null)<span class="badge bg-brand-50 text-brand-700">Automático · hoy</span>@else Etapa 2 @endif</td>
                             <td class="table-cell"></td>
                         </tr>
                     @else

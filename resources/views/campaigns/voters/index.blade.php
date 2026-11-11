@@ -59,40 +59,43 @@
         @endforelse
     </div>
 
-    {{-- Escritorio --}}
+    {{-- Escritorio: mismas columnas que la pestaña «Base de Votantes» del Excel --}}
     <div class="card hidden overflow-x-auto md:block">
         <table class="min-w-full divide-y divide-slate-200 text-sm">
             <thead class="bg-slate-50">
                 <tr>
+                    <th class="table-head">#</th>
                     <th class="table-head">Nombre completo</th>
                     <th class="table-head">Sección</th>
                     <th class="table-head">Casilla</th>
+                    <th class="table-head">Domicilio</th>
                     <th class="table-head">Tel / WhatsApp</th>
                     <th class="table-head">Comunidad</th>
-                    <th class="table-head">Promotor</th>
+                    <th class="table-head">Promotor responsable</th>
                     <th class="table-head">Afinidad</th>
-                    <th class="table-head">¿Apoyo gob?</th>
+                    <th class="table-head">¿Recibe apoyo gob?</th>
+                    <th class="table-head">Notas</th>
                     <th class="table-head"></th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
                 @forelse ($voters as $voter)
                     <tr>
-                        <td class="table-cell">
-                            <span class="font-medium text-slate-900">{{ $voter->nombre }}</span>
-                            @if ($voter->domicilio)<span class="block max-w-64 truncate text-xs text-slate-500">{{ $voter->domicilio }}</span>@endif
-                        </td>
+                        <td class="table-cell text-slate-400 tabular-nums">{{ $voters->firstItem() + $loop->index }}</td>
+                        <td class="table-cell font-medium text-slate-900">{{ $voter->nombre }}</td>
                         <td class="table-cell tabular-nums">{{ $voter->seccion ?? '—' }}</td>
                         <td class="table-cell">{{ $voter->casilla ?? '—' }}</td>
-                        <td class="table-cell whitespace-nowrap">{{ $voter->telefono ?? '—' }}</td>
+                        <td class="table-cell"><span class="block max-w-52 truncate" title="{{ $voter->domicilio }}">{{ $voter->domicilio ?? '—' }}</span></td>
+                        <td class="table-cell"><x-whatsapp :phone="$voter->telefono" /></td>
                         <td class="table-cell">{{ $voter->community?->name ?? '—' }}</td>
                         <td class="table-cell">{{ $voter->promoter?->name ?? '—' }}</td>
                         <td class="table-cell">@if ($voter->afinidad)<span class="badge {{ $afin[$voter->afinidad] ?? '' }}">{{ $voter->afinidad }}</span>@else — @endif</td>
                         <td class="table-cell">{{ $voter->recibe_apoyo === null ? '—' : ($voter->recibe_apoyo ? 'Sí' : 'No') }}</td>
+                        <td class="table-cell"><span class="block max-w-44 truncate text-slate-500" title="{{ $voter->notas }}">{{ $voter->notas ?? '—' }}</span></td>
                         <td class="table-cell text-right"><a href="{{ route('campaigns.voters.edit', [$campaign, $voter]) }}" class="text-sm font-medium text-brand-600 hover:underline">Editar</a></td>
                     </tr>
                 @empty
-                    <tr><td colspan="9" class="table-cell py-10 text-center text-slate-500">No hay votantes con estos filtros.</td></tr>
+                    <tr><td colspan="12" class="table-cell py-10 text-center text-slate-500">No hay votantes con estos filtros.</td></tr>
                 @endforelse
             </tbody>
         </table>

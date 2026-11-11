@@ -146,6 +146,20 @@ class CampaignMetrics
             'status' => self::status($k->meta, $k->valor),
         ]);
 
-        return $auto->concat($manual);
+        // Mismo orden que el «Tablero KPI» del Excel; los indicadores extra que se agreguen van al final
+        $take = function (string $prefix) use (&$manual) {
+            $found = $manual->first(fn ($k) => str_starts_with($k->nombre, $prefix));
+            $manual = $manual->reject(fn ($k) => $k === $found);
+
+            return $found;
+        };
+
+        return collect([
+            $auto[0], $auto[1], $auto[2], $auto[3],
+            $take('Aprobación'),
+            $auto[4],
+            $take('Alcance digital'),
+            $take('Incidencias'),
+        ])->filter()->concat($manual)->values();
     }
 }

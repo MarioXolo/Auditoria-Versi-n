@@ -16,7 +16,7 @@
     <form method="POST" action="{{ route('campaigns.territories.store', $campaign) }}" class="card mb-5 grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-[1.4fr_1.2fr_.8fr_.8fr_auto] lg:items-end">
         @csrf
         <div>
-            <label for="community_id" class="label">Comunidad *</label>
+            <label for="community_id" class="label">Delegación / Comunidad *</label>
             <select id="community_id" name="community_id" required class="input" data-other="community_new">
                 <option value="">Selecciona</option>
                 @foreach ($available as $community)
@@ -46,14 +46,14 @@
         <table class="min-w-full divide-y divide-slate-200 text-sm">
             <thead class="bg-slate-50">
                 <tr>
-                    <th class="table-head">Comunidad</th>
-                    <th class="table-head">Responsable</th>
+                    <th class="table-head">Delegación / Comunidad</th>
+                    <th class="table-head">Responsable territorial</th>
                     <th class="table-head text-right">Listado nominal</th>
-                    <th class="table-head text-right">Meta</th>
-                    <th class="table-head text-right">Identificados</th>
+                    <th class="table-head text-right">Meta de votos</th>
+                    <th class="table-head text-right">Votos identificados</th>
                     <th class="table-head">% avance</th>
-                    <th class="table-head text-right">Prom. nec.</th>
-                    <th class="table-head text-right">Reclutados</th>
+                    <th class="table-head text-right">Promotores necesarios</th>
+                    <th class="table-head text-right">Promotores reclutados</th>
                     <th class="table-head text-right">Faltan</th>
                     <th class="table-head"></th>
                 </tr>

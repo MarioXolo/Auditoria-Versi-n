@@ -1,4 +1,12 @@
 @csrf
+@error('duplicado')
+    <div class="mb-4 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        <p>{{ $message }}</p>
+        <label class="mt-2 inline-flex items-center gap-2 font-medium">
+            <input type="checkbox" name="confirmar_duplicado" value="1" class="size-4 rounded border-amber-400"> Es otra persona, registrarla de todos modos
+        </label>
+    </div>
+@enderror
 <div class="grid gap-4 sm:grid-cols-2">
     <div class="sm:col-span-2">
         <label for="nombre" class="label">Nombre completo *</label>

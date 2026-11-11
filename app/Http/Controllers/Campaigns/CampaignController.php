@@ -44,10 +44,27 @@ class CampaignController extends Controller
     {
         $metrics = new CampaignMetrics($campaign);
 
+        $summary = $metrics->summary();
+
+        // Pestañas del cuaderno (mismo índice que el Excel) y si ya tienen información
+        $steps = [
+            ['1. Meta de Votos', 'Calculadora: define tu número objetivo y cuántos promotores necesitas. Empieza aquí.', 'campaigns.edit', $campaign->listado_nominal > 0],
+            ['2. Estructura Territorial', 'Metas y avance por delegación.', 'campaigns.territories.index', $summary->comunidades > 0],
+            ['3. Base de Votantes', 'El padrón nominal propio: votante por votante identificado.', 'campaigns.voters.index', $summary->votantes > 0],
+            ['4. Padrón de Promotores', 'Tu ejército: quién es, a cuántos moviliza, avance.', 'campaigns.promoters.index', $summary->promotores > 0],
+            ['5. Mapeo de Actores', 'Liderazgos por comunidad: afines, neutrales, adversos.', null, false],
+            ['6. Defensa del Voto', 'Control de representantes de casilla (RC) y generales (RG).', null, false],
+            ['7. Presupuesto', 'Rubros vs. tope legal, gasto ejercido y disponible.', null, false],
+            ['8. Cronograma', 'Fases y tareas rumbo a la jornada.', null, false],
+            ['9. Tablero KPI', 'Seguimiento semanal de los indicadores clave.', 'campaigns.kpis.index', $campaign->kpis()->where('valor', '>', 0)->exists()],
+            ['10. Logros Comunicables', 'Inventario de obra del gobierno, munición para el mensaje.', null, false],
+        ];
+
         return view('campaigns.show', [
             'campaign' => $campaign,
-            'summary' => $metrics->summary(),
+            'summary' => $summary,
             'kpis' => $metrics->kpis()->take(3),
+            'steps' => $steps,
         ]);
     }
 

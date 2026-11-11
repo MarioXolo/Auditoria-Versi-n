@@ -20,6 +20,17 @@ class CampaignVoter extends Model
         return ['recibe_apoyo' => 'boolean'];
     }
 
+    /** Liga para escribir por WhatsApp (números de México de 10 dígitos o con lada 52). */
+    public static function whatsappUrl(?string $phone): ?string
+    {
+        $digits = preg_replace('/\D+/', '', (string) $phone);
+        if (strlen($digits) === 10) {
+            $digits = '52'.$digits;
+        }
+
+        return strlen($digits) >= 12 ? 'https://wa.me/'.$digits : null;
+    }
+
     public function campaign(): BelongsTo
     {
         return $this->belongsTo(Campaign::class);

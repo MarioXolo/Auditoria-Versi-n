@@ -38,7 +38,16 @@ class VoterController extends Controller
 
     public function store(Request $request, Campaign $campaign): RedirectResponse
     {
-        $voter = $campaign->voters()->create($this->validated($request, $campaign) + ['created_by' => $request->user()->id]);
+        $data = $this->validated($request, $campaign);
+
+        // Aviso de posible duplicado (mismo teléfono, o mismo nombre en la misma sección)
+        if (! $request->boolean('confirmar_duplicado') && ($dup = $this->possibleDuplicate($campaign, $data))) {
+            return back()->withInput()->withErrors(['duplicado' => "Posible duplicado: «{$dup->nombre}»"
+                .($dup->seccion ? " (sección {$dup->seccion})" : '').($dup->telefono ? ", tel. {$dup->telefono}" : '')
+                .' ya está en la base. Si es otra persona, marca «Es otra persona» y guarda de nuevo.']);
+        }
+
+        $voter = $campaign->voters()->create($data + ['created_by' => $request->user()->id]);
 
         if ($request->boolean('otro')) {
             return redirect()->route('campaigns.voters.create', [$campaign,
@@ -98,6 +107,22 @@ class VoterController extends Controller
             ->when(ctype_digit((string) $request->input('promoter_id')), fn ($q) => $q->where('promoter_id', $request->integer('promoter_id')))
             ->when($request->filled('afinidad'), fn ($q) => $q->where('afinidad', $request->input('afinidad')))
             ->orderBy('nombre');
+    }
+
+    private function possibleDuplicate(Campaign $campaign, array $data): ?CampaignVoter
+    {
+        $phone = trim((string) ($data['telefono'] ?? ''));
+        $name = mb_strtolower(trim($data['nombre']));
+
+        return $campaign->voters()
+            ->where(function ($q) use ($phone, $name, $data) {
+                if ($phone !== '') {
+                    $q->orWhere('telefono', $phone);
+                }
+                $q->orWhere(fn ($w) => $w->whereRaw('LOWER(nombre) = ?', [$name])
+                    ->where('seccion', $data['seccion'] ?? null));
+            })
+            ->first();
     }
 
     private function formData(Campaign $campaign, CampaignVoter $voter): array

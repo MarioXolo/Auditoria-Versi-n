@@ -24,21 +24,22 @@
 
         <section class="card p-6">
             <h2 class="font-semibold">Calculadora de meta de votos</h2>
-            <p class="text-sm text-slate-500">Llena estos datos; la meta y los promotores necesarios se calculan solos.</p>
+            <p class="text-sm text-slate-500">Llena estos datos. El resto se calcula solo. <b>Empieza aquí:</b> define tu número objetivo y cuántos promotores necesitas.</p>
             <div class="mt-4 grid gap-4 sm:grid-cols-2" data-calc>
                 <div>
-                    <label for="listado_nominal" class="label">Listado nominal del municipio *</label>
+                    <label for="listado_nominal" class="label">Listado nominal total del municipio *</label>
                     <input id="listado_nominal" type="number" min="0" name="listado_nominal" value="{{ old('listado_nominal', $campaign->listado_nominal) }}" required class="input tabular-nums">
-                    <p class="mt-1 text-xs text-slate-500">Dato oficial del instituto electoral local.</p>
+                    <p class="mt-1 text-xs text-slate-500">Dato oficial del instituto electoral local (IEEQ). Si aún es provisional, anótalo en Notas.</p>
                 </div>
                 <div>
-                    <label for="participacion" class="label">Participación estimada (%) *</label>
+                    <label for="participacion" class="label">Participación estimada (histórico ~55-65 %) *</label>
                     <input id="participacion" type="number" step="0.1" min="0" max="100" name="participacion" value="{{ $pct('participacion') }}" required class="input tabular-nums">
-                    <p class="mt-1 text-xs text-slate-500">Histórico típico: 55 a 65 %.</p>
+                    <p class="mt-1 text-xs text-slate-500">En porcentaje: 55 = 55 %.</p>
                 </div>
                 <div>
                     <label for="objetivo" class="label">% de la votación que buscas ganar *</label>
                     <input id="objetivo" type="number" step="0.1" min="0" max="100" name="objetivo" value="{{ $pct('objetivo') }}" required class="input tabular-nums">
+                    <p class="mt-1 text-xs text-slate-500">Objetivo de mayoría.</p>
                 </div>
                 <div>
                     <label for="colchon" class="label">Colchón de seguridad (%) *</label>
@@ -46,9 +47,9 @@
                     <p class="mt-1 text-xs text-slate-500">Margen extra recomendado: 10 %.</p>
                 </div>
                 <div>
-                    <label for="votantes_por_promotor" class="label">Votantes por promotor *</label>
+                    <label for="votantes_por_promotor" class="label">Votantes por promotor (sistema 1×N) *</label>
                     <input id="votantes_por_promotor" type="number" min="1" name="votantes_por_promotor" value="{{ old('votantes_por_promotor', $campaign->votantes_por_promotor) }}" required class="input tabular-nums">
-                    <p class="mt-1 text-xs text-slate-500">Sistema 1×N: 10 = cada promotor moviliza 10 votos.</p>
+                    <p class="mt-1 text-xs text-slate-500">1×10 = cada promotor moviliza 10 votos.</p>
                 </div>
             </div>
         </section>
@@ -63,14 +64,14 @@
     <aside class="lg:sticky lg:top-6 lg:self-start">
         <div class="card overflow-hidden">
             <div class="bg-ink px-5 py-4 text-white">
-                <p class="text-xs font-semibold tracking-wide text-white/60 uppercase">Meta de votos con colchón</p>
+                <p class="text-xs font-semibold tracking-wide text-white/60 uppercase">Meta de votos (con colchón) ← tu norte</p>
                 <p class="mt-1 font-serif text-4xl font-semibold tabular-nums" data-out="metaColchon">—</p>
                 <p class="text-xs text-white/60">El número que persigue toda la campaña</p>
             </div>
             <dl class="divide-y divide-slate-100 text-sm">
-                <div class="flex justify-between px-5 py-2.5"><dt class="text-slate-500">Votos totales esperados</dt><dd class="font-medium tabular-nums" data-out="esperados">—</dd></div>
-                <div class="flex justify-between px-5 py-2.5"><dt class="text-slate-500">Meta de votos (base)</dt><dd class="font-medium tabular-nums" data-out="base">—</dd></div>
-                <div class="flex justify-between bg-brand-50 px-5 py-2.5"><dt class="font-medium text-brand-700">Promotores necesarios</dt><dd class="font-semibold text-brand-700 tabular-nums" data-out="promotores">—</dd></div>
+                <div class="px-5 py-2.5"><div class="flex justify-between"><dt class="text-slate-500">Votos totales esperados</dt><dd class="font-medium tabular-nums" data-out="esperados">—</dd></div><p class="text-xs text-slate-400">Listado × participación.</p></div>
+                <div class="px-5 py-2.5"><div class="flex justify-between"><dt class="text-slate-500">Meta de votos (base)</dt><dd class="font-medium tabular-nums" data-out="base">—</dd></div><p class="text-xs text-slate-400">Votos esperados × % objetivo.</p></div>
+                <div class="bg-brand-50 px-5 py-2.5"><div class="flex justify-between"><dt class="font-medium text-brand-700">Promotores necesarios</dt><dd class="font-semibold text-brand-700 tabular-nums" data-out="promotores">—</dd></div><p class="text-xs text-brand-700/70">Meta con colchón ÷ votantes por promotor.</p></div>
             </dl>
         </div>
     </aside>
