@@ -64,11 +64,9 @@ class GuideSnapshotsTest extends TestCase
         $this->snap('12-encargado-actividad-creada', $created);
         $this->snap('13-encargado-asistencia', $this->get('/asistencia'));
         $nueva = Activity::where('title', 'Auditoría de sucursal Centro')->first();
-        $this->patch('/activities/'.$nueva->id.'/status', ['status' => 'completada']);
-        $this->snap('19-encargado-por-validar', $this->get('/activities/'.$nueva->id));
-        $this->snap('20-encargado-lista-por-validar', $this->get('/activities?status=por_validar'));
-        $this->post('/activities/'.$nueva->id.'/validacion', ['decision' => 'validar', 'validation_notes' => 'Se revisaron las fotos de todas las áreas.']);
-        $this->snap('21-encargado-validada', $this->followingRedirects()->get('/activities/'.$nueva->id));
+        $this->post('/activities/'.$nueva->id.'/marcar', ['marca' => 'incompleta', 'mark_notes' => 'Faltan las fotos del almacén.']);
+        $this->snap('19-encargado-marcada-incompleta', $this->get('/activities/'.$nueva->id));
+        $this->snap('20-encargado-lista-marcado', $this->get('/activities'));
 
         Attendance::where('user_id', $empleado->id)->whereDate('work_date', today())->delete();
         $this->actingAs($empleado);
@@ -76,6 +74,7 @@ class GuideSnapshotsTest extends TestCase
         $activity = Activity::where('title', 'Auditoría de sucursal Centro')->first();
         $this->snap('15-empleado-detalle', $this->get('/activities/'.$activity->id));
         $this->snap('16-empleado-asistencia', $this->get('/asistencia'));
+        $this->snap('21-empleado-cargar-actividad', $this->get('/activities/create'));
         Attendance::create([
             'user_id' => $empleado->id,
             'work_date' => today()->toDateString(),

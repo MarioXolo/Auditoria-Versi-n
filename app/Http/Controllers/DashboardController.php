@@ -67,14 +67,14 @@ class DashboardController extends Controller
             fputcsv($out, ['Periodo', $metrics->from->format('d/m/Y').' - '.$metrics->to->format('d/m/Y')]);
             fputcsv($out, []);
             fputcsv($out, [
-                'Nombre', 'Correo', 'Rol', 'Equipo', 'Asignadas', 'Completadas', 'Abiertas', 'Vencidas',
+                'Nombre', 'Correo', 'Rol', 'Equipo', 'Asignadas', 'Completadas', 'Incompletas', 'Sin marcar', 'Vencidas',
                 'Cumplimiento %', 'A tiempo %', 'Días promedio de cierre', 'Días con entrada', 'Faltas', 'Retardos', 'Asistencia %',
             ]);
 
             foreach ($people as $p) {
                 fputcsv($out, [
                     $p->user->name, $p->user->email, $p->user->role->label(), $p->user->team?->name,
-                    $p->assigned, $p->completed, $p->open, $p->overdue,
+                    $p->assigned, $p->completed, $p->incompletas, $p->open, $p->overdue,
                     $p->cumplimiento, $p->a_tiempo, $p->dias_cierre, $p->present, $p->absences, $p->late, $p->asistencia,
                 ]);
             }

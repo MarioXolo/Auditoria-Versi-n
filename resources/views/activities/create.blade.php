@@ -14,7 +14,7 @@
         @include('activities._form')
         <div class="mt-6 flex justify-end gap-2">
             <a href="{{ route('activities.index') }}" class="btn btn-secondary">Cancelar</a>
-            <button class="btn btn-primary">Guardar y asignar</button>
+            <button class="btn btn-primary">{{ auth()->user()->isEmpleado() ? 'Cargar actividad' : 'Guardar y asignar' }}</button>
         </div>
     </form>
 @endsection

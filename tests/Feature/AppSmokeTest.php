@@ -109,7 +109,8 @@ class AppSmokeTest extends TestCase
         $this->actingAs($this->gerente)->post('/teams', ['name' => 'Centro'])->assertRedirect(route('teams.index'));
         $this->assertDatabaseHas('teams', ['name' => 'Centro']);
         $this->actingAs($this->gerente)->get("/teams/{$this->team->id}/edit")->assertOk();
-        $this->actingAs($this->empleado)->get('/activities/create')->assertForbidden();
+        // El empleado sí puede cargar actividades (solo para sí mismo)
+        $this->actingAs($this->empleado)->get('/activities/create')->assertOk();
 
         // Empleado no ve actividades ajenas
         $ajena = $this->activityFor($this->otroEmpleado, $this->gerente);
@@ -166,8 +167,8 @@ class AppSmokeTest extends TestCase
             ->assertDontSee('Tarea del encargado');
 
         // El encargado no edita lo que no asignó
-        $this->actingAs($this->encargado)->patch("/activities/{$delGerente->id}/status", ['status' => 'completada'])->assertForbidden();
-        $this->actingAs($this->encargado)->patch("/activities/{$suya->id}/status", ['status' => 'completada'])->assertRedirect();
+        $this->actingAs($this->encargado)->post("/activities/{$delGerente->id}/marcar", ['marca' => 'completada'])->assertForbidden();
+        $this->actingAs($this->encargado)->post("/activities/{$suya->id}/marcar", ['marca' => 'completada'])->assertRedirect();
     }
 
     public function test_encargado_assigns_only_to_own_team(): void
@@ -180,14 +181,6 @@ class AppSmokeTest extends TestCase
 
         $this->actingAs($this->encargado)->post('/activities', $base + ['assigned_to' => $this->otroEmpleado->id])
             ->assertSessionHasErrors('assigned_to');
-    }
-
-    public function test_status_change_sets_completed_at(): void
-    {
-        $a = $this->activityFor($this->empleado, $this->encargado);
-        $this->actingAs($this->encargado)->patch("/activities/{$a->id}/status", ['status' => 'completada'])->assertRedirect();
-        $this->assertNotNull($a->fresh()->completed_at);
-        $this->actingAs($this->empleado)->patch("/activities/{$a->id}/status", ['status' => 'pendiente'])->assertForbidden();
     }
 
     public function test_evidence_upload_and_protected_download(): void

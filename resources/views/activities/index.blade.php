@@ -24,7 +24,7 @@
                 <option value="{{ $value }}" @selected(request('status') === $value)>{{ $label }}</option>
             @endforeach
             <option value="vencida" @selected(request('status') === 'vencida')>Vencidas</option>
-            <option value="por_validar" @selected(request('status') === 'por_validar')>Por validar</option>
+            <option value="sin_marcar" @selected(request('status') === 'sin_marcar')>Sin marcar</option>
         </select>
         @if ($people->isNotEmpty())
             <select name="assigned_to" class="input">
@@ -51,22 +51,25 @@
     {{-- Tarjetas en móvil --}}
     <div class="space-y-3 md:hidden">
         @forelse ($activities as $activity)
-            <a href="{{ route('activities.show', $activity) }}" class="card block p-4">
-                <div class="flex items-start justify-between gap-3">
-                    <p class="font-medium">{{ $activity->title }}</p>
-                    <span class="badge {{ $activity->status->badge() }}">{{ $activity->status->label() }}</span>
-                </div>
-                <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
-                    <span>{{ $activity->assignee?->name }}</span>
-                    @if ($activity->due_date)
-                        <span @class(['font-semibold text-rose-600' => $activity->isOverdue()])>Vence {{ $activity->due_date->format('d/m/Y') }}</span>
-                    @endif
-                    <span class="badge {{ $activity->priority->badge() }}">{{ $activity->priority->label() }}</span>
-                    @if ($activity->validation_status)
-                        <span class="badge {{ $activity->validation_status->badge() }}">{{ $activity->validation_status->label() }}</span>
-                    @endif
-                </div>
-            </a>
+            @php $failed = $activity->status === \App\Enums\ActivityStatus::Incompleta; @endphp
+            <div @class(['card flex items-start gap-3 p-4', 'border-rose-300 bg-rose-50' => $failed])>
+                @can('mark', $activity)
+                    <x-mark-controls :activity="$activity" />
+                @endcan
+                <a href="{{ route('activities.show', $activity) }}" class="min-w-0 flex-1">
+                    <div class="flex items-start justify-between gap-3">
+                        <p @class(['font-medium', 'text-rose-900' => $failed])>{{ $activity->title }}</p>
+                        <span class="badge {{ $activity->status->badge() }}">{{ $activity->status->label() }}</span>
+                    </div>
+                    <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                        <span>{{ $activity->assignee?->name }}</span>
+                        @if ($activity->due_date)
+                            <span @class(['font-semibold text-rose-600' => $activity->isOverdue()])>Vence {{ $activity->due_date->format('d/m/Y') }}</span>
+                        @endif
+                        <span class="badge {{ $activity->priority->badge() }}">{{ $activity->priority->label() }}</span>
+                    </div>
+                </a>
+            </div>
         @empty
             <div class="card p-8 text-center text-sm text-slate-500">No hay actividades con estos filtros.</div>
         @endforelse
@@ -77,6 +80,9 @@
         <table class="min-w-full divide-y divide-slate-200">
             <thead class="bg-slate-50">
                 <tr>
+                    @if ($canMarkAny)
+                        <th class="table-head w-24">Revisión</th>
+                    @endif
                     <th class="table-head">Actividad</th>
                     <th class="table-head">Asignada a</th>
                     <th class="table-head">Prioridad</th>
@@ -86,9 +92,22 @@
             </thead>
             <tbody class="divide-y divide-slate-100">
                 @forelse ($activities as $activity)
-                    <tr class="hover:bg-slate-50">
+                    @php $failed = $activity->status === \App\Enums\ActivityStatus::Incompleta; @endphp
+                    <tr @class([
+                        'bg-rose-100 shadow-[inset_4px_0_0_var(--color-rose-600)] hover:bg-rose-100' => $failed,
+                        'hover:bg-slate-50' => ! $failed,
+                    ])>
+                        @if ($canMarkAny)
+                            <td class="table-cell">
+                                @can('mark', $activity)
+                                    <x-mark-controls :activity="$activity" />
+                                @else
+                                    <span class="text-xs text-slate-400" title="La marca un superior">—</span>
+                                @endcan
+                            </td>
+                        @endif
                         <td class="table-cell">
-                            <a href="{{ route('activities.show', $activity) }}" class="font-medium text-slate-900 hover:text-brand-600">{{ $activity->title }}</a>
+                            <a href="{{ route('activities.show', $activity) }}" @class(['font-medium hover:text-brand-600', 'text-rose-900' => $failed, 'text-slate-900' => ! $failed])>{{ $activity->title }}</a>
                             @if ($activity->team)
                                 <span class="block text-xs text-slate-500">{{ $activity->team->name }}</span>
                             @endif
@@ -102,26 +121,14 @@
                             @endif
                         </td>
                         <td class="table-cell">
-                            @can('update', $activity)
-                                <form method="POST" action="{{ route('activities.status', $activity) }}">
-                                    @csrf
-                                    @method('PATCH')
-                                    <select name="status" onchange="this.form.submit()" class="rounded-full border-0 py-0.5 pr-7 pl-2 text-xs font-medium {{ $activity->status->badge() }}">
-                                        @foreach ($statuses as $value => $label)
-                                            <option value="{{ $value }}" @selected($activity->status->value === $value)>{{ $label }}</option>
-                                        @endforeach
-                                    </select>
-                                </form>
-                            @else
-                                <span class="badge {{ $activity->status->badge() }}">{{ $activity->status->label() }}</span>
-                            @endcan
-                            @if ($activity->validation_status)
-                                <span class="badge mt-1 {{ $activity->validation_status->badge() }}">{{ $activity->validation_status->label() }}</span>
+                            <span class="badge {{ $activity->status->badge() }}">{{ $activity->status->label() }}</span>
+                            @if ($activity->isSelfAssigned() && $activity->assignee?->isEmpleado())
+                                <span class="mt-1 block text-xs text-slate-500">Cargada por el empleado</span>
                             @endif
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="5" class="table-cell py-10 text-center text-slate-500">No hay actividades con estos filtros.</td></tr>
+                    <tr><td colspan="{{ $canMarkAny ? 6 : 5 }}" class="table-cell py-10 text-center text-slate-500">No hay actividades con estos filtros.</td></tr>
                 @endforelse
             </tbody>
         </table>

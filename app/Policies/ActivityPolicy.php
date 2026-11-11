@@ -7,10 +7,11 @@ use App\Models\User;
 
 /**
  * Reglas de acceso a actividades:
- * - Administrador y gerente: ven y editan todas.
- * - Encargado: ve las que él asignó y las que le asignaron; edita y borra solo las que él asignó.
- * - Empleado: ve solo las que le asignaron; no edita.
- * - Validación: quien asignó la actividad, un gerente o el administrador; nunca la persona asignada.
+ * - Administrador y gerente: ven, editan y marcan todas.
+ * - Encargado: ve las que asignó, las que le asignaron y las que sus empleados se cargaron;
+ *   edita las que él asignó y marca las de su equipo.
+ * - Empleado: ve solo las suyas y puede cargarse actividades a sí mismo; no edita ni marca.
+ * - Nadie marca una actividad asignada a sí mismo: siempre la marca alguien con más privilegios.
  */
 class ActivityPolicy
 {
@@ -21,22 +22,22 @@ class ActivityPolicy
 
     public function view(User $user, Activity $activity): bool
     {
-        if ($user->seesEverything()) {
+        if ($user->seesEverything() || $activity->assigned_to === $user->id) {
             return true;
         }
 
-        if ($activity->assigned_to === $user->id) {
-            return true;
-        }
-
-        return $user->isEncargado() && $activity->created_by === $user->id;
+        return $user->isEncargado() && (
+            $activity->created_by === $user->id
+            || $this->isTeamSelfAssigned($user, $activity)
+        );
     }
 
     public function create(User $user): bool
     {
-        return $user->canManageActivities();
+        return $user->canCreateActivities();
     }
 
+    /** Editar datos de la actividad (no marcarla). */
     public function update(User $user, Activity $activity): bool
     {
         if ($user->seesEverything()) {
@@ -46,22 +47,32 @@ class ActivityPolicy
         return $user->isEncargado() && $activity->created_by === $user->id;
     }
 
-    /**
-     * Validar o rechazar una actividad completada: quien la asignó, un gerente o el administrador.
-     * Nadie valida una actividad asignada a sí mismo.
-     */
-    public function review(User $user, Activity $activity): bool
-    {
-        if (! $activity->isPendingValidation() || $activity->assigned_to === $user->id) {
-            return false;
-        }
-
-        return $user->seesEverything()
-            || ($user->isEncargado() && $activity->created_by === $user->id);
-    }
-
     public function delete(User $user, Activity $activity): bool
     {
         return $this->update($user, $activity);
+    }
+
+    /** Marcar como completada o incompleta (checkbox). */
+    public function mark(User $user, Activity $activity): bool
+    {
+        if ($activity->assigned_to === $user->id || $activity->status === \App\Enums\ActivityStatus::Cancelada) {
+            return false;
+        }
+
+        if ($user->seesEverything()) {
+            return true;
+        }
+
+        return $user->isEncargado() && (
+            $activity->created_by === $user->id
+            || $this->isTeamSelfAssigned($user, $activity)
+        );
+    }
+
+    /** Actividad que un empleado del equipo del encargado se cargó a sí mismo. */
+    private function isTeamSelfAssigned(User $leader, Activity $activity): bool
+    {
+        return $activity->isSelfAssigned()
+            && in_array($activity->assigned_to, $leader->teamMemberIds(), true);
     }
 }

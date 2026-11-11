@@ -110,6 +110,12 @@ class User extends Authenticatable
         return $this->hasRole(Role::Admin, Role::Gerente);
     }
 
+    /** Todos pueden cargar actividades; el empleado solo para sí mismo. */
+    public function canCreateActivities(): bool
+    {
+        return true;
+    }
+
     public function canManageActivities(): bool
     {
         return $this->hasRole(Role::Admin, Role::Gerente, Role::Encargado);
@@ -148,7 +154,8 @@ class User extends Authenticatable
             Role::Gerente => $query->whereIn('role', [Role::Encargado->value, Role::Empleado->value]),
             Role::Encargado => $query->where('role', Role::Empleado->value)
                 ->whereIn('team_id', $this->ledTeamIds() ?: [0]),
-            default => $query->whereRaw('1 = 0'),
+            // Los empleados solo se cargan actividades a sí mismos
+            Role::Empleado => $query->whereKey($this->id),
         };
     }
 

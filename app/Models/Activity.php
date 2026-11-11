@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Enums\ActivityStatus;
 use App\Enums\Priority;
-use App\Enums\ValidationStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -23,10 +22,9 @@ class Activity extends Model
         'completed_at',
         'evidence_path',
         'notes',
-        'validation_status',
-        'validated_by',
-        'validated_at',
-        'validation_notes',
+        'marked_by',
+        'marked_at',
+        'mark_notes',
     ];
 
     protected function casts(): array
@@ -39,9 +37,8 @@ class Activity extends Model
             'priority' => Priority::class,
             'due_date' => 'date',
             'completed_at' => 'datetime',
-            'validation_status' => ValidationStatus::class,
-            'validated_by' => 'integer',
-            'validated_at' => 'datetime',
+            'marked_by' => 'integer',
+            'marked_at' => 'datetime',
         ];
     }
 
@@ -55,9 +52,10 @@ class Activity extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function validator(): BelongsTo
+    /** Superior que marcó la actividad como completada o incompleta. */
+    public function marker(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'validated_by');
+        return $this->belongsTo(User::class, 'marked_by');
     }
 
     public function team(): BelongsTo
@@ -72,27 +70,31 @@ class Activity extends Model
             return $query;
         }
 
-        // Encargados: solo las que ellos asignaron y las que les asignaron a ellos.
+        // Encargados: las que ellos asignaron, las que les asignaron a ellos y las que
+        // sus empleados se cargaron a sí mismos (para poder marcarlas).
         // Empleados: solo las suyas.
         if ($user->isEncargado()) {
-            return $query->where(function (Builder $q) use ($user) {
-                $q->where('created_by', $user->id)->orWhere('assigned_to', $user->id);
+            $memberIds = $user->teamMemberIds();
+
+            return $query->where(function (Builder $q) use ($user, $memberIds) {
+                $q->where('created_by', $user->id)
+                    ->orWhere('assigned_to', $user->id);
+
+                if ($memberIds !== []) {
+                    $q->orWhere(fn (Builder $own) => $own
+                        ->whereIn('assigned_to', $memberIds)
+                        ->whereColumn('created_by', 'assigned_to'));
+                }
             });
         }
 
         return $query->where('assigned_to', $user->id);
     }
 
-    /** Completadas que esperan validación. */
-    public function scopePendingValidation(Builder $query): Builder
+    /** La cargó la misma persona que la tiene asignada (empleado o encargado). */
+    public function isSelfAssigned(): bool
     {
-        return $query->where('status', ActivityStatus::Completada->value)
-            ->where('validation_status', ValidationStatus::Pendiente->value);
-    }
-
-    public function isPendingValidation(): bool
-    {
-        return $this->status === ActivityStatus::Completada && $this->validation_status === ValidationStatus::Pendiente;
+        return $this->created_by === $this->assigned_to;
     }
 
     /** Vencidas: con fecha límite pasada y sin completar ni cancelar. */
@@ -107,6 +109,6 @@ class Activity extends Model
     {
         return $this->due_date !== null
             && $this->due_date->isBefore(today())
-            && in_array($this->status, [ActivityStatus::Pendiente, ActivityStatus::EnProgreso], true);
+            && $this->status->isOpen();
     }
 }

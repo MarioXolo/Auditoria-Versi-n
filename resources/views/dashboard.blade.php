@@ -65,7 +65,7 @@
     {{-- KPI principales con meta y semáforo --}}
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         @foreach ([
-            ['key' => 'cumplimiento', 'label' => 'Cumplimiento', 'hint' => $kpi['completed'].' de '.($kpi['total'] - $kpi['cancelled']).' completadas · '.$kpi['validadas'].' ya validadas'],
+            ['key' => 'cumplimiento', 'label' => 'Cumplimiento', 'hint' => $kpi['completed'].' de '.($kpi['total'] - $kpi['cancelled']).' marcadas como completadas'],
             ['key' => 'a_tiempo', 'label' => 'Entrega a tiempo', 'hint' => 'de las completadas, antes de su fecha límite'],
             ['key' => 'asistencia', 'label' => 'Asistencia', 'hint' => $kpi['present'].' de '.$kpi['expected'].' jornadas esperadas'],
             ['key' => 'puntualidad', 'label' => 'Puntualidad', 'hint' => $kpi['late'].' retardos (entrada después de '.config('auditoria.hora_entrada').' + '.config('auditoria.tolerancia_minutos').' min)'],
@@ -96,7 +96,7 @@
     {{-- KPI de volumen --}}
     <div class="mt-4 grid grid-cols-2 gap-4 xl:grid-cols-4">
         @foreach ([
-            ['label' => 'Actividades', 'value' => $kpi['total'], 'sub' => $kpi['open'].' abiertas · '.$kpi['por_validar'].' por validar · '.$kpi['validadas'].' validadas', 'delta' => $deltaHtml($delta['total'], ''), 'link' => route('activities.index')],
+            ['label' => 'Actividades', 'value' => $kpi['total'], 'sub' => $kpi['sin_marcar'].' sin marcar · '.$kpi['incompletas'].' incompletas', 'delta' => $deltaHtml($delta['total'], ''), 'link' => route('activities.index')],
             ['label' => 'Vencidas', 'value' => $kpi['overdue'], 'sub' => 'pendientes con fecha límite pasada', 'delta' => $deltaHtml($delta['overdue'], '', true), 'link' => route('activities.index', ['status' => 'vencida']), 'alert' => $kpi['overdue'] > 0],
             ['label' => 'Tiempo de cierre', 'value' => $fmt($kpi['dias_cierre'], ' días'), 'sub' => 'promedio de creación a completado', 'delta' => $deltaHtml($delta['dias_cierre'], 'días', true)],
             ['label' => 'Horas por jornada', 'value' => $fmt($kpi['horas'], ' h'), 'sub' => 'promedio entre entrada y salida', 'delta' => $deltaHtml($delta['horas'], 'h')],
@@ -188,6 +188,7 @@
                         <th class="table-head">Persona</th>
                         <th class="table-head text-right">Asignadas</th>
                         <th class="table-head text-right">Completadas</th>
+                        <th class="table-head text-right">Incompletas</th>
                         <th class="table-head text-right">Vencidas</th>
                         <th class="table-head text-right">Cumplimiento</th>
                         <th class="table-head text-right">A tiempo</th>
@@ -206,6 +207,7 @@
                             </td>
                             <td class="table-cell text-right font-medium tabular-nums">{{ $row->assigned }}</td>
                             <td class="table-cell text-right tabular-nums">{{ $row->completed }}</td>
+                            <td @class(['table-cell text-right tabular-nums', 'font-semibold text-rose-600' => $row->incompletas > 0])>{{ $row->incompletas }}</td>
                             <td @class(['table-cell text-right tabular-nums', 'font-semibold text-rose-600' => $row->overdue > 0])>{{ $row->overdue }}</td>
                             @foreach (['cumplimiento', 'a_tiempo'] as $k)
                                 <td class="table-cell text-right"><span class="badge tabular-nums {{ $tone[M::status($k, $row->$k)]['chip'] }}">{{ $fmt($row->$k) }}</span></td>
@@ -216,7 +218,7 @@
                             <td @class(['table-cell text-right tabular-nums', 'font-semibold text-amber-700' => $row->late >= 3])>{{ $row->late }}</td>
                         </tr>
                     @empty
-                        <tr><td colspan="10" class="table-cell py-8 text-center text-slate-500">No hay personal activo con estos filtros.</td></tr>
+                        <tr><td colspan="11" class="table-cell py-8 text-center text-slate-500">No hay personal activo con estos filtros.</td></tr>
                     @endforelse
                 </tbody>
             </table>

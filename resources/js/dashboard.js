@@ -79,7 +79,7 @@ if (data) {
         type: 'doughnut',
         data: {
             labels: data.status.map((d) => d.label),
-            datasets: [{ data: data.status.map((d) => d.value), backgroundColor: [C.amber, C.sky, C.green, C.stone], borderWidth: 2, borderColor: '#fff' }],
+            datasets: [{ data: data.status.map((d) => d.value), backgroundColor: [C.amber, C.sky, C.green, C.rose, C.stone], borderWidth: 2, borderColor: '#fff' }],
         },
         options: { cutout: '68%', plugins: { legend: { position: 'bottom' } } },
     });

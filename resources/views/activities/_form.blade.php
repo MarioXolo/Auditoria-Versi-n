@@ -11,6 +11,11 @@
         <textarea id="description" name="description" rows="4" class="input">{{ old('description', $activity->description) }}</textarea>
     </div>
 
+    @if (auth()->user()->isEmpleado())
+        <div class="rounded-lg bg-brand-50 px-4 py-3 text-sm text-brand-700 sm:col-span-2">
+            La actividad quedará a tu nombre. Tu encargado la revisará y la marcará como completada o incompleta.
+        </div>
+    @else
     <div>
         <label for="assigned_to" class="label">Asignar a *</label>
         <select id="assigned_to" name="assigned_to" required class="input">
@@ -35,6 +40,7 @@
             @endforeach
         </select>
     </div>
+    @endif
 
     <div>
         <label for="priority" class="label">Prioridad</label>
@@ -50,14 +56,20 @@
         <input id="due_date" type="date" name="due_date" value="{{ old('due_date', $activity->due_date?->format('Y-m-d')) }}" class="input">
     </div>
 
-    <div>
-        <label for="status" class="label">Estado</label>
-        <select id="status" name="status" class="input">
-            @foreach ($statuses as $value => $label)
-                <option value="{{ $value }}" @selected(old('status', $activity->status?->value ?? $activity->status) === $value)>{{ $label }}</option>
-            @endforeach
-        </select>
-    </div>
+    @if ($activity->exists)
+        <div>
+            <label for="status" class="label">Estado</label>
+            @if ($activity->status->isMarked())
+                <p class="input bg-slate-50 text-slate-600">{{ $activity->status->label() }} (se cambia desde la revisión)</p>
+            @else
+                <select id="status" name="status" class="input">
+                    @foreach ($statuses as $value => $label)
+                        <option value="{{ $value }}" @selected(old('status', $activity->status->value) === $value)>{{ $label }}</option>
+                    @endforeach
+                </select>
+            @endif
+        </div>
+    @endif
 
     <div>
         <label for="evidence" class="label">Evidencia (foto o PDF)</label>

@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Enums\ActivityStatus;
 use App\Enums\Priority;
-use App\Enums\ValidationStatus;
 use App\Models\Activity;
 use App\Models\Attendance;
 use App\Models\Team;
@@ -96,44 +95,45 @@ class DemoSeeder extends Seeder
     private function createActivity(User $member, Team $team, array $creators): void
     {
         $title = array_rand(self::ACTIVITIES);
-        $status = fake()->randomElement(ActivityStatus::cases());
+
+        // Reparto realista: la mayoría ya revisadas por un superior
+        $status = fake()->randomElement([
+            ActivityStatus::Completada, ActivityStatus::Completada, ActivityStatus::Completada, ActivityStatus::Completada,
+            ActivityStatus::Incompleta, ActivityStatus::Incompleta,
+            ActivityStatus::Pendiente, ActivityStatus::Pendiente, ActivityStatus::EnProgreso, ActivityStatus::Cancelada,
+        ]);
+
+        // 1 de cada 4 la carga el propio empleado; el resto su encargado o el gerente
+        $selfAssigned = rand(1, 4) === 1;
+        $creator = $selfAssigned ? $member->id : fake()->randomElement($creators);
+        $marker = $selfAssigned ? $team->leader_id : $creator;
 
         // Creada en los últimos 45 días, en horario laboral
         $created = now()->subDays(rand(1, 45))->setTime(rand(8, 17), rand(0, 59));
         $due = $created->copy()->addDays(rand(2, 12))->startOfDay();
-
-        $completed = null;
         $updated = $created->copy()->addHours(rand(1, 48));
 
-        if ($status === ActivityStatus::Completada) {
-            $completed = now()->setTimestamp(rand($created->timestamp, now()->subHour()->timestamp));
-            $updated = $completed;
+        $completed = null;
+        $mark = ['marked_by' => null, 'marked_at' => null, 'mark_notes' => null];
+
+        if ($status->isMarked()) {
+            $markedAt = now()->setTimestamp(rand($created->timestamp, now()->subHour()->timestamp));
+            $completed = $status === ActivityStatus::Completada ? $markedAt : null;
+            $updated = $markedAt;
+            $mark = [
+                'marked_by' => $marker,
+                'marked_at' => $markedAt,
+                'mark_notes' => $status === ActivityStatus::Incompleta ? fake()->randomElement([
+                    'Falta la foto de evidencia.',
+                    'El reporte está incompleto, faltan los hallazgos de la revisión.',
+                    'Los datos del inventario no coinciden con el sistema.',
+                    'No se presentó a la visita programada.',
+                ]) : null,
+            ];
         }
 
         if ($updated->isFuture()) {
             $updated = now()->subMinutes(rand(5, 300));
-        }
-
-        $creator = fake()->randomElement($creators);
-
-        // Validación: la mayoría de las completadas ya revisadas; algunas en progreso fueron rechazadas antes
-        $validation = ['validation_status' => null, 'validated_by' => null, 'validated_at' => null, 'validation_notes' => null];
-        if ($status === ActivityStatus::Completada) {
-            $reviewedAt = $completed->copy()->addHours(rand(2, 30));
-            $validation = rand(1, 100) <= 70 && $reviewedAt->isPast()
-                ? ['validation_status' => ValidationStatus::Validada->value, 'validated_by' => $creator, 'validated_at' => $reviewedAt, 'validation_notes' => null]
-                : ['validation_status' => ValidationStatus::Pendiente->value, 'validated_by' => null, 'validated_at' => null, 'validation_notes' => null];
-        } elseif ($status === ActivityStatus::EnProgreso && rand(1, 100) <= 20) {
-            $validation = [
-                'validation_status' => ValidationStatus::Rechazada->value,
-                'validated_by' => $creator,
-                'validated_at' => $updated,
-                'validation_notes' => fake()->randomElement([
-                    'Falta la foto de evidencia.',
-                    'El reporte está incompleto, agrega los hallazgos de la revisión.',
-                    'Los datos del inventario no coinciden con el sistema.',
-                ]),
-            ];
         }
 
         $activity = new Activity([
@@ -146,7 +146,7 @@ class DemoSeeder extends Seeder
             'status' => $status->value,
             'due_date' => $due->toDateString(),
             'completed_at' => $completed,
-            ...$validation,
+            ...$mark,
         ]);
         $activity->created_at = $created;
         $activity->updated_at = $updated;

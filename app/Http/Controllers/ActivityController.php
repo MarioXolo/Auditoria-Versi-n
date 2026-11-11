@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Enums\ActivityStatus;
 use App\Enums\Priority;
-use App\Enums\ValidationStatus;
 use App\Models\Activity;
 use App\Models\Team;
 use App\Models\User;
@@ -30,8 +29,8 @@ class ActivityController extends Controller
                 if ($request->input('status') === 'vencida') {
                     return $q->overdue();
                 }
-                if ($request->input('status') === 'por_validar') {
-                    return $q->pendingValidation();
+                if ($request->input('status') === 'sin_marcar') {
+                    return $q->whereIn('status', [ActivityStatus::Pendiente->value, ActivityStatus::EnProgreso->value]);
                 }
 
                 return $q->where('status', $request->input('status'));
@@ -40,7 +39,7 @@ class ActivityController extends Controller
             ->when($request->filled('team_id'), fn ($q) => $q->where('team_id', $request->integer('team_id')));
 
         $activities = $query
-            ->orderByRaw("CASE WHEN status IN ('pendiente','en_progreso') THEN 0 ELSE 1 END")
+            ->orderByRaw("CASE WHEN status IN ('pendiente','en_progreso') THEN 0 WHEN status = 'incompleta' THEN 1 ELSE 2 END")
             ->orderByRaw('due_date IS NULL')
             ->orderBy('due_date')
             ->latest('id')
@@ -52,6 +51,7 @@ class ActivityController extends Controller
             'people' => $user->canManageActivities() ? $this->visiblePeople($user) : collect(),
             'teams' => $this->teamsFor($user),
             'statuses' => ActivityStatus::options(),
+            'canMarkAny' => $user->canManageActivities(),
         ]);
     }
 
@@ -71,27 +71,32 @@ class ActivityController extends Controller
         $this->authorize('create', Activity::class);
         $user = $request->user();
 
+        // El empleado solo se carga actividades a sí mismo, dentro de su equipo
+        if ($user->isEmpleado()) {
+            $request->merge(['assigned_to' => $user->id, 'team_id' => null]);
+        }
+
         $data = $this->validated($request, $user);
         $data['created_by'] = $user->id;
         $data['team_id'] ??= User::find($data['assigned_to'])?->team_id;
+        // Toda actividad nace sin marcar; solo un superior la marca como completada o incompleta
+        $data['status'] = ActivityStatus::Pendiente->value;
 
         if ($request->hasFile('evidence')) {
             $data['evidence_path'] = $request->file('evidence')->store('evidencias', 'local');
         }
 
-        $completed = $data['status'] === ActivityStatus::Completada->value;
-        $data['completed_at'] = $completed ? now() : null;
-        $data['validation_status'] = $completed ? ValidationStatus::Pendiente->value : null;
-
         $activity = Activity::create($data);
 
-        return redirect()->route('activities.show', $activity)->with('status', 'Actividad creada y asignada.');
+        $message = $user->isEmpleado() ? 'Actividad cargada. Tu encargado la marcará cuando la revise.' : 'Actividad creada y asignada.';
+
+        return redirect()->route('activities.show', $activity)->with('status', $message);
     }
 
     public function show(Activity $activity): View
     {
         $this->authorize('view', $activity);
-        $activity->load(['assignee', 'creator', 'team', 'validator']);
+        $activity->load(['assignee', 'creator', 'team', 'marker']);
 
         return view('activities.show', ['activity' => $activity]);
     }
@@ -109,6 +114,18 @@ class ActivityController extends Controller
 
         $data = $this->validated($request, $request->user(), $activity);
 
+        // El estado solo se edita entre pendiente, en progreso y cancelada; completada e incompleta se marcan
+        $status = $request->validate([
+            'status' => ['nullable', Rule::in(array_keys(ActivityStatus::editableOptions()))],
+        ])['status'] ?? null;
+
+        if ($status && $status !== $activity->status->value) {
+            $data['status'] = $status;
+            $data['completed_at'] = null;
+            $data['marked_by'] = null;
+            $data['marked_at'] = null;
+        }
+
         if ($request->hasFile('evidence')) {
             if ($activity->evidence_path) {
                 Storage::disk('local')->delete($activity->evidence_path);
@@ -116,55 +133,41 @@ class ActivityController extends Controller
             $data['evidence_path'] = $request->file('evidence')->store('evidencias', 'local');
         }
 
-        $this->applyCompletion($activity, $data['status']);
         $activity->fill($data)->save();
 
         return redirect()->route('activities.show', $activity)->with('status', 'Actividad actualizada.');
     }
 
-    /** Cambio rápido de estado desde el listado o el detalle. */
-    public function updateStatus(Request $request, Activity $activity): RedirectResponse
+    /**
+     * Marcado por un superior: ✓ completada, ✗ incompleta o quitar la marca.
+     */
+    public function mark(Request $request, Activity $activity): RedirectResponse
     {
-        $this->authorize('update', $activity);
+        $this->authorize('mark', $activity);
 
         $data = $request->validate([
-            'status' => ['required', new Enum(ActivityStatus::class)],
-        ]);
+            'marca' => ['required', 'in:completada,incompleta,sin_marcar'],
+            'mark_notes' => ['nullable', 'string', 'max:2000'],
+        ], [], ['mark_notes' => 'comentario']);
 
-        $this->applyCompletion($activity, $data['status']);
-        $activity->status = $data['status'];
-        $activity->save();
-
-        return back()->with('status', 'Estado actualizado a "'.$activity->status->label().'".');
-    }
-
-    /** Validar o rechazar una actividad completada. */
-    public function review(Request $request, Activity $activity): RedirectResponse
-    {
-        $this->authorize('review', $activity);
-
-        $data = $request->validate([
-            'decision' => ['required', 'in:validar,rechazar'],
-            'validation_notes' => ['nullable', 'required_if:decision,rechazar', 'string', 'max:2000'],
-        ], [
-            'validation_notes.required_if' => 'Escribe el motivo del rechazo para que la persona sepa qué corregir.',
-        ], [
-            'validation_notes' => 'comentario',
-        ]);
-
-        $activity->validated_by = $request->user()->id;
-        $activity->validated_at = now();
-        $activity->validation_notes = $data['validation_notes'] ?? null;
-
-        if ($data['decision'] === 'validar') {
-            $activity->validation_status = ValidationStatus::Validada;
-            $message = 'Actividad validada.';
-        } else {
-            // Se regresa para corregir: vuelve a "en progreso"
-            $activity->validation_status = ValidationStatus::Rechazada;
-            $activity->status = ActivityStatus::EnProgreso;
+        if ($data['marca'] === 'sin_marcar') {
+            $activity->status = ActivityStatus::Pendiente;
             $activity->completed_at = null;
-            $message = 'Actividad rechazada. Regresó a "En progreso" con tu comentario.';
+            $activity->marked_by = null;
+            $activity->marked_at = null;
+            $activity->mark_notes = null;
+            $message = 'Se quitó la marca de la actividad.';
+        } else {
+            $activity->status = $data['marca'] === 'completada' ? ActivityStatus::Completada : ActivityStatus::Incompleta;
+            $activity->completed_at = $data['marca'] === 'completada' ? now() : null;
+            $activity->marked_by = $request->user()->id;
+            $activity->marked_at = now();
+            if ($request->has('mark_notes')) {
+                $activity->mark_notes = $data['mark_notes'] ?? null;
+            }
+            $message = $data['marca'] === 'completada'
+                ? 'Actividad marcada como completada.'
+                : 'Actividad marcada como incompleta.';
         }
 
         $activity->save();
@@ -214,7 +217,6 @@ class ActivityController extends Controller
             'assigned_to' => ['required', 'integer', Rule::in($assignableIds)],
             'team_id' => ['nullable', 'integer', Rule::in($teamIds)],
             'priority' => ['required', new Enum(Priority::class)],
-            'status' => ['required', new Enum(ActivityStatus::class)],
             'due_date' => ['nullable', 'date'],
             'notes' => ['nullable', 'string', 'max:5000'],
             'evidence' => ['nullable', 'file', 'max:10240', 'mimes:jpg,jpeg,png,webp,heic,pdf'],
@@ -227,27 +229,10 @@ class ActivityController extends Controller
             'assigned_to' => 'persona asignada',
             'team_id' => 'equipo',
             'priority' => 'prioridad',
-            'status' => 'estado',
             'due_date' => 'fecha límite',
             'notes' => 'notas',
             'evidence' => 'evidencia',
         ]);
-    }
-
-    /** Al completar, la actividad queda por validar; si deja de estar completada, se limpia la validación. */
-    private function applyCompletion(Activity $activity, string $newStatus): void
-    {
-        if ($newStatus === ActivityStatus::Completada->value && $activity->status !== ActivityStatus::Completada) {
-            $activity->completed_at = now();
-            $activity->validation_status = ValidationStatus::Pendiente;
-            $activity->validated_by = null;
-            $activity->validated_at = null;
-        } elseif ($newStatus !== ActivityStatus::Completada->value) {
-            $activity->completed_at = null;
-            if ($activity->validation_status !== ValidationStatus::Rechazada) {
-                $activity->validation_status = null;
-            }
-        }
     }
 
     private function formData(User $user, Activity $activity): array
@@ -262,7 +247,7 @@ class ActivityController extends Controller
             'activity' => $activity,
             'people' => $people->filter(),
             'teams' => $this->teamsFor($user),
-            'statuses' => ActivityStatus::options(),
+            'statuses' => ActivityStatus::editableOptions(),
             'priorities' => Priority::options(),
         ];
     }

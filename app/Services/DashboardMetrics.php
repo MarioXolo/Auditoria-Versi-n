@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Enums\ActivityStatus;
 use App\Enums\Priority;
 use App\Enums\Role;
-use App\Enums\ValidationStatus;
 use App\Models\Activity;
 use App\Models\Attendance;
 use App\Models\Team;
@@ -75,7 +74,7 @@ class DashboardMetrics
         return $this->cache[$key] ??= Activity::query()
             ->whereBetween('created_at', [$from, $to])
             ->when($this->teamId, fn ($q) => $q->where('team_id', $this->teamId))
-            ->get(['id', 'title', 'assigned_to', 'created_by', 'team_id', 'priority', 'status', 'validation_status', 'due_date', 'completed_at', 'created_at', 'updated_at']);
+            ->get(['id', 'title', 'assigned_to', 'created_by', 'team_id', 'priority', 'status', 'due_date', 'completed_at', 'created_at', 'updated_at']);
     }
 
     /** Registros de asistencia del personal dentro del rango. */
@@ -167,9 +166,8 @@ class DashboardMetrics
             'cumplimiento' => self::pct($completed->count(), $effective),
             'a_tiempo' => self::pct($completed->filter(fn ($a) => $this->isOnTime($a))->count(), $completed->count()),
             'dias_cierre' => $closeDays->isEmpty() ? null : round($closeDays->avg(), 1),
-            'por_validar' => $completed->filter(fn ($a) => $a->validation_status === ValidationStatus::Pendiente)->count(),
-            'validadas' => $completed->filter(fn ($a) => $a->validation_status === ValidationStatus::Validada)->count(),
-            'validacion' => self::pct($completed->filter(fn ($a) => $a->validation_status === ValidationStatus::Validada)->count(), $completed->count()),
+            'incompletas' => $acts->filter(fn ($a) => $a->status === ActivityStatus::Incompleta)->count(),
+            'sin_marcar' => $acts->filter(fn ($a) => $a->status->isOpen())->count(),
         ];
     }
 
@@ -346,6 +344,7 @@ class DashboardMetrics
                 'assigned' => $mine->count(),
                 'completed' => $completed->count(),
                 'open' => $mine->filter(fn ($x) => in_array($x->status, [ActivityStatus::Pendiente, ActivityStatus::EnProgreso], true))->count(),
+                'incompletas' => $mine->filter(fn ($x) => $x->status === ActivityStatus::Incompleta)->count(),
                 'overdue' => $mine->filter(fn ($x) => $this->isOverdue($x))->count(),
                 'cumplimiento' => self::pct($completed->count(), $effective),
                 'a_tiempo' => self::pct($completed->filter(fn ($x) => $this->isOnTime($x))->count(), $completed->count()),
@@ -495,22 +494,35 @@ class DashboardMetrics
             ];
         }
 
-        // Completadas que esperan validación (sin importar cuándo se crearon)
-        $pending = Activity::query()
-            ->pendingValidation()
-            ->when($this->teamId, fn ($q) => $q->where('team_id', $this->teamId))
-            ->with('creator:id,name')
-            ->get(['id', 'created_by', 'completed_at']);
+        // Actividades marcadas como incompletas en el periodo
+        $failed = $this->activities($this->from, $this->to)
+            ->filter(fn ($a) => $a->status === ActivityStatus::Incompleta);
 
-        if ($pending->isNotEmpty()) {
-            $old = $pending->filter(fn ($a) => $a->completed_at && $a->completed_at->lt(now()->subDays(2)))->count();
-            $byCreator = $pending->groupBy(fn ($a) => $a->creator?->name ?? 'Sin asignador')->map->count()->sortDesc();
+        if ($failed->isNotEmpty()) {
+            $names = User::whereIn('id', $failed->pluck('assigned_to')->unique())->pluck('name', 'id');
+            $byPerson = $failed->groupBy('assigned_to')->map->count()->sortDesc();
 
             $alerts[] = [
-                'level' => $old > 0 ? 'warn' : 'info',
-                'title' => $pending->count().' '.($pending->count() === 1 ? 'actividad completada' : 'actividades completadas').' por validar'.($old > 0 ? " ({$old} con más de 2 días)" : ''),
-                'detail' => 'Pendientes de: '.$byCreator->take(4)->map(fn ($n, $name) => "{$name} ({$n})")->join(', '),
-                'link' => route('activities.index', ['status' => 'por_validar']),
+                'level' => 'bad',
+                'title' => $failed->count().' '.($failed->count() === 1 ? 'actividad marcada' : 'actividades marcadas').' como incompleta en el periodo',
+                'detail' => $byPerson->take(5)->map(fn ($n, $id) => ($names[$id] ?? '—')." ({$n})")->join(', '),
+                'link' => route('activities.index', ['status' => 'incompleta']),
+            ];
+        }
+
+        // Actividades vencidas que nadie ha marcado
+        $unmarked = Activity::query()
+            ->overdue()
+            ->whereDate('due_date', '<', today()->subDays(1))
+            ->when($this->teamId, fn ($q) => $q->where('team_id', $this->teamId))
+            ->count();
+
+        if ($unmarked > 0) {
+            $alerts[] = [
+                'level' => 'info',
+                'title' => "{$unmarked} ".($unmarked === 1 ? 'actividad vencida' : 'actividades vencidas').' sin marcar',
+                'detail' => 'Revisa si se completaron y márcalas con ✓ o ✗.',
+                'link' => route('activities.index', ['status' => 'sin_marcar']),
             ];
         }
 
@@ -585,11 +597,11 @@ class DashboardMetrics
         $tol = config('auditoria.tolerancia_minutos');
 
         return [
-            ['Cumplimiento', 'Completadas ÷ (asignadas − canceladas) × 100', "≥ {$m['cumplimiento']}%", 'Actividades creadas en el periodo'],
+            ['Cumplimiento', 'Marcadas como completadas por un superior ÷ (asignadas − canceladas) × 100', "≥ {$m['cumplimiento']}%", 'Actividades creadas en el periodo'],
             ['Entrega a tiempo', 'Completadas en o antes de su fecha límite ÷ completadas × 100', "≥ {$m['a_tiempo']}%", 'Actividades completadas del periodo'],
             ['Asistencia', "Entradas registradas ÷ (personal activo × días laborales) × 100. Hoy cuenta a partir de las {$hora} + {$tol} min", "≥ {$m['asistencia']}%", 'Registros de asistencia en días laborales'],
             ['Puntualidad', "Entradas hasta las {$hora} + {$tol} min ÷ entradas registradas × 100", "≥ {$m['puntualidad']}%", 'Hora de entrada de cada registro'],
-            ['Validación', 'Completadas validadas por quien asignó, un gerente o el administrador ÷ completadas × 100', '100%', 'Actividades completadas del periodo'],
+            ['Incompletas', 'Actividades que un superior marcó con ✗ en el periodo', 'Lo más bajo posible', 'Marcado de actividades'],
             ['Vencidas', 'Pendientes o en progreso con fecha límite anterior a hoy', 'Lo más bajo posible', 'Actividades creadas en el periodo'],
             ['Tiempo de cierre', 'Promedio de días entre la creación y el completado', 'Tendencia a la baja', 'Actividades completadas del periodo'],
             ['Horas por jornada', 'Promedio de horas entre entrada y salida', 'Referencia', 'Registros con entrada y salida'],
