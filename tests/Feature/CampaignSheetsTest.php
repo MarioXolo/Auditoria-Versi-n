@@ -58,7 +58,7 @@ class CampaignSheetsTest extends TestCase
         $this->actingAs($this->gerente)->post($this->url('/actores'), [
             'nombre' => 'Comisariado ejidal X', 'tipo' => 'Comisariado ejidal', 'community_id' => 'otro', 'community_new' => 'Comunidad Y',
             'postura' => 'Afín', 'votos_influye' => 150, 'contactado' => '1', 'responsable' => 'Coord. territorial', 'notas' => 'Pide apoyo a caminos',
-        ])->assertSessionHasNoErrors();
+        ])->assertSessionHasNoErrors()->assertRedirect();
 
         $actor = $this->campaign->actors()->first();
         $this->assertSame('Comunidad Y', $actor->community->name);
@@ -68,7 +68,7 @@ class CampaignSheetsTest extends TestCase
 
         $this->actingAs($this->gerente)->put($this->url("/actores/{$actor->id}"), [
             'nombre' => 'Comisariado ejidal X', 'community_id' => $actor->community_id, 'postura' => 'Adverso', 'votos_influye' => 90,
-        ])->assertSessionHasNoErrors();
+        ])->assertSessionHasNoErrors()->assertRedirect();
         $actor->refresh();
         $this->assertSame('Adverso', $actor->postura);
         $this->assertFalse($actor->contactado, 'la casilla sin marcar debe guardarse como No');
@@ -81,8 +81,8 @@ class CampaignSheetsTest extends TestCase
     public function test_polling_stations_feed_the_rc_kpi_and_reject_duplicates(): void
     {
         $post = fn (array $d) => $this->actingAs($this->gerente)->post($this->url('/defensa-del-voto'), $d);
-        $post(['seccion' => '0512', 'casilla' => 'B1', 'rc_propietario' => 'Pedro Sánchez', 'rc_suplente' => 'Rosa Díaz', 'acreditado' => '1'])->assertSessionHasNoErrors();
-        $post(['seccion' => '0512', 'casilla' => 'C1', 'rc_propietario' => 'Juan'])->assertSessionHasNoErrors();
+        $post(['seccion' => '0512', 'casilla' => 'B1', 'rc_propietario' => 'Pedro Sánchez', 'rc_suplente' => 'Rosa Díaz', 'acreditado' => '1'])->assertSessionHasNoErrors()->assertRedirect();
+        $post(['seccion' => '0512', 'casilla' => 'C1', 'rc_propietario' => 'Juan'])->assertSessionHasNoErrors()->assertRedirect();
         $post(['seccion' => '0512', 'casilla' => 'B1'])->assertSessionHasErrors('seccion');
 
         $rc = (new CampaignMetrics($this->campaign))->kpis()->firstWhere('nombre', '% casillas con RC propietario + suplente');
@@ -99,11 +99,11 @@ class CampaignSheetsTest extends TestCase
         $this->assertSame(array_column(Campaign::DEFAULT_BUDGET, 'rubro'), $items->pluck('rubro')->all());
         $this->assertEqualsWithDelta(1.0, $items->sum('porcentaje'), 0.0001);
 
-        $this->actingAs($this->gerente)->put($this->url('/presupuesto/tope'), ['tope_gastos' => 1000000])->assertSessionHasNoErrors();
+        $this->actingAs($this->gerente)->put($this->url('/presupuesto/tope'), ['tope_gastos' => 1000000])->assertSessionHasNoErrors()->assertRedirect();
         $first = $items->first();
         $this->actingAs($this->gerente)->put($this->url("/presupuesto/{$first->id}"), [
             'rubro' => $first->rubro, 'porcentaje' => 40, 'asignado' => 400000, 'ejercido' => 150000,
-        ])->assertSessionHasNoErrors();
+        ])->assertSessionHasNoErrors()->assertRedirect();
         $first->refresh();
         $this->assertEqualsWithDelta(0.40, $first->porcentaje, 0.0001);
         $this->assertSame(250000.0, $first->disponible());
@@ -122,14 +122,14 @@ class CampaignSheetsTest extends TestCase
     public function test_schedule_template_loads_once_and_flags_overdue_tasks(): void
     {
         $this->actingAs($this->gerente)->get($this->url('/cronograma'))->assertSee('tareas sugeridas del Excel');
-        $this->actingAs($this->gerente)->post($this->url('/cronograma/plantilla'))->assertSessionHasNoErrors();
+        $this->actingAs($this->gerente)->post($this->url('/cronograma/plantilla'))->assertSessionHasNoErrors()->assertRedirect();
         $this->assertSame(count(CampaignSheets::TASK_TEMPLATE), $this->campaign->tasks()->count());
         $this->actingAs($this->gerente)->post($this->url('/cronograma/plantilla'))->assertSessionHasErrors('tarea');
         $this->assertSame(count(CampaignSheets::TASK_TEMPLATE), $this->campaign->tasks()->count());
 
         $this->actingAs($this->gerente)->post($this->url('/cronograma'), [
             'fase' => '0. Arranque', 'tarea' => 'Tarea atrasada', 'fecha_limite' => today()->subDay()->toDateString(), 'estatus' => 'En curso',
-        ])->assertSessionHasNoErrors();
+        ])->assertSessionHasNoErrors()->assertRedirect();
         $task = $this->campaign->tasks()->latest('id')->first();
         $this->assertTrue($task->vencida());
 
@@ -144,7 +144,7 @@ class CampaignSheetsTest extends TestCase
         $this->actingAs($this->gerente)->post($this->url('/logros'), [
             'logro' => 'Nuevas patrullas + subcomandancia', 'pilar' => 'Seguridad', 'lugar' => 'Cabecera y delegaciones',
             'beneficiados' => 'Todo el municipio', 'evidencia' => '1', 'frase' => 'Hoy Huimilpan tiene más patrullas que nunca',
-        ])->assertSessionHasNoErrors();
+        ])->assertSessionHasNoErrors()->assertRedirect();
         $logro = $this->campaign->achievements()->first();
         $this->assertNull($logro->recurso);
 

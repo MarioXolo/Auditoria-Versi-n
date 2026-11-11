@@ -192,7 +192,7 @@ class SheetController extends Controller
                 'bool' => $request->boolean($name),
                 'int' => (int) ($data[$name] ?? 0),
                 'percent' => ((float) ($data[$name] ?? 0)) / 100,
-                'money' => $data[$name] === null ? (($f['nullable'] ?? false) ? null : 0) : (float) $data[$name],
+                'money' => ($data[$name] ?? null) === null ? (($f['nullable'] ?? false) ? null : 0) : (float) $data[$name],
                 'community' => CatalogResolver::community($data[$name] ?? null, $data['community_new'] ?? null),
                 'text', 'phone' => filled($data[$name] ?? null) ? trim($data[$name]) : null,
                 default => $data[$name] ?? ($f['default'] ?? null),
