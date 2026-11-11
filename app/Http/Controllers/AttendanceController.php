@@ -8,7 +8,7 @@ use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Storage;
+use App\Services\PhotoStorage;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -79,7 +79,7 @@ class AttendanceController extends Controller
             'user_id' => $user->id,
             'work_date' => today()->toDateString(),
             'check_in_at' => now(),
-            'check_in_photo' => $request->file('photo')->store('asistencia/'.today()->format('Y-m'), 'local'),
+            'check_in_photo' => PhotoStorage::store($request->file('photo'), 'asistencia/'.today()->format('Y-m')),
             'notes' => $request->input('notes'),
         ]);
 
@@ -107,7 +107,7 @@ class AttendanceController extends Controller
         $attendance->check_out_at = now();
 
         if ($request->hasFile('photo')) {
-            $attendance->check_out_photo = $request->file('photo')->store('asistencia/'.today()->format('Y-m'), 'local');
+            $attendance->check_out_photo = PhotoStorage::store($request->file('photo'), 'asistencia/'.today()->format('Y-m'));
         }
 
         $attendance->save();
@@ -132,9 +132,9 @@ class AttendanceController extends Controller
             default => null,
         };
 
-        abort_unless($path && Storage::disk('local')->exists($path), 404);
+        abort_unless(PhotoStorage::exists($path), 404);
 
-        return Storage::disk('local')->response($path);
+        return PhotoStorage::response($path);
     }
 
     private function peopleFor(User $user)

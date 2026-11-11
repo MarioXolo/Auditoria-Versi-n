@@ -22,6 +22,7 @@ composer install -q --no-dev --optimize-autoloader --no-interaction
 php artisan migrate --force          # solo aplica migraciones nuevas; no borra datos
 php artisan optimize
 
+install -m 750 deploy/backup.sh /usr/local/bin/auditorias-backup   # mantener el script de respaldo al día
 chown -R www-data:www-data "$APP_DIR"
 chmod 640 .env
 systemctl reload php8.3-fpm

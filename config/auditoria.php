@@ -13,6 +13,18 @@ return [
     */
     'max_equipos' => 30,
 
+    /*
+    | Fotos de evidencia y asistencia.
+    | disco: «local» (disco del servidor) o «s3» (Object Storage, ver AWS_* en el .env).
+    | Las fotos JPG/PNG/WEBP se reducen al subirlas para ahorrar espacio.
+    */
+    'archivos' => [
+        'disco' => env('ARCHIVOS_DISCO', 'local'),
+        'comprimir' => (bool) env('ARCHIVOS_COMPRIMIR', true),
+        'lado_maximo' => (int) env('ARCHIVOS_LADO_MAXIMO', 1600),
+        'calidad' => (int) env('ARCHIVOS_CALIDAD', 75),
+    ],
+
     // Hora oficial de entrada y minutos de tolerancia para contar un retardo
     'hora_entrada' => env('AUDITORIA_HORA_ENTRADA', '09:00'),
     'tolerancia_minutos' => (int) env('AUDITORIA_TOLERANCIA', 10),

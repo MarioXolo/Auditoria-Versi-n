@@ -10,7 +10,7 @@ use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use App\Services\PhotoStorage;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -105,7 +105,7 @@ class ActivityController extends Controller
         ], [], ['status' => 'estado'])['status'] ?? ActivityStatus::NoIniciado->value;
 
         if ($request->hasFile('evidence')) {
-            $data['evidence_path'] = $request->file('evidence')->store('evidencias', 'local');
+            $data['evidence_path'] = PhotoStorage::store($request->file('evidence'), 'evidencias');
         }
 
         $activity = Activity::create($data);
@@ -155,11 +155,11 @@ class ActivityController extends Controller
 
         if ($request->hasFile('evidence')) {
             if ($activity->evidence_path) {
-                Storage::disk('local')->delete($activity->evidence_path);
+                PhotoStorage::delete($activity->evidence_path);
             }
-            $data['evidence_path'] = $request->file('evidence')->store('evidencias', 'local');
+            $data['evidence_path'] = PhotoStorage::store($request->file('evidence'), 'evidencias');
         } elseif ($request->boolean('remove_photo') && $activity->evidence_path) {
-            Storage::disk('local')->delete($activity->evidence_path);
+            PhotoStorage::delete($activity->evidence_path);
             $data['evidence_path'] = null;
         }
 
@@ -224,7 +224,7 @@ class ActivityController extends Controller
         $this->authorize('delete', $activity);
 
         if ($activity->evidence_path) {
-            Storage::disk('local')->delete($activity->evidence_path);
+            PhotoStorage::delete($activity->evidence_path);
         }
 
         $activity->delete();
@@ -237,9 +237,9 @@ class ActivityController extends Controller
     {
         $this->authorize('view', $activity);
 
-        abort_unless($activity->evidence_path && Storage::disk('local')->exists($activity->evidence_path), 404);
+        abort_unless(PhotoStorage::exists($activity->evidence_path), 404);
 
-        return Storage::disk('local')->response($activity->evidence_path);
+        return PhotoStorage::response($activity->evidence_path);
     }
 
     // ---------- Auxiliares ----------
