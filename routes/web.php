@@ -4,6 +4,11 @@ use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\Campaigns\CampaignController;
+use App\Http\Controllers\Campaigns\KpiController;
+use App\Http\Controllers\Campaigns\PromoterController;
+use App\Http\Controllers\Campaigns\TerritoryController;
+use App\Http\Controllers\Campaigns\VoterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
@@ -65,6 +70,27 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::post('/catalogos/{catalog}', [CatalogController::class, 'store'])->whereIn('catalog', ['tipos', 'comunidades'])->name('catalogs.store');
         Route::patch('/catalogos/{catalog}/{id}', [CatalogController::class, 'update'])->whereIn('catalog', ['tipos', 'comunidades'])->whereNumber('id')->name('catalogs.update');
         Route::delete('/catalogos/{catalog}/{id}', [CatalogController::class, 'destroy'])->whereIn('catalog', ['tipos', 'comunidades'])->whereNumber('id')->name('catalogs.destroy');
+
+        // V2 · Cuaderno Maestro de Campaña (cada registro pertenece a su campaña: scopeBindings)
+        Route::resource('campanas', CampaignController::class)->parameters(['campanas' => 'campaign'])->names('campaigns');
+        Route::patch('/campanas/{campaign}/archivar', [CampaignController::class, 'toggle'])->name('campaigns.toggle');
+        Route::prefix('/campanas/{campaign}')->name('campaigns.')->scopeBindings()->group(function () {
+            Route::get('/estructura', [TerritoryController::class, 'index'])->name('territories.index');
+            Route::post('/estructura', [TerritoryController::class, 'store'])->name('territories.store');
+            Route::put('/estructura/{territory}', [TerritoryController::class, 'update'])->name('territories.update');
+            Route::delete('/estructura/{territory}', [TerritoryController::class, 'destroy'])->name('territories.destroy');
+
+            Route::get('/promotores/exportar', [PromoterController::class, 'export'])->name('promoters.export');
+            Route::resource('promotores', PromoterController::class)->parameters(['promotores' => 'promoter'])->names('promoters')->except(['show']);
+
+            Route::get('/votantes/exportar', [VoterController::class, 'export'])->name('voters.export');
+            Route::resource('votantes', VoterController::class)->parameters(['votantes' => 'voter'])->names('voters')->except(['show']);
+
+            Route::get('/kpi', [KpiController::class, 'index'])->name('kpis.index');
+            Route::post('/kpi', [KpiController::class, 'store'])->name('kpis.store');
+            Route::put('/kpi/{kpi}', [KpiController::class, 'update'])->name('kpis.update');
+            Route::delete('/kpi/{kpi}', [KpiController::class, 'destroy'])->name('kpis.destroy');
+        });
     });
 
     // Solo administradores: crear, editar y desactivar usuarios

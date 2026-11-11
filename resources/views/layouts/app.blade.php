@@ -24,6 +24,7 @@
     if ($me->seesEverything()) {
         $nav[] = ['route' => 'users.index', 'match' => 'users.*', 'label' => 'Usuarios', 'icon' => 'M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m22 0v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75M13 7a4 4 0 11-8 0 4 4 0 018 0z'];
         $nav[] = ['route' => 'teams.index', 'match' => 'teams.*', 'label' => 'Equipos', 'icon' => 'M3 7h18M3 12h18M3 17h18'];
+        $nav[] = ['route' => 'campaigns.index', 'match' => 'campaigns.*', 'label' => 'Campañas', 'icon' => 'M4 21V4m0 0h11l-1.5 4L15 12H4'];
         $nav[] = ['route' => 'catalogs.index', 'match' => 'catalogs.*', 'label' => 'Catálogos', 'icon' => 'M4 6a2 2 0 012-2h3l2 2h7a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm4 6h8m-8 4h5'];
     }
 @endphp

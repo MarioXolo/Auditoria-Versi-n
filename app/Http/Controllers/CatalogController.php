@@ -67,8 +67,8 @@ class CatalogController extends Controller
     {
         $item = $this->find($catalog, $id);
 
-        if ($item->activities()->exists()) {
-            return back()->withErrors(['name' => "«{$item->name}» ya tiene actividades; desactívalo en lugar de borrarlo."], $catalog);
+        if ($item->inUse()) {
+            return back()->withErrors(['name' => "«{$item->name}» ya se usa en actividades o campañas; desactívalo en lugar de borrarlo."], $catalog);
         }
 
         $item->delete();

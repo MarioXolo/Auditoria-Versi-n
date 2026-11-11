@@ -21,6 +21,15 @@ class Community extends Model
         return $this->hasMany(Activity::class);
     }
 
+    /** ¿La usa alguna actividad o algún registro de campaña? (entonces no se puede borrar) */
+    public function inUse(): bool
+    {
+        return $this->activities()->exists()
+            || CampaignTerritory::where('community_id', $this->id)->exists()
+            || CampaignPromoter::where('community_id', $this->id)->exists()
+            || CampaignVoter::where('community_id', $this->id)->exists();
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('active', true);

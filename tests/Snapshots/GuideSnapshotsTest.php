@@ -51,6 +51,15 @@ class GuideSnapshotsTest extends TestCase
         $this->snap('08-gerente-actividades', $this->get('/activities'));
         $this->snap('09-gerente-vencidas', $this->get('/activities?status=vencida'));
         $this->snap('23-gerente-calendario', $this->get('/calendario'));
+        $campaign = \App\Models\Campaign::first();
+        $this->snap('24-campanas', $this->get('/campanas'));
+        $this->snap('25-campana-resumen', $this->get("/campanas/{$campaign->id}"));
+        $this->snap('26-campana-estructura', $this->get("/campanas/{$campaign->id}/estructura"));
+        $this->snap('27-campana-votantes', $this->get("/campanas/{$campaign->id}/votantes"));
+        $this->snap('28-campana-promotores', $this->get("/campanas/{$campaign->id}/promotores"));
+        $this->snap('29-campana-kpi', $this->get("/campanas/{$campaign->id}/kpi"));
+        $this->snap('30-campana-meta', $this->get("/campanas/{$campaign->id}/edit"));
+        $this->snap('31-campana-votante-nuevo', $this->get("/campanas/{$campaign->id}/votantes/create"));
 
         $this->actingAs($encargado);
         $this->snap('10-encargado-actividades', $this->get('/activities'));

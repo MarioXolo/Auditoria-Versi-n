@@ -21,6 +21,11 @@ class ActivityType extends Model
         return $this->hasMany(Activity::class);
     }
 
+    public function inUse(): bool
+    {
+        return $this->activities()->exists();
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('active', true);

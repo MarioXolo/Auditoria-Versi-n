@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Enums\ActivityStatus;
 use App\Models\Activity;
+use App\Models\Campaign;
 use App\Models\ActivityType;
 use App\Models\Community;
 use App\Models\Attendance;
@@ -112,6 +113,8 @@ class DemoSeeder extends Seeder
             $activity->save();
         }
 
+        $this->createCampaign($communities->all(), $gerente);
+
         $this->command?->info('Datos demo creados. Contraseña de todos los usuarios demo: password');
     }
 
@@ -216,5 +219,57 @@ class DemoSeeder extends Seeder
         $parts = explode(' ', $ascii);
 
         return $parts[0].'.'.end($parts).'@demo.test';
+    }
+
+    /** Campaña demo con estructura, promotores y votantes ficticios (V2 · Cuaderno de Campaña). */
+    private function createCampaign(array $communityIds, User $creator): void
+    {
+        $campaign = Campaign::create([
+            'name' => 'Campaña demo 2027', 'municipality' => 'Municipio demo', 'election_date' => '2027-06-06',
+            'listado_nominal' => 30000, 'participacion' => 0.55, 'objetivo' => 0.5, 'colchon' => 0.1,
+            'votantes_por_promotor' => 10, 'created_by' => $creator->id,
+            'notes' => 'Datos ficticios para demostración.',
+        ]);
+
+        $metas = [2100, 1500, 1200, 1000, 900, 800];
+        foreach (array_slice($communityIds, 0, 6) as $i => $communityId) {
+            $campaign->territories()->create([
+                'community_id' => $communityId,
+                'responsable' => fake('es_MX')->name(),
+                'listado_nominal' => $metas[$i] * 2 + rand(0, 400),
+                'meta_votos' => $metas[$i],
+            ]);
+        }
+
+        $promoters = collect();
+        foreach (range(1, 24) as $i) {
+            $promoters->push($campaign->promoters()->create([
+                'name' => fake('es_MX')->name(),
+                'phone' => '442-'.rand(100, 999).'-'.rand(1000, 9999),
+                'community_id' => $communityIds[$i % 6],
+                'secciones' => str_pad((string) (500 + $i % 9), 4, '0', STR_PAD_LEFT),
+                'coordinador' => fake('es_MX')->name(),
+                'meta_votos' => 10,
+                'verificado' => $i % 3 !== 0,
+            ]));
+        }
+
+        foreach (range(1, 180) as $i) {
+            $promoter = rand(1, 10) > 1 ? $promoters->random() : null;
+            $campaign->voters()->create([
+                'nombre' => fake('es_MX')->name(),
+                'seccion' => $promoter?->secciones ?? str_pad((string) rand(500, 508), 4, '0', STR_PAD_LEFT),
+                'casilla' => fake()->randomElement(['B1', 'C1', 'C2']),
+                'domicilio' => fake('es_MX')->streetAddress(),
+                'telefono' => '442-'.rand(100, 999).'-'.rand(1000, 9999),
+                'community_id' => $promoter?->community_id ?? fake()->randomElement(array_slice($communityIds, 0, 6)),
+                'promoter_id' => $promoter?->id,
+                'afinidad' => fake()->randomElement(['Duro', 'Duro', 'Blando', 'Indeciso', null]),
+                'recibe_apoyo' => fake()->randomElement([true, false, false, null]),
+                'created_by' => $creator->id,
+            ]);
+        }
+
+        $campaign->kpis()->where('nombre', 'like', 'Aprobación%')->update(['meta' => 0.8, 'valor' => 0.82, 'fecha_corte' => 'oct-2026 (encuesta demo)']);
     }
 }
