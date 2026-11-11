@@ -155,7 +155,7 @@ class CampaignTest extends TestCase
         $this->actingAs($this->admin)->get("/campanas/{$c->id}/promotores")->assertSee('Juan Pérez')->assertSee('40.0%');
 
         $csv = $this->actingAs($this->admin)->get("/campanas/{$c->id}/promotores/exportar")->assertOk()->streamedContent();
-        $this->assertStringContainsString('Juan Pérez,442,,0512,,10,4,40,Sí', $csv);
+        $this->assertStringContainsString('1,"Juan Pérez",442,,0512,,10,4,40,Sí', $csv);
 
         $csv = $this->actingAs($this->admin)->get("/campanas/{$c->id}/votantes/exportar")->assertOk()->streamedContent();
         $this->assertStringContainsString('¿Recibe apoyo gob?', $csv);
