@@ -1,5 +1,5 @@
 {
-    "name": "Auditoría de Campaña (vista previa)",
+    "name": "Sistema de Auditorías (vista previa)",
     "image": "mcr.microsoft.com/devcontainers/php:1-8.3-bookworm",
     "forwardPorts": [8000],
     "portsAttributes": {

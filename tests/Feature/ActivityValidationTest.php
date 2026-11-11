@@ -32,9 +32,9 @@ class ActivityValidationTest extends TestCase
         $this->empleado = User::factory()->create(['team_id' => $team->id]);
 
         $this->actingAs($this->encargado)->post('/activities', [
-            'title' => 'Volanteo', 'assigned_to' => $this->empleado->id, 'priority' => 'media', 'status' => 'pendiente',
+            'title' => 'Visita a cliente', 'assigned_to' => $this->empleado->id, 'priority' => 'media', 'status' => 'pendiente',
         ]);
-        $this->activity = Activity::where('title', 'Volanteo')->firstOrFail();
+        $this->activity = Activity::where('title', 'Visita a cliente')->firstOrFail();
     }
 
     public function test_completing_an_activity_leaves_it_pending_validation(): void
@@ -47,7 +47,7 @@ class ActivityValidationTest extends TestCase
         $this->assertSame(ValidationStatus::Pendiente, $a->validation_status);
         $this->assertTrue($a->isPendingValidation());
 
-        $this->actingAs($this->encargado)->get('/activities?status=por_validar')->assertSee('Volanteo');
+        $this->actingAs($this->encargado)->get('/activities?status=por_validar')->assertSee('Visita a cliente');
         $this->actingAs($this->encargado)->get("/activities/{$a->id}")->assertSee('Validar')->assertSee('Rechazar');
         // El empleado ve que está por validar, pero no tiene botones
         $this->actingAs($this->empleado)->get("/activities/{$a->id}")->assertSee('Por validar')->assertDontSee('name="decision"', false);

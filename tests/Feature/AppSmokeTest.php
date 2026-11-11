@@ -172,11 +172,11 @@ class AppSmokeTest extends TestCase
 
     public function test_encargado_assigns_only_to_own_team(): void
     {
-        $base = ['title' => 'Volanteo', 'priority' => 'alta', 'status' => 'pendiente'];
+        $base = ['title' => 'Visita a cliente', 'priority' => 'alta', 'status' => 'pendiente'];
 
         $this->actingAs($this->encargado)->post('/activities', $base + ['assigned_to' => $this->empleado->id])
             ->assertRedirect();
-        $this->assertDatabaseHas('activities', ['title' => 'Volanteo', 'assigned_to' => $this->empleado->id, 'team_id' => $this->team->id]);
+        $this->assertDatabaseHas('activities', ['title' => 'Visita a cliente', 'assigned_to' => $this->empleado->id, 'team_id' => $this->team->id]);
 
         $this->actingAs($this->encargado)->post('/activities', $base + ['assigned_to' => $this->otroEmpleado->id])
             ->assertSessionHasErrors('assigned_to');

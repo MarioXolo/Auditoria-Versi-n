@@ -26,14 +26,14 @@ class DemoSeeder extends Seeder
 
     /** Actividades típicas con su descripción. */
     private const ACTIVITIES = [
-        'Recorrido por colonia asignada' => 'Visitar los domicilios de la colonia asignada y registrar comentarios de los vecinos.',
-        'Entrega de volantes' => 'Repartir volantes en cruceros y zonas comerciales del sector.',
-        'Reunión con líderes vecinales' => 'Reunión para conocer necesidades de la zona y acordar próximos pasos.',
-        'Registro de simpatizantes' => 'Capturar datos de contacto de simpatizantes con su autorización.',
-        'Colocación de lonas' => 'Colocar lonas en los puntos autorizados y tomar foto de cada una.',
+        'Visita a cliente' => 'Visitar al cliente asignado, revisar pendientes y registrar acuerdos.',
+        'Auditoría de sucursal' => 'Revisar procesos, inventario y orden de la sucursal; levantar evidencia fotográfica.',
+        'Inventario de almacén' => 'Contar existencias y comparar contra el sistema; reportar diferencias.',
+        'Revisión de expedientes' => 'Verificar que los expedientes estén completos y actualizados.',
         'Reporte semanal de avance' => 'Entregar el resumen de actividades realizadas en la semana.',
-        'Visita a mercado municipal' => 'Recorrer los locales del mercado y platicar con los comerciantes.',
-        'Seguimiento de solicitudes ciudadanas' => 'Dar respuesta a las solicitudes recibidas en recorridos anteriores.',
+        'Capacitación del personal' => 'Impartir la capacitación programada y registrar asistentes.',
+        'Seguimiento de pendientes' => 'Dar respuesta a los pendientes detectados en la revisión anterior.',
+        'Verificación de proveedores' => 'Confirmar entregas, precios y documentación de los proveedores asignados.',
     ];
 
     public function run(): void
@@ -53,7 +53,7 @@ class DemoSeeder extends Seeder
 
             $team = Team::create([
                 'name' => "Equipo {$zone}",
-                'description' => "Personal de campo de la zona {$slug}.",
+                'description' => "Personal de la zona {$slug}.",
                 'leader_id' => $leader->id,
             ]);
             $leader->update(['team_id' => $team->id]);
@@ -130,8 +130,8 @@ class DemoSeeder extends Seeder
                 'validated_at' => $updated,
                 'validation_notes' => fake()->randomElement([
                     'Falta la foto de evidencia.',
-                    'El reporte está incompleto, agrega los domicilios visitados.',
-                    'Las lonas no están en los puntos autorizados.',
+                    'El reporte está incompleto, agrega los hallazgos de la revisión.',
+                    'Los datos del inventario no coinciden con el sistema.',
                 ]),
             ];
         }

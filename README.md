@@ -1,6 +1,6 @@
-# Auditoría de Campaña · Versión 1
+# Sistema de Auditorías · Versión 1
 
-Portal web para controlar actividades y asistencia del personal de campaña. Funciona en celular, tablet y computadora desde el navegador.
+Portal web para controlar y auditar las actividades y la asistencia del personal. Funciona en celular, tablet y computadora desde el navegador.
 
 ## Roles
 

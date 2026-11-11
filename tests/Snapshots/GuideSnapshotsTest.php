@@ -54,8 +54,8 @@ class GuideSnapshotsTest extends TestCase
         $this->snap('10-encargado-actividades', $this->get('/activities'));
         $this->snap('11-encargado-nueva-actividad', $this->get('/activities/create'));
         $created = $this->followingRedirects()->post('/activities', [
-            'title' => 'Recorrido colonia Centro',
-            'description' => "Visitar 40 domicilios de la colonia Centro.\nRegistrar dudas y solicitudes de los vecinos.",
+            'title' => 'Auditoría de sucursal Centro',
+            'description' => "Revisar inventario, caja y orden de la sucursal Centro.\nLevantar evidencia fotográfica de cada área.",
             'assigned_to' => $empleado->id,
             'priority' => 'alta',
             'status' => 'pendiente',
@@ -63,17 +63,17 @@ class GuideSnapshotsTest extends TestCase
         ]);
         $this->snap('12-encargado-actividad-creada', $created);
         $this->snap('13-encargado-asistencia', $this->get('/asistencia'));
-        $nueva = Activity::where('title', 'Recorrido colonia Centro')->first();
+        $nueva = Activity::where('title', 'Auditoría de sucursal Centro')->first();
         $this->patch('/activities/'.$nueva->id.'/status', ['status' => 'completada']);
         $this->snap('19-encargado-por-validar', $this->get('/activities/'.$nueva->id));
         $this->snap('20-encargado-lista-por-validar', $this->get('/activities?status=por_validar'));
-        $this->post('/activities/'.$nueva->id.'/validacion', ['decision' => 'validar', 'validation_notes' => 'Se revisaron las fotos de los 40 domicilios.']);
+        $this->post('/activities/'.$nueva->id.'/validacion', ['decision' => 'validar', 'validation_notes' => 'Se revisaron las fotos de todas las áreas.']);
         $this->snap('21-encargado-validada', $this->followingRedirects()->get('/activities/'.$nueva->id));
 
         Attendance::where('user_id', $empleado->id)->whereDate('work_date', today())->delete();
         $this->actingAs($empleado);
         $this->snap('14-empleado-actividades', $this->get('/activities'));
-        $activity = Activity::where('title', 'Recorrido colonia Centro')->first();
+        $activity = Activity::where('title', 'Auditoría de sucursal Centro')->first();
         $this->snap('15-empleado-detalle', $this->get('/activities/'.$activity->id));
         $this->snap('16-empleado-asistencia', $this->get('/asistencia'));
         Attendance::create([
