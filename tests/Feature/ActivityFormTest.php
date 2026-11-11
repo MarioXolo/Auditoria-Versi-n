@@ -41,12 +41,12 @@ class ActivityFormTest extends TestCase
         $this->assertStringContainsString('ACT-0001', $html);
 
         $positions = array_map(fn ($needle) => strpos($html, $needle), [
-            'for="code"', 'name="activity_type_id"', 'name="community_id"', 'name="evidence_mode"', 'name="start_date"', 'name="end_date"',
+            'for="code"', 'name="activity_type_id"', 'name="community_id"', 'name="evidence_mode"', 'name="start_date"', 'name="end_date"', 'name="status"',
         ]);
         $this->assertSame($positions, array_values(array_filter($positions)), 'Todos los campos existen');
         $sorted = $positions;
         sort($sorted);
-        $this->assertSame($sorted, $positions, 'Orden: ID, tipo, comunidad, evidencia, inicio, fin');
+        $this->assertSame($sorted, $positions, 'Orden: ID, tipo, comunidad, evidencia, inicio, fin, estado');
 
         $this->actingAs($this->encargado)->post('/activities', $this->payload(['assigned_to' => $this->empleado->id]))
             ->assertSessionHas('status', 'Actividad ACT-0001 creada y asignada.');

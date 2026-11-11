@@ -114,7 +114,12 @@ class ActivityMarkingTest extends TestCase
     public function test_status_cannot_be_set_to_completed_through_edit(): void
     {
         $data = $this->payload(['assigned_to' => $this->empleado->id, 'status' => 'concluido']);
-        $this->actingAs($this->encargado)->post('/activities', $data)->assertRedirect();
+        $this->actingAs($this->encargado)->post('/activities', $data)->assertSessionHasErrors('status');
+
+        // Al crear se puede elegir cualquiera de los tres estados manuales
+        $this->actingAs($this->empleado)->post('/activities', $this->payload(['status' => 'en_proceso']))->assertRedirect();
+        $this->assertSame(ActivityStatus::EnProceso, Activity::latest('id')->first()->status);
+        $this->actingAs($this->encargado)->post('/activities', ['status' => 'no_iniciado'] + $data)->assertRedirect();
         $a = Activity::latest('id')->firstOrFail();
         $this->assertSame(ActivityStatus::NoIniciado, $a->status);
 

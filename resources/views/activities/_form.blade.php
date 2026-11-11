@@ -108,20 +108,19 @@
                min="{{ old('start_date', $activity->start_date?->format('Y-m-d')) }}" class="input">
     </div>
 
-    @if ($activity->exists)
-        <div>
-            <label for="status" class="label">Estado</label>
-            @if ($activity->status->isMarked())
-                <p class="input bg-slate-50 text-slate-600">{{ $activity->status->label() }} (lo pone la revisión con el checkbox)</p>
-            @else
-                <select id="status" name="status" class="input">
-                    @foreach ($statuses as $value => $label)
-                        <option value="{{ $value }}" @selected(old('status', $activity->status->value) === $value)>{{ $label }}</option>
-                    @endforeach
-                </select>
-            @endif
-        </div>
-    @endif
+    {{-- 7. Estado: las tres opciones manuales; Concluido y No completada los pone la revisión --}}
+    <div>
+        <label for="status" class="label">Estado *</label>
+        @if ($activity->exists && $activity->status->isMarked())
+            <p class="input bg-slate-50 text-slate-600">{{ $activity->status->label() }} (lo pone la revisión con el checkbox)</p>
+        @else
+            <select id="status" name="status" required class="input">
+                @foreach ($statuses as $value => $label)
+                    <option value="{{ $value }}" @selected(old('status', $activity->status?->value ?? 'no_iniciado') === $value)>{{ $label }}</option>
+                @endforeach
+            </select>
+        @endif
+    </div>
 </div>
 
 @push('scripts')

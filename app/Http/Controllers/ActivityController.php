@@ -94,8 +94,10 @@ class ActivityController extends Controller
         $data = $this->validated($request, $user);
         $data['created_by'] = $user->id;
         $data['team_id'] = User::find($data['assigned_to'])?->team_id;
-        // Toda actividad nace «No iniciado»; Concluido y No completada solo los pone un superior
-        $data['status'] = ActivityStatus::NoIniciado->value;
+        // Al crear se elige No iniciado, En proceso o Suspendida; Concluido y No completada solo los pone un superior
+        $data['status'] = $request->validate([
+            'status' => ['nullable', Rule::in(array_keys(ActivityStatus::editableOptions()))],
+        ], [], ['status' => 'estado'])['status'] ?? ActivityStatus::NoIniciado->value;
 
         if ($request->hasFile('evidence')) {
             $data['evidence_path'] = $request->file('evidence')->store('evidencias', 'local');
