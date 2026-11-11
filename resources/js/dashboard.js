@@ -110,15 +110,28 @@ if (data) {
         options: { scales: { y: pctAxis, x: noGrid }, plugins: { legend: { position: 'bottom' } } },
     });
 
-    make('chart-priority', {
+    const progress = (rows) => [
+        { label: 'Completadas', data: rows.map((r) => r.completadas), backgroundColor: C.green, borderRadius: 3 },
+        { label: 'Incompletas', data: rows.map((r) => r.incompletas), backgroundColor: C.rose, borderRadius: 3 },
+        { label: 'Sin marcar', data: rows.map((r) => r.sin_marcar), backgroundColor: C.amber, borderRadius: 3 },
+    ];
+
+    make('chart-types', {
         type: 'bar',
-        data: {
-            labels: data.priority.map((p) => p.label),
-            datasets: [
-                { label: 'Total', data: data.priority.map((p) => p.total), backgroundColor: C.brandSoft, borderColor: C.brand, borderWidth: 1, borderRadius: 3 },
-                { label: 'Vencidas', data: data.priority.map((p) => p.overdue), backgroundColor: C.rose, borderRadius: 3 },
-            ],
+        data: { labels: data.types.map((r) => r.label), datasets: progress(data.types) },
+        options: {
+            indexAxis: 'y',
+            scales: { x: { ...countAxis, stacked: true }, y: { ...noGrid, stacked: true } },
+            plugins: { legend: { position: 'bottom' } },
         },
-        options: { indexAxis: 'y', scales: { x: countAxis, y: noGrid }, plugins: { legend: { position: 'bottom' } } },
+    });
+
+    make('chart-communities', {
+        type: 'bar',
+        data: { labels: data.communities.map((r) => r.label), datasets: progress(data.communities) },
+        options: {
+            scales: { y: { ...countAxis, stacked: true }, x: { ...noGrid, stacked: true } },
+            plugins: { legend: { position: 'bottom' } },
+        },
     });
 }

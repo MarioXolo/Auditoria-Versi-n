@@ -24,7 +24,8 @@ class DashboardController extends Controller
             'trend' => $metrics->activityTrend(),
             'attendance' => $metrics->attendanceTrend(),
             'status' => $metrics->byStatus(),
-            'priority' => $metrics->byPriority(),
+            'types' => $metrics->byType(),
+            'communities' => $metrics->byCommunity(),
             'teams' => $metrics->teams()->values(),
             'goals' => config('auditoria.metas'),
         ];
@@ -45,7 +46,7 @@ class DashboardController extends Controller
             'alerts' => $metrics->alerts(),
             'absent' => $metrics->absentToday(),
             'definitions' => DashboardMetrics::definitions(),
-            'recent' => Activity::with(['assignee:id,name', 'creator:id,name'])
+            'recent' => Activity::with(['assignee:id,name', 'creator:id,name', 'type:id,name', 'community:id,name'])
                 ->when($metrics->teamId, fn ($q) => $q->where('team_id', $metrics->teamId))
                 ->latest('updated_at')
                 ->limit(8)

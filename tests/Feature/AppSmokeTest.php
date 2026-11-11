@@ -9,10 +9,12 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Tests\Concerns\MakesActivities;
 use Tests\TestCase;
 
 class AppSmokeTest extends TestCase
 {
+    use MakesActivities;
     use RefreshDatabase;
 
     private User $admin;
@@ -36,13 +38,11 @@ class AppSmokeTest extends TestCase
         $this->otroEmpleado = User::factory()->create(); // sin equipo
     }
 
-    private function activityFor(User $assignee, User $creator): Activity
+    private function activityFor(User $assignee, User $creator, string $community = 'Comunidad Prueba'): Activity
     {
-        return Activity::create([
-            'title' => 'Prueba', 'assigned_to' => $assignee->id, 'created_by' => $creator->id,
-            'team_id' => $assignee->team_id, 'priority' => 'media', 'status' => 'pendiente',
-            'due_date' => now()->subDay()->toDateString(),
-        ]);
+        return $this->makeActivity([
+            'assigned_to' => $assignee->id, 'created_by' => $creator->id, 'team_id' => $assignee->team_id,
+        ], $community);
     }
 
     public function test_login_page_and_guest_redirect(): void
@@ -78,12 +78,12 @@ class AppSmokeTest extends TestCase
         foreach ([$this->admin, $this->gerente, $this->encargado, $this->empleado] as $u) {
             $this->actingAs($u)->get('/activities')->assertOk();
             $this->actingAs($u)->get('/activities?status=vencida')->assertOk();
-            $this->actingAs($u)->get("/activities/{$activity->id}")->assertOk()->assertSee('Prueba');
+            $this->actingAs($u)->get("/activities/{$activity->id}")->assertOk()->assertSee('Comunidad Prueba')->assertSee($activity->code);
             $this->actingAs($u)->get('/asistencia')->assertOk();
             $this->actingAs($u)->get('/perfil')->assertOk();
         }
 
-        foreach (['/users', '/users/create', "/users/{$this->empleado->id}/edit", '/teams', '/teams/create', "/teams/{$this->team->id}/edit"] as $url) {
+        foreach (['/users', '/users/create', "/users/{$this->empleado->id}/edit", '/teams', '/teams/create', "/teams/{$this->team->id}/edit", '/catalogos'] as $url) {
             $this->actingAs($this->admin)->get($url)->assertOk();
         }
 
@@ -98,6 +98,8 @@ class AppSmokeTest extends TestCase
             $this->actingAs($u)->get('/dashboard')->assertForbidden();
             $this->actingAs($u)->get('/users')->assertForbidden();
             $this->actingAs($u)->get('/teams')->assertForbidden();
+            $this->actingAs($u)->get('/catalogos')->assertForbidden();
+            $this->actingAs($u)->post('/catalogos/tipos', ['name' => 'X'])->assertForbidden();
         }
         // Gerente: ve usuarios y administra equipos, pero no crea ni edita usuarios
         $this->actingAs($this->gerente)->get('/users')->assertOk()->assertDontSee('Nuevo usuario');
@@ -122,10 +124,8 @@ class AppSmokeTest extends TestCase
     public function test_teammates_do_not_see_each_others_activities(): void
     {
         $companero = User::factory()->create(['team_id' => $this->team->id]);
-        $mia = $this->activityFor($this->empleado, $this->encargado);
-        $deEl = $this->activityFor($companero, $this->encargado);
-        $mia->update(['title' => 'Actividad de Ana']);
-        $deEl->update(['title' => 'Actividad de Beto']);
+        $mia = $this->activityFor($this->empleado, $this->encargado, 'Actividad de Ana');
+        $deEl = $this->activityFor($companero, $this->encargado, 'Actividad de Beto');
 
         $this->actingAs($this->empleado)->get('/activities')->assertSee('Actividad de Ana')->assertDontSee('Actividad de Beto');
         $this->actingAs($this->empleado)->get("/activities/{$deEl->id}")->assertForbidden();
@@ -136,20 +136,17 @@ class AppSmokeTest extends TestCase
         $this->actingAs($otroEncargado)->get("/activities/{$mia->id}")->assertForbidden();
 
         // Un encargado no puede asignar a empleados que no son de su equipo
-        $this->actingAs($otroEncargado)->post('/activities', [
-            'title' => 'X', 'assigned_to' => $this->empleado->id, 'priority' => 'media', 'status' => 'pendiente',
-        ])->assertSessionHasErrors('assigned_to');
+        $this->actingAs($otroEncargado)->post('/activities', $this->payload([
+            'assigned_to' => $this->empleado->id,
+        ]))->assertSessionHasErrors('assigned_to');
     }
 
     public function test_encargado_only_sees_activities_he_assigned(): void
     {
-        $suya = $this->activityFor($this->empleado, $this->encargado);
+        $suya = $this->activityFor($this->empleado, $this->encargado, 'Asignada por encargado');
         // El gerente asigna directo a un empleado del equipo del encargado
-        $delGerente = $this->activityFor($this->empleado, $this->gerente);
-        $paraEncargado = $this->activityFor($this->encargado, $this->gerente);
-        $delGerente->update(['title' => 'Asignada por gerente']);
-        $suya->update(['title' => 'Asignada por encargado']);
-        $paraEncargado->update(['title' => 'Tarea del encargado']);
+        $delGerente = $this->activityFor($this->empleado, $this->gerente, 'Asignada por gerente');
+        $paraEncargado = $this->activityFor($this->encargado, $this->gerente, 'Tarea del encargado');
 
         $this->actingAs($this->encargado)->get("/activities/{$suya->id}")->assertOk();
         $this->actingAs($this->encargado)->get("/activities/{$paraEncargado->id}")->assertOk();
@@ -173,24 +170,22 @@ class AppSmokeTest extends TestCase
 
     public function test_encargado_assigns_only_to_own_team(): void
     {
-        $base = ['title' => 'Visita a cliente', 'priority' => 'alta', 'status' => 'pendiente'];
-
-        $this->actingAs($this->encargado)->post('/activities', $base + ['assigned_to' => $this->empleado->id])
+        $this->actingAs($this->encargado)->post('/activities', $this->payload(['assigned_to' => $this->empleado->id]))
             ->assertRedirect();
-        $this->assertDatabaseHas('activities', ['title' => 'Visita a cliente', 'assigned_to' => $this->empleado->id, 'team_id' => $this->team->id]);
+        $this->assertDatabaseHas('activities', ['activity_type_id' => $this->typeId(), 'assigned_to' => $this->empleado->id, 'team_id' => $this->team->id]);
 
-        $this->actingAs($this->encargado)->post('/activities', $base + ['assigned_to' => $this->otroEmpleado->id])
+        $this->actingAs($this->encargado)->post('/activities', $this->payload(['assigned_to' => $this->otroEmpleado->id]))
             ->assertSessionHasErrors('assigned_to');
     }
 
     public function test_evidence_upload_and_protected_download(): void
     {
-        $this->actingAs($this->encargado)->post('/activities', [
-            'title' => 'Con evidencia', 'assigned_to' => $this->empleado->id, 'priority' => 'media',
-            'status' => 'pendiente', 'evidence' => UploadedFile::fake()->create('foto.jpg', 200, 'image/jpeg'),
-        ])->assertRedirect();
+        $this->actingAs($this->encargado)->post('/activities', $this->payload([
+            'assigned_to' => $this->empleado->id,
+            'evidence' => UploadedFile::fake()->create('foto.jpg', 200, 'image/jpeg'),
+        ]))->assertRedirect();
 
-        $a = Activity::where('title', 'Con evidencia')->first();
+        $a = Activity::latest('id')->first();
         $this->assertNotNull($a->evidence_path);
         $this->actingAs($this->empleado)->get("/activities/{$a->id}/evidence")->assertOk();
         $this->actingAs($this->otroEmpleado)->get("/activities/{$a->id}/evidence")->assertForbidden();

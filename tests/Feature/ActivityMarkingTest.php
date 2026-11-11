@@ -7,10 +7,12 @@ use App\Models\Activity;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\MakesActivities;
 use Tests\TestCase;
 
 class ActivityMarkingTest extends TestCase
 {
+    use MakesActivities;
     use RefreshDatabase;
 
     private User $admin;
@@ -34,15 +36,15 @@ class ActivityMarkingTest extends TestCase
         $this->companero = User::factory()->create(['team_id' => $team->id]);
     }
 
-    private function selfLoaded(string $title = 'Visita a cliente propia'): Activity
+    private function selfLoaded(string $community = 'Visita a cliente propia'): Activity
     {
-        $this->actingAs($this->empleado)->post('/activities', [
-            'title' => $title, 'priority' => 'media',
+        $this->actingAs($this->empleado)->post('/activities', $this->payload([
+            'community_id' => $this->communityId($community),
             // aunque intente asignarla a otro, queda a su nombre
             'assigned_to' => $this->companero->id,
-        ])->assertRedirect();
+        ]))->assertRedirect();
 
-        return Activity::where('title', $title)->firstOrFail();
+        return Activity::latest('id')->firstOrFail();
     }
 
     public function test_employee_loads_activities_only_for_himself(): void
@@ -95,10 +97,10 @@ class ActivityMarkingTest extends TestCase
     public function test_nobody_marks_their_own_activity_and_employees_cannot_mark(): void
     {
         // Actividad del gerente para el encargado
-        $this->actingAs($this->gerente)->post('/activities', [
-            'title' => 'Reporte del encargado', 'assigned_to' => $this->encargado->id, 'priority' => 'media',
-        ]);
-        $a = Activity::where('title', 'Reporte del encargado')->firstOrFail();
+        $this->actingAs($this->gerente)->post('/activities', $this->payload([
+            'assigned_to' => $this->encargado->id,
+        ]))->assertRedirect();
+        $a = Activity::latest('id')->firstOrFail();
 
         $this->actingAs($this->encargado)->post("/activities/{$a->id}/marcar", ['marca' => 'completada'])->assertForbidden();
         $this->actingAs($this->gerente)->post("/activities/{$a->id}/marcar", ['marca' => 'completada'])->assertRedirect();
@@ -111,19 +113,14 @@ class ActivityMarkingTest extends TestCase
 
     public function test_status_cannot_be_set_to_completed_through_edit(): void
     {
-        $this->actingAs($this->encargado)->post('/activities', [
-            'title' => 'Inventario', 'assigned_to' => $this->empleado->id, 'priority' => 'media', 'status' => 'completada',
-        ]);
-        $a = Activity::where('title', 'Inventario')->firstOrFail();
+        $data = $this->payload(['assigned_to' => $this->empleado->id, 'status' => 'completada']);
+        $this->actingAs($this->encargado)->post('/activities', $data)->assertRedirect();
+        $a = Activity::latest('id')->firstOrFail();
         $this->assertSame(ActivityStatus::Pendiente, $a->status);
 
-        $this->actingAs($this->encargado)->put("/activities/{$a->id}", [
-            'title' => 'Inventario', 'assigned_to' => $this->empleado->id, 'priority' => 'media', 'status' => 'completada',
-        ])->assertSessionHasErrors('status');
+        $this->actingAs($this->encargado)->put("/activities/{$a->id}", $data)->assertSessionHasErrors('status');
 
-        $this->actingAs($this->encargado)->put("/activities/{$a->id}", [
-            'title' => 'Inventario', 'assigned_to' => $this->empleado->id, 'priority' => 'media', 'status' => 'cancelada',
-        ])->assertRedirect();
+        $this->actingAs($this->encargado)->put("/activities/{$a->id}", ['status' => 'cancelada'] + $data)->assertRedirect();
         $this->assertSame(ActivityStatus::Cancelada, $a->fresh()->status);
     }
 }

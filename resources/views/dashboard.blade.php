@@ -66,7 +66,7 @@
     <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         @foreach ([
             ['key' => 'cumplimiento', 'label' => 'Cumplimiento', 'hint' => $kpi['completed'].' de '.($kpi['total'] - $kpi['cancelled']).' marcadas como completadas'],
-            ['key' => 'a_tiempo', 'label' => 'Entrega a tiempo', 'hint' => 'de las completadas, antes de su fecha límite'],
+            ['key' => 'a_tiempo', 'label' => 'Entrega a tiempo', 'hint' => 'de las completadas, antes de su fecha de fin'],
             ['key' => 'asistencia', 'label' => 'Asistencia', 'hint' => $kpi['present'].' de '.$kpi['expected'].' jornadas esperadas'],
             ['key' => 'puntualidad', 'label' => 'Puntualidad', 'hint' => $kpi['late'].' retardos (entrada después de '.config('auditoria.hora_entrada').' + '.config('auditoria.tolerancia_minutos').' min)'],
         ] as $card)
@@ -97,7 +97,7 @@
     <div class="mt-4 grid grid-cols-2 gap-4 xl:grid-cols-4">
         @foreach ([
             ['label' => 'Actividades', 'value' => $kpi['total'], 'sub' => $kpi['sin_marcar'].' sin marcar · '.$kpi['incompletas'].' incompletas', 'delta' => $deltaHtml($delta['total'], ''), 'link' => route('activities.index')],
-            ['label' => 'Vencidas', 'value' => $kpi['overdue'], 'sub' => 'pendientes con fecha límite pasada', 'delta' => $deltaHtml($delta['overdue'], '', true), 'link' => route('activities.index', ['status' => 'vencida']), 'alert' => $kpi['overdue'] > 0],
+            ['label' => 'Vencidas', 'value' => $kpi['overdue'], 'sub' => 'pendientes con fecha de fin pasada', 'delta' => $deltaHtml($delta['overdue'], '', true), 'link' => route('activities.index', ['status' => 'vencida']), 'alert' => $kpi['overdue'] > 0],
             ['label' => 'Tiempo de cierre', 'value' => $fmt($kpi['dias_cierre'], ' días'), 'sub' => 'promedio de creación a completado', 'delta' => $deltaHtml($delta['dias_cierre'], 'días', true)],
             ['label' => 'Horas por jornada', 'value' => $fmt($kpi['horas'], ' h'), 'sub' => 'promedio entre entrada y salida', 'delta' => $deltaHtml($delta['horas'], 'h')],
         ] as $card)
@@ -166,11 +166,17 @@
             <div class="mt-4 h-60"><canvas id="chart-teams" role="img" aria-label="Gráfica comparativa por equipo"></canvas></div>
         </section>
         <section class="card p-5">
-            <h2 class="font-semibold">Carga por prioridad</h2>
-            <p class="text-xs text-slate-500">Total y vencidas de cada prioridad</p>
-            <div class="mt-4 h-60"><canvas id="chart-priority" role="img" aria-label="Gráfica de actividades por prioridad"></canvas></div>
+            <h2 class="font-semibold">Por tipo de actividad</h2>
+            <p class="text-xs text-slate-500">Completadas, incompletas y sin marcar de cada tipo</p>
+            <div class="mt-4 h-60"><canvas id="chart-types" role="img" aria-label="Gráfica de actividades por tipo"></canvas></div>
         </section>
     </div>
+
+    <section class="card mt-6 p-5">
+        <h2 class="font-semibold">Por comunidad</h2>
+        <p class="text-xs text-slate-500">Las {{ count($charts['communities']) }} comunidades con más actividades en el periodo</p>
+        <div class="mt-4 h-64"><canvas id="chart-communities" role="img" aria-label="Gráfica de actividades por comunidad"></canvas></div>
+    </section>
 
     {{-- Indicadores por persona --}}
     <section class="card mt-6 overflow-hidden">
@@ -278,7 +284,7 @@
                 @forelse ($recent as $activity)
                     <li class="flex items-center justify-between gap-3 px-5 py-3">
                         <div class="min-w-0">
-                            <a href="{{ route('activities.show', $activity) }}" class="block truncate text-sm font-medium hover:text-brand-600">{{ $activity->title }}</a>
+                            <a href="{{ route('activities.show', $activity) }}" class="block truncate text-sm font-medium hover:text-brand-600"><span class="font-mono text-xs text-slate-500">{{ $activity->code }}</span> {{ $activity->type?->name }} · {{ $activity->community?->name }}</a>
                             <span class="block truncate text-xs text-slate-500">{{ $activity->assignee?->name }} · asignada por {{ $activity->creator?->name }} · {{ $activity->updated_at->diffForHumans() }}</span>
                         </div>
                         <span class="badge {{ $activity->status->badge() }}">{{ $activity->status->label() }}</span>

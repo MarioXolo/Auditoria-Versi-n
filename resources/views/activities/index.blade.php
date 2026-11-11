@@ -16,8 +16,8 @@
 @endsection
 
 @section('content')
-    <form method="GET" class="card mb-5 grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-5">
-        <input type="search" name="q" value="{{ request('q') }}" placeholder="Buscar por título" class="input lg:col-span-2">
+    <form method="GET" class="card mb-5 grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-6">
+        <input type="search" name="q" value="{{ request('q') }}" placeholder="Buscar por ID, tipo o comunidad" class="input lg:col-span-2">
         <select name="status" class="input">
             <option value="">Todos los estados</option>
             @foreach ($statuses as $value => $label)
@@ -25,6 +25,18 @@
             @endforeach
             <option value="vencida" @selected(request('status') === 'vencida')>Vencidas</option>
             <option value="sin_marcar" @selected(request('status') === 'sin_marcar')>Sin marcar</option>
+        </select>
+        <select name="activity_type_id" class="input">
+            <option value="">Todos los tipos</option>
+            @foreach ($types as $type)
+                <option value="{{ $type->id }}" @selected((int) request('activity_type_id') === $type->id)>{{ $type->name }}</option>
+            @endforeach
+        </select>
+        <select name="community_id" class="input">
+            <option value="">Todas las comunidades</option>
+            @foreach ($communities as $community)
+                <option value="{{ $community->id }}" @selected((int) request('community_id') === $community->id)>{{ $community->name }}</option>
+            @endforeach
         </select>
         @if ($people->isNotEmpty())
             <select name="assigned_to" class="input">
@@ -42,7 +54,7 @@
                 @endforeach
             </select>
         @endif
-        <div class="flex gap-2 sm:col-span-2 lg:col-span-5 lg:justify-end">
+        <div class="flex gap-2 sm:col-span-2 lg:col-span-6 lg:justify-end">
             <a href="{{ route('activities.index') }}" class="btn btn-secondary">Limpiar</a>
             <button class="btn btn-primary">Filtrar</button>
         </div>
@@ -58,15 +70,18 @@
                 @endcan
                 <a href="{{ route('activities.show', $activity) }}" class="min-w-0 flex-1">
                     <div class="flex items-start justify-between gap-3">
-                        <p @class(['font-medium', 'text-rose-900' => $failed])>{{ $activity->title }}</p>
+                        <div class="min-w-0">
+                            <p class="font-mono text-xs font-semibold text-slate-500">{{ $activity->code }}</p>
+                            <p @class(['font-medium', 'text-rose-900' => $failed])>{{ $activity->type?->name }}</p>
+                            <p class="text-sm text-slate-600">{{ $activity->community?->name }}</p>
+                        </div>
                         <span class="badge {{ $activity->status->badge() }}">{{ $activity->status->label() }}</span>
                     </div>
                     <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
                         <span>{{ $activity->assignee?->name }}</span>
-                        @if ($activity->due_date)
-                            <span @class(['font-semibold text-rose-600' => $activity->isOverdue()])>Vence {{ $activity->due_date->format('d/m/Y') }}</span>
-                        @endif
-                        <span class="badge {{ $activity->priority->badge() }}">{{ $activity->priority->label() }}</span>
+                        <span @class(['font-semibold text-rose-600' => $activity->isOverdue()])>
+                            {{ $activity->start_date->format('d/m') }} – {{ $activity->end_date->format('d/m/Y') }}{{ $activity->isOverdue() ? ' · Vencida' : '' }}
+                        </span>
                     </div>
                 </a>
             </div>
@@ -83,10 +98,11 @@
                     @if ($canMarkAny)
                         <th class="table-head w-24">Revisión</th>
                     @endif
-                    <th class="table-head">Actividad</th>
+                    <th class="table-head">ID</th>
+                    <th class="table-head">Tipo de actividad</th>
+                    <th class="table-head">Comunidad</th>
                     <th class="table-head">Asignada a</th>
-                    <th class="table-head">Prioridad</th>
-                    <th class="table-head">Fecha límite</th>
+                    <th class="table-head">Inicio – Fin</th>
                     <th class="table-head">Estado</th>
                 </tr>
             </thead>
@@ -106,19 +122,20 @@
                                 @endcan
                             </td>
                         @endif
+                        <td class="table-cell whitespace-nowrap">
+                            <a href="{{ route('activities.show', $activity) }}" @class(['font-mono text-sm font-semibold hover:text-brand-600', 'text-rose-900' => $failed, 'text-slate-700' => ! $failed])>{{ $activity->code }}</a>
+                        </td>
                         <td class="table-cell">
-                            <a href="{{ route('activities.show', $activity) }}" @class(['font-medium hover:text-brand-600', 'text-rose-900' => $failed, 'text-slate-900' => ! $failed])>{{ $activity->title }}</a>
+                            <a href="{{ route('activities.show', $activity) }}" @class(['font-medium hover:text-brand-600', 'text-rose-900' => $failed, 'text-slate-900' => ! $failed])>{{ $activity->type?->name }}</a>
                             @if ($activity->team)
                                 <span class="block text-xs text-slate-500">{{ $activity->team->name }}</span>
                             @endif
                         </td>
+                        <td class="table-cell">{{ $activity->community?->name }}</td>
                         <td class="table-cell">{{ $activity->assignee?->name }}</td>
-                        <td class="table-cell"><span class="badge {{ $activity->priority->badge() }}">{{ $activity->priority->label() }}</span></td>
                         <td @class(['table-cell whitespace-nowrap', 'font-semibold text-rose-600' => $activity->isOverdue()])>
-                            {{ $activity->due_date?->format('d/m/Y') ?? '—' }}
-                            @if ($activity->isOverdue())
-                                <span class="block text-xs font-normal">Vencida</span>
-                            @endif
+                            {{ $activity->start_date->format('d/m/Y') }}
+                            <span class="block text-xs {{ $activity->isOverdue() ? '' : 'text-slate-500' }}">al {{ $activity->end_date->format('d/m/Y') }}{{ $activity->isOverdue() ? ' · Vencida' : '' }}</span>
                         </td>
                         <td class="table-cell">
                             <span class="badge {{ $activity->status->badge() }}">{{ $activity->status->label() }}</span>
@@ -128,7 +145,7 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="{{ $canMarkAny ? 6 : 5 }}" class="table-cell py-10 text-center text-slate-500">No hay actividades con estos filtros.</td></tr>
+                    <tr><td colspan="{{ $canMarkAny ? 7 : 6 }}" class="table-cell py-10 text-center text-slate-500">No hay actividades con estos filtros.</td></tr>
                 @endforelse
             </tbody>
         </table>

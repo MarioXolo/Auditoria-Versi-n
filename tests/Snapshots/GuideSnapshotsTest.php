@@ -44,6 +44,7 @@ class GuideSnapshotsTest extends TestCase
         $this->snap('04-admin-usuario-nuevo', $this->get('/users/create'));
         $this->snap('05-admin-equipos', $this->get('/teams'));
         $this->snap('06-admin-equipo-editar', $this->get('/teams/'.$encargado->team_id.'/edit'));
+        $this->snap('22-admin-catalogos', $this->get('/catalogos'));
 
         $this->actingAs($gerente);
         $this->snap('07-gerente-dashboard', $this->get('/dashboard?period=30'));
@@ -54,24 +55,24 @@ class GuideSnapshotsTest extends TestCase
         $this->snap('10-encargado-actividades', $this->get('/activities'));
         $this->snap('11-encargado-nueva-actividad', $this->get('/activities/create'));
         $created = $this->followingRedirects()->post('/activities', [
-            'title' => 'Auditoría de sucursal Centro',
-            'description' => "Revisar inventario, caja y orden de la sucursal Centro.\nLevantar evidencia fotográfica de cada área.",
+            'activity_type_id' => \App\Models\ActivityType::where('name', 'Reunión vecinal')->value('id'),
+            'community_id' => \App\Models\Community::where('name', 'San Isidro')->value('id'),
             'assigned_to' => $empleado->id,
-            'priority' => 'alta',
-            'status' => 'pendiente',
-            'due_date' => now()->addDays(2)->toDateString(),
+            'evidence_text' => 'Reunión con 25 vecinos en el salón comunal. Se acordó una segunda reunión en dos semanas.',
+            'start_date' => today()->toDateString(),
+            'end_date' => now()->addDays(2)->toDateString(),
         ]);
         $this->snap('12-encargado-actividad-creada', $created);
         $this->snap('13-encargado-asistencia', $this->get('/asistencia'));
-        $nueva = Activity::where('title', 'Auditoría de sucursal Centro')->first();
-        $this->post('/activities/'.$nueva->id.'/marcar', ['marca' => 'incompleta', 'mark_notes' => 'Faltan las fotos del almacén.']);
+        $nueva = Activity::latest('id')->first();
+        $this->post('/activities/'.$nueva->id.'/marcar', ['marca' => 'incompleta', 'mark_notes' => 'Falta la foto de la reunión.']);
         $this->snap('19-encargado-marcada-incompleta', $this->get('/activities/'.$nueva->id));
         $this->snap('20-encargado-lista-marcado', $this->get('/activities'));
 
         Attendance::where('user_id', $empleado->id)->whereDate('work_date', today())->delete();
         $this->actingAs($empleado);
         $this->snap('14-empleado-actividades', $this->get('/activities'));
-        $activity = Activity::where('title', 'Auditoría de sucursal Centro')->first();
+        $activity = $nueva;
         $this->snap('15-empleado-detalle', $this->get('/activities/'.$activity->id));
         $this->snap('16-empleado-asistencia', $this->get('/asistencia'));
         $this->snap('21-empleado-cargar-actividad', $this->get('/activities/create'));

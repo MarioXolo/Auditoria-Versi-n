@@ -5,7 +5,7 @@
 @section('header')
     <div>
         <a href="{{ route('activities.show', $activity) }}" class="text-sm text-slate-500 hover:text-slate-800">← Volver a la actividad</a>
-        <h1 class="mt-1 text-2xl font-semibold">Editar actividad</h1>
+        <h1 class="mt-1 text-2xl font-semibold">Editar actividad <span class="font-mono text-slate-500">{{ $activity->code }}</span></h1>
     </div>
 @endsection
 

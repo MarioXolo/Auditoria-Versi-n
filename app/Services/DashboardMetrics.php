@@ -3,9 +3,10 @@
 namespace App\Services;
 
 use App\Enums\ActivityStatus;
-use App\Enums\Priority;
 use App\Enums\Role;
 use App\Models\Activity;
+use App\Models\ActivityType;
+use App\Models\Community;
 use App\Models\Attendance;
 use App\Models\Team;
 use App\Models\User;
@@ -74,7 +75,7 @@ class DashboardMetrics
         return $this->cache[$key] ??= Activity::query()
             ->whereBetween('created_at', [$from, $to])
             ->when($this->teamId, fn ($q) => $q->where('team_id', $this->teamId))
-            ->get(['id', 'title', 'assigned_to', 'created_by', 'team_id', 'priority', 'status', 'due_date', 'completed_at', 'created_at', 'updated_at']);
+            ->get(['id', 'activity_type_id', 'community_id', 'assigned_to', 'created_by', 'team_id', 'status', 'start_date', 'end_date', 'completed_at', 'created_at', 'updated_at']);
     }
 
     /** Registros de asistencia del personal dentro del rango. */
@@ -125,15 +126,15 @@ class DashboardMetrics
 
     private function isOverdue(Activity $a): bool
     {
-        return $a->due_date !== null
-            && $a->due_date->lt(today())
+        return $a->end_date !== null
+            && $a->end_date->lt(today())
             && in_array($a->status, [ActivityStatus::Pendiente, ActivityStatus::EnProgreso], true);
     }
 
     private function isOnTime(Activity $a): bool
     {
         return $a->status === ActivityStatus::Completada
-            && ($a->due_date === null || ($a->completed_at && $a->completed_at->copy()->startOfDay()->lte($a->due_date)));
+            && ($a->end_date === null || ($a->completed_at && $a->completed_at->copy()->startOfDay()->lte($a->end_date)));
     }
 
     private static function pct(int|float $part, int|float $whole): ?float
@@ -306,15 +307,34 @@ class DashboardMetrics
         ])->all();
     }
 
-    public function byPriority(): array
+    /** Avance por tipo de actividad (los más usados primero). */
+    public function byType(int $limit = 8): array
     {
-        $acts = $this->activities($this->from, $this->to);
+        return $this->groupedBy('activity_type_id', ActivityType::pluck('name', 'id'), $limit);
+    }
 
-        return collect(Priority::cases())->map(fn ($p) => [
-            'label' => $p->label(),
-            'total' => $acts->filter(fn ($a) => $a->priority === $p)->count(),
-            'overdue' => $acts->filter(fn ($a) => $a->priority === $p && $this->isOverdue($a))->count(),
-        ])->all();
+    /** Avance por comunidad (las de más actividades primero). */
+    public function byCommunity(int $limit = 12): array
+    {
+        return $this->groupedBy('community_id', Community::pluck('name', 'id'), $limit);
+    }
+
+    private function groupedBy(string $column, Collection $names, int $limit): array
+    {
+        return $this->activities($this->from, $this->to)
+            ->where('status', '!=', ActivityStatus::Cancelada)
+            ->groupBy($column)
+            ->map(fn (Collection $group, $id) => [
+                'label' => $names[$id] ?? '—',
+                'total' => $group->count(),
+                'completadas' => $group->where('status', ActivityStatus::Completada)->count(),
+                'incompletas' => $group->where('status', ActivityStatus::Incompleta)->count(),
+                'sin_marcar' => $group->filter(fn ($a) => $a->status->isOpen())->count(),
+            ])
+            ->sortByDesc('total')
+            ->take($limit)
+            ->values()
+            ->all();
     }
 
     // ------------------------------------------------------------------
@@ -479,17 +499,17 @@ class DashboardMetrics
         // Vencidas hace más de N días (sin importar cuándo se crearon)
         $critical = Activity::query()
             ->overdue()
-            ->whereDate('due_date', '<', today()->subDays($cfg['dias_vencida_critica']))
+            ->whereDate('end_date', '<', today()->subDays($cfg['dias_vencida_critica']))
             ->when($this->teamId, fn ($q) => $q->where('team_id', $this->teamId))
-            ->with('assignee:id,name')
-            ->orderBy('due_date')
+            ->with(['assignee:id,name', 'type:id,name'])
+            ->orderBy('end_date')
             ->get();
 
         if ($critical->isNotEmpty()) {
             $alerts[] = [
                 'level' => 'bad',
                 'title' => $critical->count().' '.($critical->count() === 1 ? 'actividad vencida' : 'actividades vencidas')." hace más de {$cfg['dias_vencida_critica']} días",
-                'detail' => $critical->take(3)->map(fn ($a) => "{$a->title} ({$a->assignee?->name}, venció {$a->due_date->format('d/m')})")->join(' · '),
+                'detail' => $critical->take(3)->map(fn ($a) => "{$a->code} {$a->type?->name} ({$a->assignee?->name}, venció {$a->end_date->format('d/m')})")->join(' · '),
                 'link' => route('activities.index', ['status' => 'vencida']),
             ];
         }
@@ -513,7 +533,7 @@ class DashboardMetrics
         // Actividades vencidas que nadie ha marcado
         $unmarked = Activity::query()
             ->overdue()
-            ->whereDate('due_date', '<', today()->subDays(1))
+            ->whereDate('end_date', '<', today()->subDays(1))
             ->when($this->teamId, fn ($q) => $q->where('team_id', $this->teamId))
             ->count();
 
@@ -598,11 +618,11 @@ class DashboardMetrics
 
         return [
             ['Cumplimiento', 'Marcadas como completadas por un superior ÷ (asignadas − canceladas) × 100', "≥ {$m['cumplimiento']}%", 'Actividades creadas en el periodo'],
-            ['Entrega a tiempo', 'Completadas en o antes de su fecha límite ÷ completadas × 100', "≥ {$m['a_tiempo']}%", 'Actividades completadas del periodo'],
+            ['Entrega a tiempo', 'Completadas en o antes de su fecha de fin ÷ completadas × 100', "≥ {$m['a_tiempo']}%", 'Actividades completadas del periodo'],
             ['Asistencia', "Entradas registradas ÷ (personal activo × días laborales) × 100. Hoy cuenta a partir de las {$hora} + {$tol} min", "≥ {$m['asistencia']}%", 'Registros de asistencia en días laborales'],
             ['Puntualidad', "Entradas hasta las {$hora} + {$tol} min ÷ entradas registradas × 100", "≥ {$m['puntualidad']}%", 'Hora de entrada de cada registro'],
             ['Incompletas', 'Actividades que un superior marcó con ✗ en el periodo', 'Lo más bajo posible', 'Marcado de actividades'],
-            ['Vencidas', 'Pendientes o en progreso con fecha límite anterior a hoy', 'Lo más bajo posible', 'Actividades creadas en el periodo'],
+            ['Vencidas', 'Pendientes o en progreso con fecha de fin anterior a hoy', 'Lo más bajo posible', 'Actividades creadas en el periodo'],
             ['Tiempo de cierre', 'Promedio de días entre la creación y el completado', 'Tendencia a la baja', 'Actividades completadas del periodo'],
             ['Horas por jornada', 'Promedio de horas entre entrada y salida', 'Referencia', 'Registros con entrada y salida'],
             ['Comparativo', 'Valor actual − valor del periodo anterior de la misma duración', 'Positivo', 'Mismo cálculo en el periodo previo'],

@@ -3,15 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Enums\ActivityStatus;
-use App\Enums\Priority;
 use App\Models\Activity;
+use App\Models\ActivityType;
+use App\Models\Community;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\Enum;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -23,8 +23,22 @@ class ActivityController extends Controller
 
         $query = Activity::query()
             ->visibleTo($user)
-            ->with(['assignee:id,name', 'team:id,name'])
-            ->when($request->filled('q'), fn ($q) => $q->where('title', 'like', '%'.$request->string('q').'%'))
+            ->with(['assignee:id,name,role', 'team:id,name', 'type:id,name', 'community:id,name'])
+            ->when($request->filled('q'), function ($q) use ($request) {
+                $term = trim((string) $request->string('q'));
+
+                // «ACT-0012» o «12» buscan por folio
+                if (preg_match('/^(?:act-?)?0*(\d+)$/i', $term, $m)) {
+                    return $q->whereKey((int) $m[1]);
+                }
+
+                return $q->where(fn ($w) => $w
+                    ->whereHas('type', fn ($t) => $t->where('name', 'like', "%{$term}%"))
+                    ->orWhereHas('community', fn ($c) => $c->where('name', 'like', "%{$term}%"))
+                    ->orWhere('evidence_text', 'like', "%{$term}%"));
+            })
+            ->when($request->filled('activity_type_id'), fn ($q) => $q->where('activity_type_id', $request->integer('activity_type_id')))
+            ->when($request->filled('community_id'), fn ($q) => $q->where('community_id', $request->integer('community_id')))
             ->when($request->filled('status'), function ($q) use ($request) {
                 if ($request->input('status') === 'vencida') {
                     return $q->overdue();
@@ -40,8 +54,7 @@ class ActivityController extends Controller
 
         $activities = $query
             ->orderByRaw("CASE WHEN status IN ('pendiente','en_progreso') THEN 0 WHEN status = 'incompleta' THEN 1 ELSE 2 END")
-            ->orderByRaw('due_date IS NULL')
-            ->orderBy('due_date')
+            ->orderBy('end_date')
             ->latest('id')
             ->paginate(15)
             ->withQueryString();
@@ -51,6 +64,8 @@ class ActivityController extends Controller
             'people' => $user->canManageActivities() ? $this->visiblePeople($user) : collect(),
             'teams' => $this->teamsFor($user),
             'statuses' => ActivityStatus::options(),
+            'types' => ActivityType::orderBy('name')->get(['id', 'name']),
+            'communities' => Community::orderBy('name')->get(['id', 'name']),
             'canMarkAny' => $user->canManageActivities(),
         ]);
     }
@@ -60,9 +75,9 @@ class ActivityController extends Controller
         $this->authorize('create', Activity::class);
 
         return view('activities.create', $this->formData($request->user(), new Activity([
-            'priority' => Priority::Media->value,
             'status' => ActivityStatus::Pendiente->value,
             'assigned_to' => $request->integer('assigned_to') ?: null,
+            'start_date' => today(),
         ])));
     }
 
@@ -71,14 +86,14 @@ class ActivityController extends Controller
         $this->authorize('create', Activity::class);
         $user = $request->user();
 
-        // El empleado solo se carga actividades a sí mismo, dentro de su equipo
+        // El empleado solo se carga actividades a sí mismo
         if ($user->isEmpleado()) {
-            $request->merge(['assigned_to' => $user->id, 'team_id' => null]);
+            $request->merge(['assigned_to' => $user->id]);
         }
 
         $data = $this->validated($request, $user);
         $data['created_by'] = $user->id;
-        $data['team_id'] ??= User::find($data['assigned_to'])?->team_id;
+        $data['team_id'] = User::find($data['assigned_to'])?->team_id;
         // Toda actividad nace sin marcar; solo un superior la marca como completada o incompleta
         $data['status'] = ActivityStatus::Pendiente->value;
 
@@ -88,7 +103,9 @@ class ActivityController extends Controller
 
         $activity = Activity::create($data);
 
-        $message = $user->isEmpleado() ? 'Actividad cargada. Tu encargado la marcará cuando la revise.' : 'Actividad creada y asignada.';
+        $message = $user->isEmpleado()
+            ? "Actividad {$activity->code} cargada. Tu encargado la marcará cuando la revise."
+            : "Actividad {$activity->code} creada y asignada.";
 
         return redirect()->route('activities.show', $activity)->with('status', $message);
     }
@@ -96,7 +113,7 @@ class ActivityController extends Controller
     public function show(Activity $activity): View
     {
         $this->authorize('view', $activity);
-        $activity->load(['assignee', 'creator', 'team', 'marker']);
+        $activity->load(['assignee', 'creator', 'team', 'marker', 'type', 'community']);
 
         return view('activities.show', ['activity' => $activity]);
     }
@@ -113,6 +130,9 @@ class ActivityController extends Controller
         $this->authorize('update', $activity);
 
         $data = $this->validated($request, $request->user(), $activity);
+        if ((int) $data['assigned_to'] !== $activity->assigned_to) {
+            $data['team_id'] = User::find($data['assigned_to'])?->team_id;
+        }
 
         // El estado solo se edita entre pendiente, en progreso y cancelada; completada e incompleta se marcan
         $status = $request->validate([
@@ -131,6 +151,9 @@ class ActivityController extends Controller
                 Storage::disk('local')->delete($activity->evidence_path);
             }
             $data['evidence_path'] = $request->file('evidence')->store('evidencias', 'local');
+        } elseif ($request->boolean('remove_photo') && $activity->evidence_path) {
+            Storage::disk('local')->delete($activity->evidence_path);
+            $data['evidence_path'] = null;
         }
 
         $activity->fill($data)->save();
@@ -204,35 +227,41 @@ class ActivityController extends Controller
     {
         $assignableIds = $user->assignableUsers()->pluck('id')->all();
 
-        // Al editar, conservar la persona asignada aunque ya no esté en la lista
+        // Al editar, conservar la persona, el tipo y la comunidad aunque ya no estén disponibles
         if ($activity) {
             $assignableIds[] = $activity->assigned_to;
         }
 
-        $teamIds = $this->teamsFor($user)->pluck('id')->all();
+        $typeIds = ActivityType::active()->pluck('id')->push($activity?->activity_type_id)->filter()->all();
+        $communityIds = Community::active()->pluck('id')->push($activity?->community_id)->filter()->all();
 
-        return $request->validate([
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['nullable', 'string', 'max:5000'],
+        $data = $request->validate([
+            'activity_type_id' => ['required', 'integer', Rule::in($typeIds)],
+            'community_id' => ['required', 'integer', Rule::in($communityIds)],
             'assigned_to' => ['required', 'integer', Rule::in($assignableIds)],
-            'team_id' => ['nullable', 'integer', Rule::in($teamIds)],
-            'priority' => ['required', new Enum(Priority::class)],
-            'due_date' => ['nullable', 'date'],
-            'notes' => ['nullable', 'string', 'max:5000'],
-            'evidence' => ['nullable', 'file', 'max:10240', 'mimes:jpg,jpeg,png,webp,heic,pdf'],
+            'evidence' => ['nullable', 'file', 'max:10240', 'mimes:jpg,jpeg,png,webp,heic,heif'],
+            'evidence_text' => ['nullable', 'string', 'max:5000'],
+            'start_date' => ['required', 'date'],
+            'end_date' => ['required', 'date', 'after_or_equal:start_date'],
         ], [
             'assigned_to.in' => 'No puedes asignar actividades a esa persona.',
-            'team_id.in' => 'No puedes usar ese equipo.',
+            'activity_type_id.in' => 'Elige un tipo de actividad del catálogo.',
+            'community_id.in' => 'Elige una comunidad del catálogo.',
+            'evidence.mimes' => 'La evidencia debe ser una fotografía (JPG, PNG, WEBP o HEIC).',
+            'end_date.after_or_equal' => 'La fecha de fin no puede ser anterior a la de inicio.',
         ], [
-            'title' => 'título',
-            'description' => 'descripción',
+            'activity_type_id' => 'tipo de actividad',
+            'community_id' => 'comunidad',
             'assigned_to' => 'persona asignada',
-            'team_id' => 'equipo',
-            'priority' => 'prioridad',
-            'due_date' => 'fecha límite',
-            'notes' => 'notas',
-            'evidence' => 'evidencia',
+            'evidence' => 'fotografía',
+            'evidence_text' => 'evidencia en texto',
+            'start_date' => 'fecha de inicio',
+            'end_date' => 'fecha de fin',
         ]);
+
+        unset($data['evidence']);
+
+        return $data;
     }
 
     private function formData(User $user, Activity $activity): array
@@ -248,7 +277,9 @@ class ActivityController extends Controller
             'people' => $people->filter(),
             'teams' => $this->teamsFor($user),
             'statuses' => ActivityStatus::editableOptions(),
-            'priorities' => Priority::options(),
+            'types' => ActivityType::active()->orWhere('id', $activity->activity_type_id)->orderBy('name')->get(['id', 'name']),
+            'communities' => Community::active()->orWhere('id', $activity->community_id)->orderBy('name')->get(['id', 'name']),
+            'code' => $activity->exists ? $activity->code : Activity::nextCode(),
         ];
     }
 

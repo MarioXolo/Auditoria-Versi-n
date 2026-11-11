@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
@@ -53,6 +54,12 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::middleware('role:admin,gerente')->group(function () {
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
         Route::resource('teams', TeamController::class)->except(['show']);
+
+        // Catálogos: tipos de actividad y comunidades
+        Route::get('/catalogos', [CatalogController::class, 'index'])->name('catalogs.index');
+        Route::post('/catalogos/{catalog}', [CatalogController::class, 'store'])->whereIn('catalog', ['tipos', 'comunidades'])->name('catalogs.store');
+        Route::patch('/catalogos/{catalog}/{id}', [CatalogController::class, 'update'])->whereIn('catalog', ['tipos', 'comunidades'])->whereNumber('id')->name('catalogs.update');
+        Route::delete('/catalogos/{catalog}/{id}', [CatalogController::class, 'destroy'])->whereIn('catalog', ['tipos', 'comunidades'])->whereNumber('id')->name('catalogs.destroy');
     });
 
     // Solo administradores: crear, editar y desactivar usuarios

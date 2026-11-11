@@ -1,14 +1,15 @@
 @extends('layouts.app')
 
-@section('title', $activity->title)
+@section('title', $activity->code.' · '.$activity->label)
 
 @section('header')
     <div class="min-w-0">
         <a href="{{ route('activities.index') }}" class="text-sm text-slate-500 hover:text-slate-800">← Actividades</a>
-        <h1 class="mt-1 text-2xl font-semibold break-words">{{ $activity->title }}</h1>
+        <p class="mt-1 font-mono text-sm font-semibold text-slate-500">{{ $activity->code }}</p>
+        <h1 class="text-2xl font-semibold break-words">{{ $activity->type?->name }}</h1>
+        <p class="text-slate-600">{{ $activity->community?->name }}</p>
         <div class="mt-2 flex flex-wrap gap-2">
             <span class="badge {{ $activity->status->badge() }}">{{ $activity->status->label() }}</span>
-            <span class="badge {{ $activity->priority->badge() }}">Prioridad {{ strtolower($activity->priority->label()) }}</span>
             @if ($activity->isOverdue())
                 <span class="badge bg-rose-600 text-white">Vencida</span>
             @endif
@@ -35,29 +36,21 @@
     <div class="grid gap-6 lg:grid-cols-3">
         <div class="space-y-6 lg:col-span-2">
             <section class="card p-6">
-                <h2 class="text-sm font-semibold text-slate-500 uppercase">Descripción</h2>
-                <p class="mt-2 whitespace-pre-line text-slate-800">{{ $activity->description ?: 'Sin descripción.' }}</p>
-            </section>
-
-            @if ($activity->notes)
-                <section class="card p-6">
-                    <h2 class="text-sm font-semibold text-slate-500 uppercase">Notas de seguimiento</h2>
-                    <p class="mt-2 whitespace-pre-line text-slate-800">{{ $activity->notes }}</p>
-                </section>
-            @endif
-
-            <section class="card p-6">
                 <h2 class="text-sm font-semibold text-slate-500 uppercase">Evidencia</h2>
+                @if (! $activity->hasEvidence())
+                    <p class="mt-2 text-sm text-slate-500">Aún no se ha cargado evidencia.</p>
+                @endif
                 @if ($activity->evidence_path)
                     @if (\Illuminate\Support\Str::endsWith(strtolower($activity->evidence_path), '.pdf'))
                         <a href="{{ route('activities.evidence', $activity) }}" target="_blank" class="btn btn-secondary mt-3">Abrir PDF</a>
                     @else
                         <a href="{{ route('activities.evidence', $activity) }}" target="_blank">
-                            <img src="{{ route('activities.evidence', $activity) }}" alt="Evidencia" class="mt-3 max-h-96 rounded-lg border border-slate-200">
+                            <img src="{{ route('activities.evidence', $activity) }}" alt="Fotografía de evidencia" class="mt-3 max-h-96 rounded-lg border border-slate-200">
                         </a>
                     @endif
-                @else
-                    <p class="mt-2 text-sm text-slate-500">Aún no se ha cargado evidencia.</p>
+                @endif
+                @if (filled($activity->evidence_text))
+                    <p class="mt-3 whitespace-pre-line text-slate-800">{{ $activity->evidence_text }}</p>
                 @endif
             </section>
         </div>
@@ -120,10 +113,14 @@
 
             <dl class="card divide-y divide-slate-100 text-sm">
                 @foreach ([
+                    'ID' => $activity->code,
+                    'Tipo' => $activity->type?->name,
+                    'Comunidad' => $activity->community?->name,
                     'Asignada a' => $activity->assignee?->name,
                     ($activity->isSelfAssigned() ? 'Cargada por' : 'Asignada por') => $activity->creator?->name,
                     'Equipo' => $activity->team?->name ?? '—',
-                    'Fecha límite' => $activity->due_date?->format('d/m/Y') ?? 'Sin fecha',
+                    'Fecha de inicio' => $activity->start_date->format('d/m/Y'),
+                    'Fecha de fin' => $activity->end_date->format('d/m/Y'),
                     'Creada' => $activity->created_at->format('d/m/Y H:i'),
                     'Completada' => $activity->completed_at?->format('d/m/Y H:i') ?? '—',
                 ] as $label => $value)

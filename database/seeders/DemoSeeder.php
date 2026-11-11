@@ -3,8 +3,9 @@
 namespace Database\Seeders;
 
 use App\Enums\ActivityStatus;
-use App\Enums\Priority;
 use App\Models\Activity;
+use App\Models\ActivityType;
+use App\Models\Community;
 use App\Models\Attendance;
 use App\Models\Team;
 use App\Models\User;
@@ -23,20 +24,37 @@ class DemoSeeder extends Seeder
         'Sur' => ['Jorge Castillo', 'Ana Sofía Morales', 'Ricardo Vega'],
     ];
 
-    /** Actividades típicas con su descripción. */
-    private const ACTIVITIES = [
-        'Visita a cliente' => 'Visitar al cliente asignado, revisar pendientes y registrar acuerdos.',
-        'Auditoría de sucursal' => 'Revisar procesos, inventario y orden de la sucursal; levantar evidencia fotográfica.',
-        'Inventario de almacén' => 'Contar existencias y comparar contra el sistema; reportar diferencias.',
-        'Revisión de expedientes' => 'Verificar que los expedientes estén completos y actualizados.',
-        'Reporte semanal de avance' => 'Entregar el resumen de actividades realizadas en la semana.',
-        'Capacitación del personal' => 'Impartir la capacitación programada y registrar asistentes.',
-        'Seguimiento de pendientes' => 'Dar respuesta a los pendientes detectados en la revisión anterior.',
-        'Verificación de proveedores' => 'Confirmar entregas, precios y documentación de los proveedores asignados.',
+    /** Catálogo demo de tipos de actividad. */
+    private const TYPES = [
+        'Visita domiciliaria', 'Reunión vecinal', 'Recorrido de zona', 'Entrega de material',
+        'Capacitación', 'Levantamiento de encuesta', 'Evento comunitario', 'Reporte de incidencias',
     ];
+
+    /** Catálogo demo de comunidades. */
+    private const COMMUNITIES = [
+        'San Isidro', 'El Mirador', 'La Esperanza', 'Santa Cruz', 'Los Pinos',
+        'Valle Verde', 'Lomas del Sol', 'Centro', 'San Miguel', 'La Joya',
+    ];
+
+    /** Evidencias en texto de ejemplo. */
+    private const EVIDENCE = [
+        'Se visitaron 18 domicilios; 12 personas atendieron y se registraron sus datos de contacto.',
+        'Reunión con 25 vecinos en el salón comunal. Se acordó una segunda reunión en dos semanas.',
+        'Recorrido completo de la zona; se detectaron 3 calles sin alumbrado y se reportaron.',
+        'Se entregaron 150 folletos y 40 carteles en los comercios de la colonia.',
+        'Capacitación a 8 personas del equipo sobre el uso del sistema y el llenado de reportes.',
+        'Se levantaron 32 encuestas de satisfacción en la plaza principal.',
+    ];
+
+    /** @var array<int, array> Actividades por crear, se guardan en orden cronológico */
+    private array $pending = [];
 
     public function run(): void
     {
+        $types = collect(self::TYPES)->map(fn ($name) => ActivityType::firstOrCreate(['name' => $name]))->pluck('id');
+        $communities = collect(self::COMMUNITIES)->map(fn ($name) => Community::firstOrCreate(['name' => $name]))->pluck('id');
+        ActivityType::firstOrCreate(['name' => 'Volanteo'], ['active' => false]); // ejemplo de tipo desactivado
+
         $gerente = User::factory()->role('gerente')->create([
             'name' => 'Gerente Demo',
             'email' => 'gerente@demo.test',
@@ -80,7 +98,7 @@ class DemoSeeder extends Seeder
 
             foreach ($members as $member) {
                 foreach (range(1, rand(6, 12)) as $i) {
-                    $this->createActivity($member, $team, [$team->leader_id, $gerente->id]);
+                    $this->createActivity($member, $team, [$team->leader_id, $gerente->id], $types->random(), $communities->random());
                 }
 
                 $this->createAttendance($member);
@@ -89,12 +107,16 @@ class DemoSeeder extends Seeder
             $this->createAttendance($team->leader);
         }
 
+        // Guardar en orden de creación para que los folios ACT-0001… sigan la cronología
+        foreach (collect($this->pending)->sortBy(fn ($a) => $a->created_at->timestamp) as $activity) {
+            $activity->save();
+        }
+
         $this->command?->info('Datos demo creados. Contraseña de todos los usuarios demo: password');
     }
 
-    private function createActivity(User $member, Team $team, array $creators): void
+    private function createActivity(User $member, Team $team, array $creators, int $typeId, int $communityId): void
     {
-        $title = array_rand(self::ACTIVITIES);
 
         // Reparto realista: la mayoría ya revisadas por un superior
         $status = fake()->randomElement([
@@ -110,7 +132,8 @@ class DemoSeeder extends Seeder
 
         // Creada en los últimos 45 días, en horario laboral
         $created = now()->subDays(rand(1, 45))->setTime(rand(8, 17), rand(0, 59));
-        $due = $created->copy()->addDays(rand(2, 12))->startOfDay();
+        $start = $created->copy()->addDays(rand(0, 2))->startOfDay();
+        $end = $start->copy()->addDays(rand(1, 10));
         $updated = $created->copy()->addHours(rand(1, 48));
 
         $completed = null;
@@ -136,21 +159,28 @@ class DemoSeeder extends Seeder
             $updated = now()->subMinutes(rand(5, 300));
         }
 
+        // Las revisadas casi siempre traen evidencia: texto o foto (las fotos demo no existen, se omiten)
+        $evidenceText = $status->isMarked() || rand(1, 3) === 1 ? fake()->randomElement(self::EVIDENCE) : null;
+        if ($status === ActivityStatus::Incompleta && rand(1, 2) === 1) {
+            $evidenceText = null;
+        }
+
         $activity = new Activity([
-            'title' => $title,
-            'description' => self::ACTIVITIES[$title],
+            'activity_type_id' => $typeId,
+            'community_id' => $communityId,
             'assigned_to' => $member->id,
             'created_by' => $creator,
             'team_id' => $team->id,
-            'priority' => fake()->randomElement(Priority::cases())->value,
             'status' => $status->value,
-            'due_date' => $due->toDateString(),
+            'start_date' => $start->toDateString(),
+            'end_date' => $end->toDateString(),
+            'evidence_text' => $evidenceText,
             'completed_at' => $completed,
             ...$mark,
         ]);
         $activity->created_at = $created;
         $activity->updated_at = $updated;
-        $activity->save();
+        $this->pending[] = $activity;
     }
 
     private function createAttendance(User $member): void

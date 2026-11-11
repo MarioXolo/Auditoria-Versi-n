@@ -9,10 +9,12 @@ use App\Models\User;
 use App\Services\DashboardMetrics;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Tests\Concerns\MakesActivities;
 use Tests\TestCase;
 
 class DashboardMetricsTest extends TestCase
 {
+    use MakesActivities;
     use RefreshDatabase;
 
     protected function setUp(): void
@@ -32,8 +34,9 @@ class DashboardMetricsTest extends TestCase
     private function act(User $to, User $by, string $status, ?string $due, ?string $completed = null): Activity
     {
         $a = new Activity([
-            'title' => 'T', 'assigned_to' => $to->id, 'created_by' => $by->id, 'team_id' => $to->team_id,
-            'priority' => 'media', 'status' => $status, 'due_date' => $due, 'completed_at' => $completed,
+            'activity_type_id' => $this->typeId(), 'community_id' => $this->communityId(),
+            'assigned_to' => $to->id, 'created_by' => $by->id, 'team_id' => $to->team_id,
+            'status' => $status, 'start_date' => '2026-11-08', 'end_date' => $due ?? '2026-11-20', 'completed_at' => $completed,
         ]);
         $a->created_at = now()->subDays(3);
         $a->updated_at = now()->subDays(3);

@@ -15,11 +15,12 @@ Portal web para controlar y auditar las actividades y la asistencia del personal
 
 - **Inicio de sesión** con bloqueo tras 5 intentos fallidos por minuto. Los usuarios desactivados no pueden entrar.
 - **Usuarios y equipos** (solo administrador). Cada equipo tiene un encargado.
-- **Actividades**: título, descripción, persona asignada, equipo, prioridad, fecha límite, estado, evidencia (foto o PDF) y notas. Filtros por estado, persona, equipo y vencidas.
+- **Actividades**: el formulario pide, en orden, ID automático (folio ACT-0001), tipo de actividad, comunidad, persona asignada, evidencia (fotografía o texto), fecha de inicio y fecha de fin. Se buscan por folio, tipo o comunidad y se filtran por estado, tipo, comunidad, persona, equipo y vencidas (fecha de fin pasada sin marcar).
+- **Catálogos** (administrador y gerente): altas, cambios de nombre y activación de tipos de actividad y comunidades. Lo que ya tiene actividades no se borra; se desactiva para que deje de salir en el formulario.
 - **Marcado de actividades**: solo un superior marca cada actividad con un checkbox: ✓ completada o ✗ incompleta (la actividad se pinta de rojo). Volver a tocar la marca la quita. Nadie marca una actividad asignada a sí mismo.
 - **Actividades cargadas por el empleado**: el empleado puede cargarse actividades a sí mismo (no editarlas ni borrarlas); su encargado las ve y las marca.
 - **Asistencia**: entrada con foto obligatoria tomada desde la cámara y salida con foto opcional. Encargados, gerentes y administradores ven quién registró y quién no, por día.
-- **Dashboard** (administrador y gerente): indicadores del periodo, cumplimiento por persona, quién tiene más actividades asignadas, desempeño de encargados, personal sin entrada hoy y movimientos recientes.
+- **Dashboard** (administrador y gerente): indicadores del periodo, cumplimiento por persona, quién tiene más actividades asignadas, desempeño de encargados, personal sin entrada hoy, avance por tipo de actividad y por comunidad, y movimientos recientes.
 - **Mi perfil**: cada usuario cambia su contraseña.
 
 Las fotos y evidencias se guardan en `storage/app/private` y solo se muestran a quien tiene permiso; no quedan públicas en internet.
