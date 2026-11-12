@@ -197,6 +197,62 @@
         </section>
     </div>
 
+    {{-- Calidad de la evidencia y velocidad de revisión --}}
+    @php $bar = fn ($n) => $quality['concluded'] > 0 ? round($n / $quality['concluded'] * 100, 1) : 0; @endphp
+    <div class="mt-6 grid gap-6 lg:grid-cols-2">
+        <section class="card p-5">
+            <h2 class="font-semibold">Calidad de la evidencia</h2>
+            <p class="text-xs text-slate-500">De las {{ $quality['concluded'] }} actividades concluidas del periodo</p>
+            <div class="mt-4 flex items-baseline gap-2">
+                <p @class(['text-4xl font-semibold tabular-nums', 'text-rose-600' => $quality['none'] > 0 && $quality['with_pct'] < 80])>{{ $fmt($quality['with_pct']) }}</p>
+                <p class="text-xs text-slate-500">se cerraron con evidencia</p>
+            </div>
+            @if ($quality['concluded'] > 0)
+                <div class="mt-3 flex h-2.5 overflow-hidden rounded-full bg-slate-100" aria-hidden="true">
+                    <div class="bg-emerald-600" style="width: {{ $bar($quality['photo']) }}%"></div>
+                    <div class="bg-sky-500" style="width: {{ $bar($quality['text']) }}%"></div>
+                    <div class="bg-rose-500" style="width: {{ $bar($quality['none']) }}%"></div>
+                </div>
+            @endif
+            <dl class="mt-4 grid grid-cols-3 gap-3 text-sm">
+                <div><dt class="flex items-center gap-1.5 text-xs text-slate-500"><span class="size-2 rounded-full bg-emerald-600"></span>Con fotografía</dt><dd class="text-xl font-semibold tabular-nums">{{ $quality['photo'] }}</dd></div>
+                <div><dt class="flex items-center gap-1.5 text-xs text-slate-500"><span class="size-2 rounded-full bg-sky-500"></span>Solo texto</dt><dd class="text-xl font-semibold tabular-nums">{{ $quality['text'] }}</dd></div>
+                <div><dt class="flex items-center gap-1.5 text-xs text-slate-500"><span class="size-2 rounded-full bg-rose-500"></span>Sin evidencia</dt><dd @class(['text-xl font-semibold tabular-nums', 'text-rose-600' => $quality['none'] > 0])>{{ $quality['none'] }}</dd></div>
+            </dl>
+            @if ($quality['none'] > 0)
+                <a href="{{ route('activities.index', ['status' => 'concluido', 'evidencia' => 'sin']) }}" class="mt-4 inline-block text-xs font-medium text-brand-600 hover:underline">Ver las concluidas sin evidencia →</a>
+            @endif
+        </section>
+
+        <section class="card p-5">
+            <h2 class="font-semibold">Velocidad de revisión</h2>
+            <p class="text-xs text-slate-500">Días entre la fecha de fin y la marca verde o roja</p>
+            <div class="mt-4 grid grid-cols-2 gap-4">
+                <div>
+                    <p class="text-4xl font-semibold tabular-nums">{{ $fmt($quality['review_days'], ' días') }}</p>
+                    <p class="text-xs text-slate-500">promedio en {{ $quality['reviewed'] }} revisadas</p>
+                </div>
+                <a href="{{ route('activities.index', ['status' => 'vencida']) }}" class="block rounded-lg transition hover:bg-slate-50">
+                    <p @class(['text-4xl font-semibold tabular-nums', 'text-rose-600' => $quality['pending'] > 0])>{{ $quality['pending'] }}</p>
+                    <p class="text-xs text-slate-500">esperando revisión con fecha de fin pasada@if ($quality['pending_max_days']) · la más antigua lleva {{ $quality['pending_max_days'] }} {{ $quality['pending_max_days'] === 1 ? 'día' : 'días' }}@endif</p>
+                </a>
+            </div>
+            @if ($quality['reviewers']->isNotEmpty())
+                <table class="mt-4 w-full text-sm">
+                    <thead><tr class="text-left text-xs text-slate-500"><th class="py-1 font-medium">Quién revisa</th><th class="py-1 text-right font-medium">Revisadas</th><th class="py-1 text-right font-medium">Días promedio</th></tr></thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @foreach ($quality['reviewers'] as $r)
+                            <tr><td class="py-1.5">{{ $r->name }}</td><td class="py-1.5 text-right tabular-nums">{{ $r->count }}</td><td @class(['py-1.5 text-right font-medium tabular-nums', 'text-rose-600' => $r->days > 3])>{{ number_format($r->days, 1) }}</td></tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                <p class="mt-2 text-xs text-slate-400">Los más lentos primero; 0 significa que se revisó a más tardar en la fecha de fin.</p>
+            @else
+                <p class="mt-4 text-sm text-slate-500">Aún no hay actividades revisadas en el periodo.</p>
+            @endif
+        </section>
+    </div>
+
     <section class="card mt-6 p-5">
         <h2 class="font-semibold">Por comunidad</h2>
         <p class="text-xs text-slate-500">Las {{ count($charts['communities']) }} comunidades con más actividades en el periodo</p>

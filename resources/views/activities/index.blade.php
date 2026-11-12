@@ -16,7 +16,14 @@
 @endsection
 
 @section('content')
+    @if (request('evidencia') === 'sin')
+        <p class="mb-3 rounded-lg bg-amber-50 px-4 py-2 text-sm text-amber-800">
+            Mostrando solo actividades <b>sin evidencia</b> (ni fotografía ni texto).
+            <a href="{{ route('activities.index', request()->except('evidencia', 'page')) }}" class="font-medium underline">Quitar filtro</a>
+        </p>
+    @endif
     <form method="GET" class="card mb-5 grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-4">
+        @if (request('evidencia') === 'sin')<input type="hidden" name="evidencia" value="sin">@endif
         <input type="search" name="q" value="{{ request('q') }}" placeholder="Buscar por ID, tipo o comunidad" class="input lg:col-span-2">
         <select name="status" class="input">
             <option value="">Todos los estados</option>

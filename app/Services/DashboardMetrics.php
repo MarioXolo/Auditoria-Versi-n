@@ -447,6 +447,49 @@ class DashboardMetrics
             ->values();
     }
 
+    /**
+     * Calidad de la evidencia y velocidad de revisión.
+     * Evidencia: de las concluidas del periodo, cuántas traen foto, solo texto o nada.
+     * Revisión: días entre la fecha de fin y el momento en que se marcó verde o rojo
+     * (0 si se revisó antes de la fecha de fin), y cuántas siguen esperando revisión.
+     */
+    public function evidenceAndReview(): array
+    {
+        $acts = Activity::query()
+            ->whereBetween('created_at', [$this->from, $this->to])
+            ->when($this->teamId, fn ($q) => $q->where('team_id', $this->teamId))
+            ->get(['id', 'status', 'end_date', 'evidence_path', 'evidence_text', 'marked_by', 'marked_at']);
+
+        $concluded = $acts->filter(fn ($a) => $a->status === ActivityStatus::Concluido);
+        $photo = $concluded->filter(fn ($a) => $a->evidence_path !== null)->count();
+        $text = $concluded->filter(fn ($a) => $a->evidence_path === null && filled($a->evidence_text))->count();
+        $none = $concluded->count() - $photo - $text;
+
+        $wait = fn (Activity $a) => max(0, $a->end_date->copy()->startOfDay()->diffInDays($a->marked_at->copy()->startOfDay(), false));
+        $reviewed = $acts->filter(fn ($a) => $a->status->isMarked() && $a->marked_at && $a->end_date);
+        $pending = $acts->filter(fn ($a) => $this->isOverdue($a));
+        $names = User::whereIn('id', $reviewed->pluck('marked_by')->filter()->unique())->pluck('name', 'id');
+
+        return [
+            'concluded' => $concluded->count(),
+            'photo' => $photo,
+            'text' => $text,
+            'none' => $none,
+            'with_pct' => self::pct($photo + $text, $concluded->count()),
+            'reviewed' => $reviewed->count(),
+            'review_days' => $reviewed->isEmpty() ? null : round($reviewed->avg($wait), 1),
+            'pending' => $pending->count(),
+            'pending_max_days' => $pending->isEmpty() ? null : (int) $pending->max(fn ($a) => $a->end_date->copy()->startOfDay()->diffInDays(today())),
+            'reviewers' => $reviewed->filter(fn ($a) => $a->marked_by)->groupBy('marked_by')
+                ->map(fn (Collection $g, $id) => (object) [
+                    'name' => $names[$id] ?? 'Usuario eliminado',
+                    'count' => $g->count(),
+                    'days' => round($g->avg($wait), 1),
+                ])
+                ->sortByDesc('days')->take(5)->values(),
+        ];
+    }
+
     /** Comparativo entre equipos. */
     public function teams(): Collection
     {
@@ -625,6 +668,8 @@ class DashboardMetrics
             ['No completadas', 'Actividades que un superior marcó en rojo (✗) en el periodo', 'Lo más bajo posible', 'Marcado de actividades'],
             ['Vencidas', 'No iniciadas o en proceso con fecha de fin anterior a hoy', 'Lo más bajo posible', 'Actividades creadas en el periodo'],
             ['Tiempo de cierre', 'Promedio de días entre la creación y la marca «Concluido»', 'Tendencia a la baja', 'Actividades concluidas del periodo'],
+            ['Calidad de la evidencia', 'Concluidas con fotografía o texto ÷ concluidas × 100', 'Lo más alto posible', 'Evidencia cargada en cada actividad concluida'],
+            ['Velocidad de revisión', 'Promedio de días entre la fecha de fin y la marca verde o roja (0 si se revisó a tiempo)', 'Tendencia a la baja', 'Actividades revisadas del periodo'],
             ['Horas por jornada', 'Promedio de horas entre entrada y salida', 'Referencia', 'Registros con entrada y salida'],
             ['Comparativo', 'Valor actual − valor del periodo anterior de la misma duración', 'Positivo', 'Mismo cálculo en el periodo previo'],
         ];

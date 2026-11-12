@@ -53,6 +53,8 @@ class ActivityController extends Controller
 
                 return $q->where('status', $request->input('status'));
             })
+            ->when($request->input('evidencia') === 'sin', fn ($q) => $q->whereNull('evidence_path')
+                ->where(fn ($w) => $w->whereNull('evidence_text')->orWhere('evidence_text', '')))
             ->when($request->filled('assigned_to'), fn ($q) => $q->where('assigned_to', $request->integer('assigned_to')))
             ->when($request->filled('team_id'), fn ($q) => $q->where('team_id', $request->integer('team_id')));
 

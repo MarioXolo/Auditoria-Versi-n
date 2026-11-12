@@ -130,4 +130,37 @@ class DashboardMetricsTest extends TestCase
 
         $this->assertSame([1, 2, 1, 1, 1], array_column((new DashboardMetrics('30'))->byStatus(), 'value'));
     }
+
+    public function test_evidence_quality_and_review_speed(): void
+    {
+        $gerente = User::factory()->role('gerente')->create();
+        $encargado = User::factory()->role('encargado')->create(['name' => 'Elena Encargada']);
+        $empleado = User::factory()->create();
+
+        // Concluidas: una con foto, una con texto, una sin nada. Revisadas 0, 2 y 4 días después de su fecha de fin.
+        foreach ([['evidence_path' => 'evidencias/a.jpg', 'marked_at' => '2026-11-09 10:00'], ['evidence_text' => 'Se visitó la comunidad', 'marked_at' => '2026-11-11 10:00'], ['marked_at' => '2026-11-13 10:00']] as $extra) {
+            $a = $this->act($empleado, $gerente, 'concluido', '2026-11-09', '2026-11-09 09:00');
+            $a->forceFill($extra + ['marked_by' => $encargado->id])->save();
+        }
+        // Dos abiertas con fecha de fin pasada: esperan revisión (la más antigua, 6 días)
+        $this->act($empleado, $gerente, 'en_proceso', '2026-11-05');
+        $this->act($empleado, $gerente, 'no_iniciado', '2026-11-10');
+
+        $q = (new DashboardMetrics('30'))->evidenceAndReview();
+        $this->assertSame([3, 1, 1, 1], [$q['concluded'], $q['photo'], $q['text'], $q['none']]);
+        $this->assertSame(66.7, $q['with_pct']);
+        $this->assertSame(2.0, $q['review_days']);
+        $this->assertSame(2, $q['pending']);
+        $this->assertSame(6, $q['pending_max_days']);
+        $this->assertSame('Elena Encargada', $q['reviewers'][0]->name);
+        $this->assertSame(3, $q['reviewers'][0]->count);
+
+        $this->actingAs($gerente)->get('/dashboard?period=30')->assertOk()
+            ->assertSee('Calidad de la evidencia')->assertSee('Velocidad de revisión')
+            ->assertSee('Elena Encargada')->assertSee('Ver las concluidas sin evidencia');
+
+        // La liga abre solo las concluidas sin evidencia
+        $this->actingAs($gerente)->get('/activities?status=concluido&evidencia=sin')->assertOk()
+            ->assertSee('sin evidencia')->assertViewHas('activities', fn ($p) => $p->total() === 1);
+    }
 }

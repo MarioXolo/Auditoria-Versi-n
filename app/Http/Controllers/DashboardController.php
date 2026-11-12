@@ -42,6 +42,7 @@ class DashboardController extends Controller
             'people' => $metrics->people(),
             'leaders' => $metrics->leaders(),
             'alerts' => $metrics->alerts(),
+            'quality' => $metrics->evidenceAndReview(),
             'absent' => $metrics->absentToday(),
             'definitions' => DashboardMetrics::definitions(),
             'recent' => Activity::with(['assignee:id,name', 'creator:id,name', 'type:id,name', 'community:id,name'])
