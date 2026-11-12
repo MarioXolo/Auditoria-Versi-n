@@ -234,7 +234,11 @@
                 </div>
                 <a href="{{ route('activities.index', ['status' => 'vencida']) }}" class="block rounded-lg transition hover:bg-slate-50">
                     <p @class(['text-4xl font-semibold tabular-nums', 'text-rose-600' => $quality['pending'] > 0])>{{ $quality['pending'] }}</p>
-                    <p class="text-xs text-slate-500">esperando revisión con fecha de fin pasada@if ($quality['pending_max_days']) · la más antigua lleva {{ $quality['pending_max_days'] }} {{ $quality['pending_max_days'] === 1 ? 'día' : 'días' }}@endif</p>
+                    <p class="text-xs text-slate-500">esperando revisión con fecha de fin pasada
+                        @if ($quality['pending_max_days'])
+                            · la más antigua lleva {{ $quality['pending_max_days'] }} {{ $quality['pending_max_days'] === 1 ? 'día' : 'días' }}
+                        @endif
+                    </p>
                 </a>
             </div>
             @if ($quality['reviewers']->isNotEmpty())
