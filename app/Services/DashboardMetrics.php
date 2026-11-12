@@ -302,6 +302,7 @@ class DashboardMetrics
         $acts = $this->activities($this->from, $this->to);
 
         return collect(ActivityStatus::cases())->map(fn ($s) => [
+            'key' => $s->value,
             'label' => $s->label(),
             'value' => $acts->filter(fn ($a) => $a->status === $s)->count(),
         ])->all();

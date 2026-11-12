@@ -111,6 +111,36 @@
         @endforeach
     </div>
 
+    {{-- Actividades por estado (los 5 estados; respeta periodo y equipo del filtro) --}}
+    @php
+        $statusRows = $charts['status'];
+        $statusTotal = array_sum(array_column($statusRows, 'value'));
+        $statusDot = ['no_iniciado' => 'bg-amber-400', 'en_proceso' => 'bg-sky-500', 'suspendida' => 'bg-slate-400', 'concluido' => 'bg-emerald-600', 'no_completada' => 'bg-rose-600'];
+        $statusHint = ['no_iniciado' => 'aún sin arrancar', 'en_proceso' => 'trabajándose', 'suspendida' => 'detenidas por ahora', 'concluido' => 'revisadas en verde', 'no_completada' => 'revisadas en rojo'];
+    @endphp
+    <section class="mt-6" aria-labelledby="por-estado">
+        <div class="mb-2 flex items-baseline justify-between">
+            <h2 id="por-estado" class="font-semibold">Actividades por estado</h2>
+            <p class="text-xs text-slate-500">{{ $statusTotal }} en el periodo</p>
+        </div>
+        <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-5">
+            @foreach ($statusRows as $row)
+                <a href="{{ route('activities.index', ['status' => $row['key']]) }}" class="card block p-4 transition hover:border-brand-500">
+                    <p class="flex items-center gap-2 text-xs font-semibold tracking-wide text-slate-500 uppercase">
+                        <span class="size-2.5 rounded-full {{ $statusDot[$row['key']] ?? 'bg-slate-300' }}" aria-hidden="true"></span>{{ $row['label'] }}
+                    </p>
+                    <p class="mt-1 text-2xl font-semibold tabular-nums">{{ $row['value'] }}</p>
+                    <p class="mt-1 text-xs text-slate-500">
+                        {{ $statusTotal > 0 ? number_format($row['value'] / $statusTotal * 100, 1).' %' : '—' }} · {{ $statusHint[$row['key']] ?? '' }}
+                    </p>
+                    <div class="mt-2 h-1.5 rounded-full bg-slate-100" aria-hidden="true">
+                        <div class="h-1.5 rounded-full {{ $statusDot[$row['key']] ?? 'bg-slate-300' }}" style="width: {{ $statusTotal > 0 ? round($row['value'] / $statusTotal * 100, 1) : 0 }}%"></div>
+                    </div>
+                </a>
+            @endforeach
+        </div>
+    </section>
+
     {{-- Alertas --}}
     @if (count($alerts))
         <section class="card mt-6 overflow-hidden" aria-labelledby="alertas">
@@ -154,16 +184,11 @@
         </section>
     </div>
 
-    <div class="mt-6 grid gap-6 lg:grid-cols-3">
+    <div class="mt-6 grid gap-6 lg:grid-cols-2">
         <section class="card p-5">
             <h2 class="font-semibold">Asistencia y puntualidad diaria</h2>
             <p class="text-xs text-slate-500">Días laborales, últimos 30 días como máximo</p>
             <div class="mt-4 h-60"><canvas id="chart-attendance" role="img" aria-label="Gráfica de asistencia y puntualidad"></canvas></div>
-        </section>
-        <section class="card p-5">
-            <h2 class="font-semibold">Comparativo por equipo</h2>
-            <p class="text-xs text-slate-500">Cumplimiento, entrega a tiempo y asistencia</p>
-            <div class="mt-4 h-60"><canvas id="chart-teams" role="img" aria-label="Gráfica comparativa por equipo"></canvas></div>
         </section>
         <section class="card p-5">
             <h2 class="font-semibold">Por tipo de actividad</h2>

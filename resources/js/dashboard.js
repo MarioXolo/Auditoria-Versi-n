@@ -97,19 +97,6 @@ if (data) {
         plugins: [goalLine(data.goals.asistencia, 'Meta ' + data.goals.asistencia + '%')],
     });
 
-    make('chart-teams', {
-        type: 'bar',
-        data: {
-            labels: data.teams.map((t) => t.name),
-            datasets: [
-                { label: 'Cumplimiento', data: data.teams.map((t) => t.cumplimiento), backgroundColor: C.brand, borderRadius: 3 },
-                { label: 'A tiempo', data: data.teams.map((t) => t.a_tiempo), backgroundColor: C.ink, borderRadius: 3 },
-                { label: 'Asistencia', data: data.teams.map((t) => t.asistencia), backgroundColor: '#93b4f5', borderRadius: 3 },
-            ],
-        },
-        options: { scales: { y: pctAxis, x: noGrid }, plugins: { legend: { position: 'bottom' } } },
-    });
-
     const progress = (rows) => [
         { label: 'Concluidas', data: rows.map((r) => r.completadas), backgroundColor: C.green, borderRadius: 3 },
         { label: 'No completadas', data: rows.map((r) => r.incompletas), backgroundColor: C.rose, borderRadius: 3 },

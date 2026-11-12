@@ -111,4 +111,23 @@ class DashboardMetricsTest extends TestCase
         $empleado = User::where('email', 'empleado.norte@demo.test')->first();
         $this->actingAs($empleado)->get('/dashboard/exportar')->assertForbidden();
     }
+
+    public function test_dashboard_shows_every_status_and_no_team_comparison(): void
+    {
+        $gerente = User::factory()->role('gerente')->create();
+        $empleado = User::factory()->create();
+        foreach (['no_iniciado', 'en_proceso', 'en_proceso', 'suspendida', 'concluido', 'no_completada'] as $status) {
+            $this->act($empleado, $gerente, $status, '2026-11-20', $status === 'concluido' ? now()->subDay() : null);
+        }
+
+        $response = $this->actingAs($gerente)->get('/dashboard?period=30')->assertOk()
+            ->assertSee('Actividades por estado')
+            ->assertSeeInOrder(['No iniciado', 'En proceso', 'Suspendida', 'Concluido', 'No completada'])
+            ->assertSee(route('activities.index', ['status' => 'en_proceso']), false)
+            ->assertSee('33.3 %')
+            ->assertDontSee('Comparativo por equipo')
+            ->assertDontSee('chart-teams');
+
+        $this->assertSame([1, 2, 1, 1, 1], array_column((new DashboardMetrics('30'))->byStatus(), 'value'));
+    }
 }

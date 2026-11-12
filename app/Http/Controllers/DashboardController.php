@@ -26,7 +26,6 @@ class DashboardController extends Controller
             'status' => $metrics->byStatus(),
             'types' => $metrics->byType(),
             'communities' => $metrics->byCommunity(),
-            'teams' => $metrics->teams()->values(),
             'goals' => config('auditoria.metas'),
         ];
 
@@ -42,7 +41,6 @@ class DashboardController extends Controller
             'charts' => $charts,
             'people' => $metrics->people(),
             'leaders' => $metrics->leaders(),
-            'teamRows' => $metrics->teams(),
             'alerts' => $metrics->alerts(),
             'absent' => $metrics->absentToday(),
             'definitions' => DashboardMetrics::definitions(),
