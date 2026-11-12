@@ -73,8 +73,8 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::delete('/catalogos/{catalog}/{id}', [CatalogController::class, 'destroy'])->whereIn('catalog', ['tipos', 'comunidades'])->whereNumber('id')->name('catalogs.destroy');
 
         // V2 · Cuaderno Maestro de Campaña (cada registro pertenece a su campaña: scopeBindings)
-        Route::resource('campanas', CampaignController::class)->parameters(['campanas' => 'campaign'])->names('campaigns');
-        Route::patch('/campanas/{campaign}/archivar', [CampaignController::class, 'toggle'])->name('campaigns.toggle');
+        // Cuaderno Maestro de Campaña: uno solo; /campanas abre el que existe (o su configuración inicial)
+        Route::resource('campanas', CampaignController::class)->parameters(['campanas' => 'campaign'])->names('campaigns')->except('destroy');
         Route::prefix('/campanas/{campaign}')->name('campaigns.')->scopeBindings()->group(function () {
             Route::get('/estructura', [TerritoryController::class, 'index'])->name('territories.index');
             Route::post('/estructura', [TerritoryController::class, 'store'])->name('territories.store');

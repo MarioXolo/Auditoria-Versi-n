@@ -111,6 +111,12 @@ class Campaign extends Model
         return $this->hasMany(CampaignKpi::class)->orderBy('orden');
     }
 
+    /** El sistema lleva un solo Cuaderno Maestro: el activo más antiguo (o el primero que haya). */
+    public static function current(): ?self
+    {
+        return static::orderByDesc('active')->orderBy('id')->first();
+    }
+
     public function actors(): HasMany
     {
         return $this->hasMany(CampaignActor::class);

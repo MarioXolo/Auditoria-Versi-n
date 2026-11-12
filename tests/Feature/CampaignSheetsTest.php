@@ -38,7 +38,7 @@ class CampaignSheetsTest extends TestCase
     {
         $admin = User::factory()->role('admin')->create();
         foreach ([$this->gerente, $admin] as $u) {
-            $this->actingAs($u)->get($this->url())->assertOk()->assertDontSee('Etapa 2');
+            $this->actingAs($u)->get($this->url())->assertOk()->assertDontSee('Etapa 2')->assertSee('Hojas del cuaderno');
             foreach (CampaignSheets::all() as $key => $sheet) {
                 $this->actingAs($u)->get($this->url("/{$key}"))->assertOk()->assertSee($sheet['tab']);
                 $this->actingAs($u)->get($this->url("/{$key}/exportar"))->assertOk();
@@ -153,14 +153,9 @@ class CampaignSheetsTest extends TestCase
         $this->assertStringContainsString('Seguridad', $csv);
 
         // Otra campaña no puede tocar las filas de esta
-        $this->actingAs($this->gerente)->post('/campanas', ['name' => 'Otra', 'municipality' => 'X', 'listado_nominal' => 1, 'participacion' => 50, 'objetivo' => 50, 'colchon' => 0, 'votantes_por_promotor' => 10]);
-        $other = Campaign::latest('id')->first();
+        $other = Campaign::create(['name' => 'Otra', 'municipality' => 'X', 'listado_nominal' => 1, 'participacion' => 0.5, 'objetivo' => 0.5, 'colchon' => 0, 'votantes_por_promotor' => 10]);
         $this->actingAs($this->gerente)->delete("/campanas/{$other->id}/logros/{$logro->id}")->assertNotFound();
         $this->actingAs($this->gerente)->delete($this->url("/logros/{$logro->id}"))->assertRedirect();
         $this->assertSame(0, $this->campaign->achievements()->count());
-
-        // Con información capturada la campaña ya no se puede borrar, solo archivar
-        $this->actingAs($this->gerente)->post($this->url('/actores'), ['nombre' => 'Líder']);
-        $this->actingAs($this->gerente)->delete($this->url())->assertSessionHasErrors('name');
     }
 }

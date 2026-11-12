@@ -12,6 +12,34 @@
 @section('content')
     @include('campaigns._nav')
 
+    {{-- Las 10 hojas del cuaderno como burbujas: se entra a cada una para llenarla --}}
+    <section class="mb-8" aria-labelledby="hojas">
+        <h2 id="hojas" class="font-semibold">Hojas del cuaderno</h2>
+        <p class="text-sm text-slate-500">Entra a cada burbuja para llenarla. Es tu documento vivo: los cálculos se hacen solos conforme llega la información.</p>
+        <ul class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+            @foreach ($steps as [$num, $label, $desc, $url, $done, $stat])
+                <li>
+                    <a href="{{ $url }}" class="group flex h-full flex-col items-center rounded-3xl border border-slate-200 bg-white px-3 py-5 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-brand-400 hover:shadow-md focus-visible:ring-2 focus-visible:ring-brand-500">
+                        <span @class([
+                            'relative grid size-16 place-items-center rounded-full text-2xl font-semibold transition',
+                            'bg-emerald-600 text-white' => $done,
+                            'bg-brand-50 text-brand-700 ring-2 ring-brand-200 group-hover:bg-brand-600 group-hover:text-white' => ! $done,
+                        ])>
+                            {{ $num }}
+                            @if ($done)
+                                <span class="absolute -right-1 -bottom-1 grid size-6 place-items-center rounded-full bg-white text-xs font-bold text-emerald-600 ring-2 ring-emerald-600" title="Ya tiene información">✓</span>
+                            @endif
+                        </span>
+                        <span class="mt-3 text-sm leading-tight font-semibold text-slate-900">{{ $num }}. {{ $label }}</span>
+                        <span class="mt-1 text-xs leading-snug text-slate-500">{{ $desc }}</span>
+                        <span @class(['mt-auto pt-3 text-xs font-medium tabular-nums', 'text-emerald-700' => $done, 'text-slate-400' => ! $done])>{{ $done ? $stat : 'Por llenar' }}</span>
+                    </a>
+                </li>
+            @endforeach
+        </ul>
+    </section>
+
+    <h2 class="mb-3 font-semibold">Resumen</h2>
     <div class="grid gap-6 lg:grid-cols-3">
         {{-- Meta y avance --}}
         <section class="card overflow-hidden lg:col-span-2">
@@ -93,34 +121,6 @@
             </ul>
         </section>
     </div>
-
-    {{-- Índice del cuaderno --}}
-    <section class="card mt-6 overflow-hidden">
-        <div class="border-b border-slate-200 px-5 py-3">
-            <h2 class="font-semibold">Pestañas del cuaderno</h2>
-            <p class="text-xs text-slate-500">Es tu documento vivo: ve llenando cada pestaña conforme llega la información; los cálculos se hacen solos.</p>
-        </div>
-        <ul class="grid divide-y divide-slate-100 sm:grid-cols-2 sm:divide-y-0">
-            @foreach ($steps as [$label, $desc, $route, $done])
-                <li class="flex items-start gap-3 px-5 py-3 sm:border-b sm:border-slate-100">
-                    <span @class([
-                        'mt-0.5 grid size-5 shrink-0 place-items-center rounded-full text-[11px] font-bold',
-                        'bg-emerald-600 text-white' => $done,
-                        'border-2 border-slate-300' => ! $done && $route,
-                        'bg-slate-100 text-slate-300' => ! $route,
-                    ])>@if ($done)✓@endif</span>
-                    <div class="min-w-0 text-sm">
-                        @if ($route)
-                            <a href="{{ is_array($route) ? route($route[0], [$campaign, $route[1]]) : route($route, $campaign) }}" class="font-medium text-slate-900 hover:text-brand-600">{{ $label }}</a>
-                        @else
-                            <span class="font-medium text-slate-400">{{ $label }}</span> <span class="badge bg-slate-100 text-slate-500">Etapa 2</span>
-                        @endif
-                        <p @class(['text-xs', 'text-slate-500' => $route, 'text-slate-400' => ! $route])>{{ $desc }}</p>
-                    </div>
-                </li>
-            @endforeach
-        </ul>
-    </section>
 
     @if ($summary->metaTerritorial > 0 && $summary->metaTerritorial < round($summary->meta))
         <div class="mt-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">

@@ -30,10 +30,22 @@ class CampaignTest extends TestCase
     /** Datos del Excel original: 30,000 · 55 % · 50 % · 10 % · 1×10. */
     private function excelCampaign(array $over = []): Campaign
     {
-        $this->actingAs($this->gerente)->post('/campanas', array_merge([
+        $data = array_merge([
             'name' => 'Reelección Huimilpan 2027', 'municipality' => 'Huimilpan', 'election_date' => '2027-06-06',
             'listado_nominal' => 30000, 'participacion' => 55, 'objetivo' => 50, 'colchon' => 10, 'votantes_por_promotor' => 10,
-        ], $over))->assertRedirect();
+        ], $over);
+
+        // El sistema lleva un solo cuaderno: el primero se crea por la pantalla; los demás
+        // (solo para probar el aislamiento entre campañas) directo en la base.
+        if (Campaign::exists()) {
+            foreach (['participacion', 'objetivo', 'colchon'] as $f) {
+                $data[$f] /= 100;
+            }
+
+            return Campaign::create($data);
+        }
+
+        $this->actingAs($this->gerente)->post('/campanas', $data)->assertRedirect();
 
         return Campaign::latest('id')->first();
     }
@@ -48,11 +60,12 @@ class CampaignTest extends TestCase
             $this->actingAs($u)->get('/campanas')->assertForbidden();
             $this->actingAs($u)->get("/campanas/{$campaign->id}/votantes")->assertForbidden();
             $this->actingAs($u)->post("/campanas/{$campaign->id}/votantes", ['nombre' => 'X'])->assertForbidden();
-            $this->actingAs($u)->get('/activities')->assertDontSee('Campañas');
+            $this->actingAs($u)->get('/activities')->assertDontSee('Cuaderno Maestro');
         }
 
         foreach ([$this->admin, $this->gerente] as $u) {
-            $this->actingAs($u)->get('/campanas')->assertOk()->assertSee('Reelección Huimilpan 2027');
+            $this->actingAs($u)->get('/activities')->assertSee('Cuaderno Maestro');
+            $this->actingAs($u)->get('/campanas')->assertRedirect("/campanas/{$campaign->id}");
             foreach (['', '/estructura', '/votantes', '/votantes/create', '/promotores', '/promotores/create', '/kpi', '/edit'] as $page) {
                 $this->actingAs($u)->get("/campanas/{$campaign->id}{$page}")->assertOk();
             }
@@ -186,34 +199,48 @@ class CampaignTest extends TestCase
             ->assertSee('jun-2026 (B&amp;M)', false);
     }
 
-    public function test_campaign_lifecycle_and_used_communities_are_protected(): void
+    public function test_there_is_a_single_notebook_and_used_communities_are_protected(): void
     {
+        // Sin cuaderno, el menú lleva a configurarlo (una sola vez)
+        $this->actingAs($this->gerente)->get('/campanas')->assertRedirect('/campanas/create');
+        $this->actingAs($this->gerente)->get('/campanas/create')->assertOk()->assertSee('Configura tu cuaderno');
+
         $c = $this->excelCampaign();
+
+        // Ya configurado: el menú lo abre directo y no se puede crear otro ni borrarlo
+        $this->actingAs($this->gerente)->get('/campanas')->assertRedirect("/campanas/{$c->id}");
+        $this->actingAs($this->gerente)->get('/campanas/create')->assertRedirect("/campanas/{$c->id}");
+        $this->actingAs($this->gerente)->post('/campanas', ['name' => 'Otro', 'municipality' => 'X', 'listado_nominal' => 1, 'participacion' => 50, 'objetivo' => 50, 'colchon' => 0, 'votantes_por_promotor' => 10])
+            ->assertSessionHasErrors('name');
+        $this->assertSame(1, Campaign::count());
+        $this->actingAs($this->gerente)->delete("/campanas/{$c->id}")->assertStatus(405);
+        $this->assertNotNull($c->fresh());
+
+        // La comunidad usada en el cuaderno no se puede borrar del catálogo
         $community = Community::create(['name' => 'Usada en campaña']);
         CampaignVoter::create(['campaign_id' => $c->id, 'nombre' => 'X', 'community_id' => $community->id]);
-
-        // La comunidad usada en la campaña no se puede borrar del catálogo
         $this->actingAs($this->gerente)->delete("/catalogos/comunidades/{$community->id}")->assertSessionHasErrors('name', null, 'comunidades');
         $this->assertNotNull($community->fresh());
-
-        // Con votantes no se elimina: se archiva
-        $this->actingAs($this->gerente)->delete("/campanas/{$c->id}")->assertSessionHasErrors('name');
-        $this->actingAs($this->gerente)->patch("/campanas/{$c->id}/archivar")->assertRedirect();
-        $this->assertFalse($c->fresh()->active);
-
-        $vacia = $this->excelCampaign(['name' => 'Vacía']);
-        $this->actingAs($this->gerente)->delete("/campanas/{$vacia->id}")->assertRedirect('/campanas');
-        $this->assertNull($vacia->fresh());
     }
 
     public function test_layout_follows_the_excel_and_adds_helpers(): void
     {
         $c = $this->excelCampaign();
 
-        // Pestañas con la numeración del Excel
+        // Portada: una burbuja por hoja, con la numeración del Excel
         $this->actingAs($this->gerente)->get("/campanas/{$c->id}")
-            ->assertSeeInOrder(['1. Meta de Votos', '2. Estructura Territorial', '3. Base de Votantes', '4. Padrón de Promotores', '5. Mapeo de Actores', '9. Tablero KPI', '10. Logros Comunicables'])
-            ->assertSee('Pestañas del cuaderno');
+            ->assertSee('Cuaderno Maestro de Campaña')
+            ->assertSee('Hojas del cuaderno')
+            ->assertSeeInOrder(['1. Meta de Votos', '2. Estructura Territorial', '3. Base de Votantes', '4. Padrón de Promotores', '5. Mapeo de Actores',
+                '6. Defensa del Voto', '7. Presupuesto', '8. Cronograma', '9. Tablero KPI', '10. Logros Comunicables'])
+            ->assertSee('Meta: 9,075 votos')
+            ->assertSee('Por llenar');
+
+        // Dentro de una hoja: regreso a la portada y burbujas numeradas para saltar a otra
+        $this->actingAs($this->gerente)->get("/campanas/{$c->id}/votantes")
+            ->assertSee('← Cuaderno Maestro de Campaña')
+            ->assertSee('aria-label="10. Logros Comunicables"', false)
+            ->assertSee('Base de Votantes');
 
         // Tablero KPI en el orden del Excel
         $this->actingAs($this->gerente)->get("/campanas/{$c->id}/kpi")->assertSeeInOrder([
