@@ -38,7 +38,7 @@
                 <a href="{{ $url }}" title="{{ $num }}. {{ $label }}" aria-label="{{ $num }}. {{ $label }}" @if ($num === $current) aria-current="page" @endif @class([
                     'grid size-9 shrink-0 place-items-center rounded-full text-sm font-semibold transition',
                     'bg-brand-600 text-white shadow ring-2 ring-brand-600 ring-offset-2' => $num === $current,
-                    'bg-brand-100 text-brand-700 hover:bg-brand-200' => $num !== $current && $done,
+                    'bg-brand-100 text-brand-700 hover:ring-2 hover:ring-brand-500' => $num !== $current && $done,
                     'bg-white text-slate-500 ring-1 ring-slate-300 hover:bg-slate-100 hover:text-slate-800' => $num !== $current && ! $done,
                 ])>{{ $num }}</a>
             @endforeach

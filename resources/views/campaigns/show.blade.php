@@ -19,11 +19,11 @@
         <ul class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
             @foreach ($steps as [$num, $label, $desc, $url, $done, $stat])
                 <li>
-                    <a href="{{ $url }}" class="group flex h-full flex-col items-center rounded-3xl border border-slate-200 bg-white px-3 py-5 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-brand-400 hover:shadow-md focus-visible:ring-2 focus-visible:ring-brand-500">
+                    <a href="{{ $url }}" class="group flex h-full flex-col items-center rounded-3xl border border-slate-200 bg-white px-3 py-5 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-brand-500 hover:shadow-md focus-visible:ring-2 focus-visible:ring-brand-500">
                         <span @class([
                             'relative grid size-16 place-items-center rounded-full text-2xl font-semibold transition',
                             'bg-brand-600 text-white' => $done,
-                            'bg-white text-brand-600 ring-2 ring-brand-300 group-hover:bg-brand-50' => ! $done,
+                            'bg-white text-brand-600 ring-2 ring-brand-500 group-hover:bg-brand-50' => ! $done,
                         ])>
                             {{ $num }}
                             @if ($done)
