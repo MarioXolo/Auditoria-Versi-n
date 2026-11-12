@@ -33,13 +33,13 @@
                 <p class="truncate text-sm text-slate-500">{{ $campaign->name }} · {{ $campaign->municipality }}</p>
             </div>
         </div>
-        <nav class="mt-4 flex gap-2 overflow-x-auto pb-1" aria-label="Hojas del cuaderno">
+        <nav class="mt-4 flex gap-2 overflow-x-auto p-1" aria-label="Hojas del cuaderno">
             @foreach ($bubbles as [$num, $label, $desc, $url, $done])
                 <a href="{{ $url }}" title="{{ $num }}. {{ $label }}" aria-label="{{ $num }}. {{ $label }}" @if ($num === $current) aria-current="page" @endif @class([
                     'grid size-9 shrink-0 place-items-center rounded-full text-sm font-semibold transition',
-                    'bg-brand-600 text-white shadow' => $num === $current,
-                    'bg-emerald-100 text-emerald-800 hover:bg-emerald-200' => $num !== $current && $done,
-                    'bg-white text-slate-500 ring-1 ring-slate-200 hover:bg-slate-100 hover:text-slate-800' => $num !== $current && ! $done,
+                    'bg-brand-600 text-white shadow ring-2 ring-brand-600 ring-offset-2' => $num === $current,
+                    'bg-brand-100 text-brand-700 hover:bg-brand-200' => $num !== $current && $done,
+                    'bg-white text-slate-500 ring-1 ring-slate-300 hover:bg-slate-100 hover:text-slate-800' => $num !== $current && ! $done,
                 ])>{{ $num }}</a>
             @endforeach
         </nav>

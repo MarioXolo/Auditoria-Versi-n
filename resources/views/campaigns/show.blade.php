@@ -22,17 +22,17 @@
                     <a href="{{ $url }}" class="group flex h-full flex-col items-center rounded-3xl border border-slate-200 bg-white px-3 py-5 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-brand-400 hover:shadow-md focus-visible:ring-2 focus-visible:ring-brand-500">
                         <span @class([
                             'relative grid size-16 place-items-center rounded-full text-2xl font-semibold transition',
-                            'bg-emerald-600 text-white' => $done,
-                            'bg-brand-50 text-brand-700 ring-2 ring-brand-200 group-hover:bg-brand-600 group-hover:text-white' => ! $done,
+                            'bg-brand-600 text-white' => $done,
+                            'bg-white text-brand-600 ring-2 ring-brand-300 group-hover:bg-brand-50' => ! $done,
                         ])>
                             {{ $num }}
                             @if ($done)
-                                <span class="absolute -right-1 -bottom-1 grid size-6 place-items-center rounded-full bg-white text-xs font-bold text-emerald-600 ring-2 ring-emerald-600" title="Ya tiene información">✓</span>
+                                <span class="absolute -right-1 -bottom-1 grid size-6 place-items-center rounded-full bg-white text-xs font-bold text-brand-600 ring-2 ring-brand-600" title="Ya tiene información">✓</span>
                             @endif
                         </span>
                         <span class="mt-3 text-sm leading-tight font-semibold text-slate-900">{{ $num }}. {{ $label }}</span>
                         <span class="mt-1 text-xs leading-snug text-slate-500">{{ $desc }}</span>
-                        <span @class(['mt-auto pt-3 text-xs font-medium tabular-nums', 'text-emerald-700' => $done, 'text-slate-400' => ! $done])>{{ $done ? $stat : 'Por llenar' }}</span>
+                        <span @class(['mt-auto pt-3 text-xs font-medium tabular-nums', 'text-brand-700' => $done, 'text-slate-400' => ! $done])>{{ $done ? $stat : 'Por llenar' }}</span>
                     </a>
                 </li>
             @endforeach
