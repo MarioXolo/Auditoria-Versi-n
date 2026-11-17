@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Campaigns;
 
+use App\Support\Csv;
 use App\Http\Controllers\Controller;
 use App\Models\Campaign;
 use App\Models\Community;
@@ -68,9 +69,9 @@ class SheetController extends Controller
         return response()->streamDownload(function () use ($rows, $columns) {
             $out = fopen('php://output', 'w');
             fwrite($out, "\xEF\xBB\xBF");
-            fputcsv($out, ['#', ...array_column($columns, 'label')]);
+            Csv::put($out, ['#', ...array_column($columns, 'label')]);
             foreach ($rows as $i => $row) {
-                fputcsv($out, [$i + 1, ...array_map(fn ($c) => $c['computed'] ?? false
+                Csv::put($out, [$i + 1, ...array_map(fn ($c) => $c['computed'] ?? false
                     ? CampaignSheets::money(($c['value'])($row))
                     : CampaignSheets::display($c, $row, $c['name']), $columns)]);
             }

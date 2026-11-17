@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Campaigns;
 
+use App\Support\Csv;
 use App\Http\Controllers\Controller;
 use App\Models\Campaign;
 use App\Models\CampaignPromoter;
@@ -78,9 +79,9 @@ class PromoterController extends Controller
         return response()->streamDownload(function () use ($rows) {
             $out = fopen('php://output', 'w');
             fwrite($out, "\xEF\xBB\xBF");
-            fputcsv($out, ['#', 'Nombre del promotor', 'Tel / WhatsApp', 'Comunidad', 'Sección(es)', 'Coordinador seccional', 'Meta (votos)', 'Identificados', '% avance', '¿Verificado?']);
+            Csv::put($out, ['#', 'Nombre del promotor', 'Tel / WhatsApp', 'Comunidad', 'Sección(es)', 'Coordinador seccional', 'Meta (votos)', 'Identificados', '% avance', '¿Verificado?']);
             foreach ($rows as $i => $p) {
-                fputcsv($out, [$i + 1, $p->name, $p->phone, $p->community?->name, $p->secciones, $p->coordinador, $p->meta_votos, $p->voters_count, round($p->avance() * 100, 1), $p->verificado ? 'Sí' : 'No']);
+                Csv::put($out, [$i + 1, $p->name, $p->phone, $p->community?->name, $p->secciones, $p->coordinador, $p->meta_votos, $p->voters_count, round($p->avance() * 100, 1), $p->verificado ? 'Sí' : 'No']);
             }
             fclose($out);
         }, 'promotores-'.str($campaign->name)->slug().'.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);

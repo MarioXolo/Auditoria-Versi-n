@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Campaigns;
 
+use App\Support\Csv;
 use App\Http\Controllers\Controller;
 use App\Models\Campaign;
 use App\Models\CampaignVoter;
@@ -84,9 +85,9 @@ class VoterController extends Controller
         return response()->streamDownload(function () use ($rows) {
             $out = fopen('php://output', 'w');
             fwrite($out, "\xEF\xBB\xBF");
-            fputcsv($out, ['#', 'Nombre completo', 'Sección', 'Casilla', 'Domicilio', 'Tel / WhatsApp', 'Comunidad', 'Promotor responsable', 'Afinidad', '¿Recibe apoyo gob?', 'Notas']);
+            Csv::put($out, ['#', 'Nombre completo', 'Sección', 'Casilla', 'Domicilio', 'Tel / WhatsApp', 'Comunidad', 'Promotor responsable', 'Afinidad', '¿Recibe apoyo gob?', 'Notas']);
             foreach ($rows as $i => $v) {
-                fputcsv($out, [$i + 1, $v->nombre, $v->seccion, $v->casilla, $v->domicilio, $v->telefono, $v->community?->name, $v->promoter?->name,
+                Csv::put($out, [$i + 1, $v->nombre, $v->seccion, $v->casilla, $v->domicilio, $v->telefono, $v->community?->name, $v->promoter?->name,
                     $v->afinidad, $v->recibe_apoyo === null ? '' : ($v->recibe_apoyo ? 'Sí' : 'No'), $v->notas]);
             }
             fclose($out);
