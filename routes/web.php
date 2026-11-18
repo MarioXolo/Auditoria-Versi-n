@@ -12,6 +12,7 @@ use App\Http\Controllers\Campaigns\TerritoryController;
 use App\Http\Controllers\Campaigns\VoterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MinuteController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\UserController;
@@ -38,6 +39,10 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::middleware('role:admin,gerente')->group(function () {
         Route::get('/dashboard', DashboardController::class)->name('dashboard');
         Route::get('/dashboard/exportar', [DashboardController::class, 'export'])->name('dashboard.export');
+
+        // Minutas de reunión (formato de Excel de 5 secciones)
+        Route::post('/minutas/importar', [MinuteController::class, 'import'])->name('minutes.import');
+        Route::resource('minutas', MinuteController::class)->parameters(['minutas' => 'minute'])->names('minutes');
     });
 
     // Actividades (los permisos finos están en ActivityPolicy)
