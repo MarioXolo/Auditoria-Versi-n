@@ -8,7 +8,7 @@ Portal web para controlar y auditar las actividades y la asistencia del personal
 |---|---|
 | **Administrador** | Todo: es el único que crea, edita y desactiva usuarios. |
 | **Gerente** | Todo lo demás: ve todas las actividades y la asistencia, asigna a encargados y empleados, administra equipos, consulta la lista de usuarios y usa el dashboard de auditoría. No crea ni edita usuarios. |
-| **Encargado** | Solo crea y asigna actividades a los empleados de su equipo. Ve las actividades que él asignó, las que le asignaron a él y las que sus empleados se cargaron, y las marca como completadas o incompletas. No ve las de otros encargados. Ve la asistencia y las fotos de entrada de su equipo. |
+| **Encargado** | Solo crea y asigna actividades a los empleados de su equipo. Ve las actividades que él asignó, las que le asignaron a él y las que sus empleados se cargaron, y las marca como completadas o incompletas. No ve las de otros encargados. Ve la asistencia de su equipo. |
 | **Empleado** | Solo ve las actividades asignadas a él, aunque comparta equipo con otros. Puede cargarse actividades a sí mismo, pero no editarlas, borrarlas ni marcarlas. Registra su entrada y salida. |
 
 ## Módulos de esta versión
@@ -23,7 +23,7 @@ Portal web para controlar y auditar las actividades y la asistencia del personal
 - **Catálogos** (administrador y gerente): altas, cambios de nombre y activación de tipos de actividad y comunidades. Lo que ya tiene actividades no se borra; se desactiva para que deje de salir en el formulario.
 - **Estado de la actividad**: a mano se elige *No iniciado*, *En proceso* o *Suspendida* (también lo puede cambiar el empleado asignado). Un superior revisa con el checkbox: verde ✓ la pone en *Concluido* y rojo ✗ en *No completada* (la actividad se pinta de rojo). Volver a tocar la marca la regresa a *En proceso*. Nadie marca una actividad asignada a sí mismo. El dashboard cuenta Concluido y No completada.
 - **Actividades cargadas por el empleado**: el empleado puede cargarse actividades a sí mismo (no editarlas ni borrarlas); su encargado las ve y las marca.
-- **Asistencia**: entrada con foto obligatoria tomada desde la cámara y salida con foto opcional. Encargados, gerentes y administradores ven quién registró y quién no, por día.
+- **Asistencia (checador)**: un solo botón que registra la entrada y después la salida, sin foto, solo de lunes a viernes (configurable con `AUDITORIA_DIAS_LABORALES`). Marca retardo después de la hora de entrada más la tolerancia. Encargados, gerentes y administradores ven quién registró y quién no, por día; las fotos de registros anteriores se siguen pudiendo consultar.
 - **Dashboard** (administrador y gerente): indicadores del periodo, cumplimiento por persona, quién tiene más actividades asignadas, desempeño de encargados, personal sin entrada hoy, avance por tipo de actividad y por comunidad, y movimientos recientes.
 - **Mi perfil**: cada usuario cambia su contraseña.
 

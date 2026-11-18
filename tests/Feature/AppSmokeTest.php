@@ -193,24 +193,48 @@ class AppSmokeTest extends TestCase
 
     public function test_check_in_and_check_out(): void
     {
-        $this->actingAs($this->empleado)->post('/asistencia/entrada', ['photo' => UploadedFile::fake()->create('selfie.jpg', 200, 'image/jpeg')])
-            ->assertSessionHasNoErrors();
-        $this->actingAs($this->empleado)->post('/asistencia/entrada', ['photo' => UploadedFile::fake()->create('selfie.jpg', 200, 'image/jpeg')])
-            ->assertSessionHasErrors('photo');
-        $this->actingAs($this->empleado)->post('/asistencia/salida')->assertSessionHasNoErrors();
+        $this->travelTo(now()->setTimezone('America/Mexico_City')->next('Wednesday')->setTime(9, 5));
 
+        // Un solo botón, sin foto: primero entrada, luego salida
+        $this->actingAs($this->empleado)->get('/asistencia')->assertOk()->assertSee('Registrar entrada')->assertDontSee('Tomar foto');
+        $this->actingAs($this->empleado)->post('/asistencia/registrar')->assertSessionHasNoErrors()->assertSessionHas('status', 'Entrada registrada a las 09:05.');
+        $this->actingAs($this->empleado)->get('/asistencia')->assertSee('Registrar salida');
+
+        $this->travel(8)->hours();
+        $this->actingAs($this->empleado)->post('/asistencia/registrar', ['notes' => 'Termino en campo'])->assertSessionHasNoErrors();
         $att = Attendance::where('user_id', $this->empleado->id)->first();
-        $this->assertNotNull($att->check_out_at);
+        $this->assertSame('09:05', $att->check_in_at->format('H:i'));
+        $this->assertSame('17:05', $att->check_out_at->format('H:i'));
+        $this->assertNull($att->check_in_photo);
+        $this->assertSame('Termino en campo', $att->notes);
+        $this->actingAs($this->empleado)->get('/asistencia')->assertSee('Jornada completa');
+
+        // Un tercer registro el mismo día se rechaza
+        $this->actingAs($this->empleado)->post('/asistencia/registrar')->assertSessionHasErrors('asistencia');
+        $this->assertSame(1, Attendance::count());
+
+        // Sábado y domingo no se puede checar
+        foreach (['Saturday', 'Sunday'] as $day) {
+            $this->travelTo(now()->next($day)->setTime(10, 0));
+            $this->actingAs($this->otroEmpleado)->get('/asistencia')->assertSee('Hoy no es día laboral')->assertDontSee('Registrar entrada');
+            $this->actingAs($this->otroEmpleado)->post('/asistencia/registrar')->assertSessionHasErrors('asistencia');
+        }
+        $this->assertSame(0, Attendance::where('user_id', $this->otroEmpleado->id)->count());
+
+        // Las fotos de registros anteriores se siguen viendo, con los mismos permisos
+        Storage::fake('local');
+        Storage::disk('local')->put('asistencia/vieja.jpg', 'x');
+        $att->update(['check_in_photo' => 'asistencia/vieja.jpg']);
         $this->actingAs($this->empleado)->get("/asistencia/{$att->id}/foto/entrada")->assertOk();
         $this->actingAs($this->gerente)->get("/asistencia/{$att->id}/foto/entrada")->assertOk();
         $this->actingAs($this->encargado)->get("/asistencia/{$att->id}/foto/entrada")->assertOk();
         $this->actingAs($this->otroEmpleado)->get("/asistencia/{$att->id}/foto/entrada")->assertForbidden();
-
-        // Encargados ven la asistencia de su equipo; otro encargado no ve las fotos de este equipo
-        $this->actingAs($this->encargado)->get('/asistencia')->assertOk()->assertSee('Asistencia del personal')->assertSee($this->empleado->name);
-        $this->actingAs($this->gerente)->get('/asistencia')->assertOk()->assertSee('Asistencia del personal');
         $otroEncargado = User::factory()->role('encargado')->create();
         $this->actingAs($otroEncargado)->get("/asistencia/{$att->id}/foto/entrada")->assertForbidden();
+
+        // Encargados ven la asistencia de su equipo; el empleado no
+        $this->actingAs($this->encargado)->get('/asistencia')->assertOk()->assertSee('Asistencia del personal')->assertSee($this->empleado->name);
+        $this->actingAs($this->gerente)->get('/asistencia')->assertOk()->assertSee('Asistencia del personal');
         $this->actingAs($this->empleado)->get('/asistencia')->assertOk()->assertDontSee('Asistencia del personal');
     }
 

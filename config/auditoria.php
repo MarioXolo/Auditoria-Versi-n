@@ -29,8 +29,8 @@ return [
     'hora_entrada' => env('AUDITORIA_HORA_ENTRADA', '09:00'),
     'tolerancia_minutos' => (int) env('AUDITORIA_TOLERANCIA', 10),
 
-    // Días laborales (ISO: 1 = lunes ... 7 = domingo)
-    'dias_laborales' => array_map('intval', explode(',', env('AUDITORIA_DIAS_LABORALES', '1,2,3,4,5,6'))),
+    // Días laborales (ISO: 1 = lunes ... 7 = domingo). El checador solo acepta registros estos días.
+    'dias_laborales' => array_map('intval', explode(',', env('AUDITORIA_DIAS_LABORALES', '1,2,3,4,5'))),
 
     // Metas de cada indicador (en %). Verde: >= meta. Ámbar: >= meta - margen. Rojo: menor.
     'metas' => [

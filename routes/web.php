@@ -56,8 +56,7 @@ Route::middleware(['auth', 'active'])->group(function () {
 
     // Asistencia
     Route::get('/asistencia', [AttendanceController::class, 'index'])->name('attendance.index');
-    Route::post('/asistencia/entrada', [AttendanceController::class, 'checkIn'])->name('attendance.check-in');
-    Route::post('/asistencia/salida', [AttendanceController::class, 'checkOut'])->name('attendance.check-out');
+    Route::post('/asistencia/registrar', [AttendanceController::class, 'register'])->middleware('throttle:10,1')->name('attendance.register');
     Route::get('/asistencia/{attendance}/foto/{type}', [AttendanceController::class, 'photo'])
         ->whereIn('type', ['entrada', 'salida'])
         ->name('attendance.photo');

@@ -58,64 +58,46 @@ class AttendanceController extends Controller
         return view('attendance.index', $data);
     }
 
-    public function checkIn(Request $request): RedirectResponse
+    /**
+     * Un solo botón: registra la entrada si aún no hay, o la salida si ya hay entrada.
+     * Sin foto. Solo en días laborales (lunes a viernes).
+     */
+    public function register(Request $request): RedirectResponse
     {
-        $user = $request->user();
+        $request->validate(['notes' => ['nullable', 'string', 'max:500']]);
 
-        $request->validate([
-            'photo' => ['required', 'image', 'max:8192'],
-            'notes' => ['nullable', 'string', 'max:500'],
-        ], [
-            'photo.required' => 'Toma una foto para registrar tu entrada.',
-        ], ['photo' => 'foto']);
-
-        $exists = Attendance::where('user_id', $user->id)->whereDate('work_date', today())->exists();
-
-        if ($exists) {
-            return back()->withErrors(['photo' => 'Ya registraste tu entrada de hoy.']);
+        if (! Attendance::isWorkday()) {
+            return back()->withErrors(['asistencia' => 'Hoy no es día laboral. El checador solo registra de '.Attendance::workdaysLabel().'.']);
         }
 
-        Attendance::create([
-            'user_id' => $user->id,
-            'work_date' => today()->toDateString(),
-            'check_in_at' => now(),
-            'check_in_photo' => PhotoStorage::store($request->file('photo'), 'asistencia/'.today()->format('Y-m')),
-            'notes' => $request->input('notes'),
-        ]);
-
-        return back()->with('status', 'Entrada registrada a las '.now()->format('H:i').'.');
-    }
-
-    public function checkOut(Request $request): RedirectResponse
-    {
         $user = $request->user();
-
-        $request->validate([
-            'photo' => ['nullable', 'image', 'max:8192'],
-        ], [], ['photo' => 'foto']);
-
         $attendance = Attendance::where('user_id', $user->id)->whereDate('work_date', today())->first();
 
         if (! $attendance) {
-            return back()->withErrors(['photo' => 'Primero registra tu entrada.']);
+            Attendance::create([
+                'user_id' => $user->id,
+                'work_date' => today()->toDateString(),
+                'check_in_at' => now(),
+                'notes' => $request->input('notes'),
+            ]);
+
+            return back()->with('status', 'Entrada registrada a las '.now()->format('H:i').'.');
         }
 
         if ($attendance->check_out_at) {
-            return back()->withErrors(['photo' => 'Ya registraste tu salida de hoy.']);
+            return back()->withErrors(['asistencia' => 'Ya registraste tu entrada y tu salida de hoy.']);
         }
 
         $attendance->check_out_at = now();
-
-        if ($request->hasFile('photo')) {
-            $attendance->check_out_photo = PhotoStorage::store($request->file('photo'), 'asistencia/'.today()->format('Y-m'));
+        if ($request->filled('notes')) {
+            $attendance->notes = trim(($attendance->notes ? $attendance->notes.' · ' : '').$request->input('notes'));
         }
-
         $attendance->save();
 
-        return back()->with('status', 'Salida registrada a las '.now()->format('H:i').'.');
+        return back()->with('status', 'Salida registrada a las '.now()->format('H:i').'. Jornada de '.$attendance->workedTime().'.');
     }
 
-    /** Foto de entrada o salida, solo para quien tiene permiso de verla. */
+    /** Foto de entrada o salida de registros anteriores (el checador ya no pide foto). */
     public function photo(Request $request, Attendance $attendance, string $type): StreamedResponse
     {
         $viewer = $request->user();
