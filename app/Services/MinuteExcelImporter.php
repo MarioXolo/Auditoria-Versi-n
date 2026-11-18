@@ -7,6 +7,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 use SimpleXMLElement;
+use Throwable;
 use ZipArchive;
 
 /**
@@ -167,21 +168,17 @@ class MinuteExcelImporter
     /** @return array<int, array<string, string|float>> renglón => [columna => valor] */
     private function readFirstSheet(string $path): array
     {
-        $zip = new ZipArchive;
-        if ($zip->open($path) !== true) {
-            throw new RuntimeException('El archivo no es un Excel (.xlsx) válido.');
-        }
+        [$read, $close] = $this->openXlsx($path);
 
         try {
             $shared = [];
-            if (($xml = $zip->getFromName('xl/sharedStrings.xml')) !== false) {
+            if (($xml = $read('xl/sharedStrings.xml')) !== false) {
                 foreach ($this->xml($xml)->si as $si) {
                     $shared[] = $this->inlineText($si);
                 }
             }
 
-            $sheetPath = $this->firstSheetPath($zip);
-            $sheet = $zip->getFromName($sheetPath);
+            $sheet = $read($this->firstSheetPath($read));
             if ($sheet === false) {
                 throw new RuntimeException('El Excel no tiene hojas.');
             }
@@ -193,14 +190,13 @@ class MinuteExcelImporter
                     if (! $ref) {
                         continue;
                     }
-                    $type = (string) $c['t'];
-                    $value = match ($type) {
+                    $value = match ((string) $c['t']) {
                         's' => $shared[(int) $c->v] ?? '',
                         'inlineStr' => $this->inlineText($c->is),
                         'str', 'b', 'e' => (string) $c->v,
                         default => isset($c->v) ? (float) $c->v : null,
                     };
-                    if ($value !== null && $value !== '' && ! (is_string($value) && trim($value) === '')) {
+                    if ($value !== null && ! (is_string($value) && trim($value) === '')) {
                         $rows[(int) $ref[2]][$ref[1]] = $value;
                     }
                 }
@@ -209,17 +205,61 @@ class MinuteExcelImporter
 
             return $rows;
         } finally {
-            $zip->close();
+            $close();
         }
     }
 
-    private function firstSheetPath(ZipArchive $zip): string
+    /**
+     * Abre el .xlsx (un ZIP). Usa la extensión zip si existe; si no, el lector
+     * de archivos que trae PHP (Phar), para no depender de una extensión opcional.
+     *
+     * @return array{0: callable(string): (string|false), 1: callable(): void}
+     */
+    private function openXlsx(string $path): array
     {
-        $workbook = $zip->getFromName('xl/workbook.xml');
-        $rels = $zip->getFromName('xl/_rels/workbook.xml.rels');
+        $head = @file_get_contents($path, false, null, 0, 4);
+        if ($head !== "PK\x03\x04") {
+            throw new RuntimeException('El archivo no es un Excel (.xlsx) válido.');
+        }
+
+        if (class_exists(ZipArchive::class)) {
+            $zip = new ZipArchive;
+            if ($zip->open($path) !== true) {
+                throw new RuntimeException('El archivo no es un Excel (.xlsx) válido.');
+            }
+
+            return [fn (string $name) => $zip->getFromName($name), fn () => $zip->close()];
+        }
+
+        // Phar reconoce el formato por la extensión, así que se trabaja sobre una copia .zip
+        $base = tempnam(sys_get_temp_dir(), 'xlsx');
+        $tmp = $base.'.zip';
+        copy($path, $tmp);
+        @unlink($base);
+        try {
+            new \PharData($tmp);
+        } catch (Throwable) {
+            @unlink($tmp);
+            throw new RuntimeException('El archivo no es un Excel (.xlsx) válido.');
+        }
+        $read = function (string $name) use ($tmp) {
+            $file = 'phar://'.$tmp.'/'.$name;
+
+            return file_exists($file) ? file_get_contents($file) : false;
+        };
+
+        return [$read, function () use ($tmp) {
+            \Phar::unlinkArchive($tmp);
+        }];
+    }
+
+    /** @param  callable(string): (string|false)  $read */
+    private function firstSheetPath(callable $read): string
+    {
+        $workbook = $read('xl/workbook.xml');
+        $rels = $read('xl/_rels/workbook.xml.rels');
         if ($workbook && $rels) {
-            $wb = $this->xml($workbook);
-            $first = $wb->sheets->sheet[0] ?? null;
+            $first = $this->xml($workbook)->sheets->sheet[0] ?? null;
             if ($first) {
                 $rid = (string) $first->attributes('http://schemas.openxmlformats.org/officeDocument/2006/relationships')['id'];
                 foreach ($this->xml($rels)->Relationship as $rel) {
