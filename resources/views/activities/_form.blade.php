@@ -55,9 +55,9 @@
 
     {{-- Asignar a --}}
     <div class="sm:col-span-2">
-        @if (auth()->user()->isEmpleado())
+        @if (auth()->user()->selfAssignOnly())
             <div class="rounded-lg bg-brand-50 px-4 py-3 text-sm text-brand-700">
-                La actividad quedará a tu nombre. Tu encargado la revisará: verde la pone en «Concluido» y rojo en «No completada».
+                La actividad quedará a tu nombre. Un gerente la revisará: verde la pone en «Concluido» y rojo en «No completada».
             </div>
         @else
             <label for="assigned_to" class="label">Asignar a *</label>

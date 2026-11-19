@@ -124,7 +124,7 @@ class AttendanceController extends Controller
         $query = User::active()->orderBy('name');
 
         if ($user->seesEverything()) {
-            return $query->whereIn('role', [Role::Encargado->value, Role::Empleado->value]);
+            return $query->whereIn('role', [Role::Gerente->value, Role::Encargado->value]);
         }
 
         return $query->whereIn('id', $user->teamMemberIds() ?: [0])

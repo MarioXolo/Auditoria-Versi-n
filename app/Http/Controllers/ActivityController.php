@@ -93,8 +93,8 @@ class ActivityController extends Controller
         $this->authorize('create', Activity::class);
         $user = $request->user();
 
-        // El empleado solo se carga actividades a sí mismo
-        if ($user->isEmpleado()) {
+        // El encargado solo se carga actividades a sí mismo
+        if ($user->selfAssignOnly()) {
             $request->merge(['assigned_to' => $user->id]);
         }
 
@@ -112,8 +112,8 @@ class ActivityController extends Controller
 
         $activity = Activity::create($data);
 
-        $message = $user->isEmpleado()
-            ? "Actividad {$activity->code} cargada. Tu encargado la marcará cuando la revise."
+        $message = $user->selfAssignOnly()
+            ? "Actividad {$activity->code} cargada. Un gerente la marcará cuando la revise."
             : "Actividad {$activity->code} creada y asignada.";
 
         return redirect()->route('activities.show', $activity)->with('status', $message);
@@ -335,7 +335,7 @@ class ActivityController extends Controller
         $previews = $people->mapWithKeys(fn ($p) => [$p->id => Activity::nextCode($groupOf($p->team_id))]);
         $code = match (true) {
             $activity->exists => $activity->code,
-            $user->isEmpleado() => Activity::nextCode($groupOf($user->team_id)),
+            $user->selfAssignOnly() => Activity::nextCode($groupOf($user->team_id)),
             (bool) $activity->assigned_to => $previews[$activity->assigned_to] ?? Activity::nextCode(0),
             // Si todas las personas son del mismo equipo (caso del encargado), el folio ya se conoce
             $previews->unique()->count() === 1 => $previews->first(),
@@ -360,10 +360,6 @@ class ActivityController extends Controller
             return Team::orderBy('name')->get(['id', 'name']);
         }
 
-        if ($user->isEncargado()) {
-            return $user->ledTeams()->orderBy('name')->get(['id', 'name']);
-        }
-
         return collect();
     }
 
@@ -373,6 +369,6 @@ class ActivityController extends Controller
             return User::orderBy('name')->get(['id', 'name']);
         }
 
-        return User::whereIn('id', [...$user->teamMemberIds(), $user->id])->orderBy('name')->get(['id', 'name']);
+        return User::whereKey($user->id)->get(['id', 'name']);
     }
 }

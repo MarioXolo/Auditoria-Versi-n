@@ -28,16 +28,11 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['auth', 'active'])->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-    // Inicio: administradores y gerentes van al dashboard, el resto a sus actividades
-    Route::get('/', function () {
-        return auth()->user()->seesEverything()
-            ? redirect()->route('dashboard')
-            : redirect()->route('activities.index');
-    })->name('home');
+    // Inicio: todos van a su dashboard (el de auditoría, o el propio del encargado)
+    Route::get('/', fn () => redirect()->route('dashboard'))->name('home');
+    Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
-    // Dashboard de auditoría
     Route::middleware('role:admin,gerente')->group(function () {
-        Route::get('/dashboard', DashboardController::class)->name('dashboard');
         Route::get('/dashboard/exportar', [DashboardController::class, 'export'])->name('dashboard.export');
 
         // Minutas de reunión (formato de Excel de 5 secciones)
@@ -54,12 +49,14 @@ Route::middleware(['auth', 'active'])->group(function () {
     // Calendario de actividades (cada quien ve lo que su rol le permite); se imprime a PDF desde el navegador
     Route::get('/calendario', CalendarController::class)->name('calendar.index');
 
-    // Asistencia
-    Route::get('/asistencia', [AttendanceController::class, 'index'])->name('attendance.index');
-    Route::post('/asistencia/registrar', [AttendanceController::class, 'register'])->middleware('throttle:10,1')->name('attendance.register');
-    Route::get('/asistencia/{attendance}/foto/{type}', [AttendanceController::class, 'photo'])
-        ->whereIn('type', ['entrada', 'salida'])
-        ->name('attendance.photo');
+    // Asistencia (checador): solo el administrador. No interviene en ningún indicador.
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/asistencia', [AttendanceController::class, 'index'])->name('attendance.index');
+        Route::post('/asistencia/registrar', [AttendanceController::class, 'register'])->middleware('throttle:10,1')->name('attendance.register');
+        Route::get('/asistencia/{attendance}/foto/{type}', [AttendanceController::class, 'photo'])
+            ->whereIn('type', ['entrada', 'salida'])
+            ->name('attendance.photo');
+    });
 
     // Perfil
     Route::get('/perfil', [ProfileController::class, 'edit'])->name('profile.edit');

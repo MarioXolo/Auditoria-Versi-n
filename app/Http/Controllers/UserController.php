@@ -40,7 +40,7 @@ class UserController extends Controller
     public function create(): View
     {
         return view('users.create', [
-            'user' => new User(['role' => Role::Empleado, 'active' => true]),
+            'user' => new User(['role' => Role::Encargado, 'active' => true]),
             'roles' => Role::options(),
             'teams' => Team::orderBy('name')->get(['id', 'name']),
         ]);
@@ -101,7 +101,7 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user?->id)],
             'phone' => ['nullable', 'string', 'max:30'],
-            'role' => ['required', new Enum(Role::class)],
+            'role' => ['required', Rule::in(array_keys(Role::options()))],
             'team_id' => ['nullable', 'integer', 'exists:teams,id'],
             'password' => [$user ? 'nullable' : 'required', 'confirmed', Password::min(8)],
         ], [], [

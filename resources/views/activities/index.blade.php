@@ -4,7 +4,7 @@
 
 @section('header')
     <div>
-        <h1 class="text-2xl font-semibold">{{ auth()->user()->isEmpleado() ? 'Mis actividades' : 'Actividades' }}</h1>
+        <h1 class="text-2xl font-semibold">{{ auth()->user()->selfAssignOnly() ? 'Mis actividades' : 'Actividades' }}</h1>
         <p class="text-sm text-slate-500">{{ $activities->total() }} {{ $activities->total() === 1 ? 'actividad' : 'actividades' }}</p>
     </div>
     @can('create', \App\Models\Activity::class)
@@ -146,8 +146,8 @@
                         </td>
                         <td class="table-cell">
                             <span class="badge {{ $activity->status->badge() }}">{{ $activity->status->label() }}</span>
-                            @if ($activity->isSelfAssigned() && $activity->assignee?->isEmpleado())
-                                <span class="mt-1 block text-xs text-slate-500">Cargada por el empleado</span>
+                            @if ($activity->isSelfAssigned() && $activity->assignee?->selfAssignOnly())
+                                <span class="mt-1 block text-xs text-slate-500">Se la cargó él mismo</span>
                             @endif
                         </td>
                     </tr>

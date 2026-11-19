@@ -37,7 +37,7 @@
         <h1 class="text-2xl font-semibold">Dashboard de auditoría</h1>
         <p class="text-sm text-slate-500">
             {{ $metrics->from->translatedFormat('j M Y') }} – {{ $metrics->to->translatedFormat('j M Y') }}
-            · {{ $kpi['workdays'] }} días laborales · actualizado {{ now()->format('H:i') }}
+            · actualizado {{ now()->format('H:i') }}
         </p>
     </div>
 
@@ -63,12 +63,10 @@
 
 @section('content')
     {{-- KPI principales con meta y semáforo --}}
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
         @foreach ([
             ['key' => 'cumplimiento', 'label' => 'Cumplimiento', 'hint' => $kpi['completed'].' de '.($kpi['total'] - $kpi['cancelled']).' marcadas «Concluido»'],
             ['key' => 'a_tiempo', 'label' => 'Entrega a tiempo', 'hint' => 'de las concluidas, antes de su fecha de fin'],
-            ['key' => 'asistencia', 'label' => 'Asistencia', 'hint' => $kpi['present'].' de '.$kpi['expected'].' jornadas esperadas'],
-            ['key' => 'puntualidad', 'label' => 'Puntualidad', 'hint' => $kpi['late'].' retardos (entrada después de '.config('auditoria.hora_entrada').' + '.config('auditoria.tolerancia_minutos').' min)'],
         ] as $card)
             @php
                 $value = $kpi[$card['key']];
@@ -99,7 +97,7 @@
             ['label' => 'Actividades', 'value' => $kpi['total'], 'sub' => $kpi['sin_marcar'].' sin revisar · '.$kpi['incompletas'].' no completadas', 'delta' => $deltaHtml($delta['total'], ''), 'link' => route('activities.index')],
             ['label' => 'Vencidas', 'value' => $kpi['overdue'], 'sub' => 'abiertas con fecha de fin pasada', 'delta' => $deltaHtml($delta['overdue'], '', true), 'link' => route('activities.index', ['status' => 'vencida']), 'alert' => $kpi['overdue'] > 0],
             ['label' => 'Tiempo de cierre', 'value' => $fmt($kpi['dias_cierre'], ' días'), 'sub' => 'promedio de creación a completado', 'delta' => $deltaHtml($delta['dias_cierre'], 'días', true)],
-            ['label' => 'Horas por jornada', 'value' => $fmt($kpi['horas'], ' h'), 'sub' => 'promedio entre entrada y salida', 'delta' => $deltaHtml($delta['horas'], 'h')],
+            ['label' => 'Duración promedio', 'value' => $fmt($durations['duracion'], ' días'), 'sub' => 'de la fecha de inicio a concluida · planeado '.$fmt($durations['planeado'], ' días'), 'delta' => ''],
         ] as $card)
             @php $tag = isset($card['link']) ? 'a' : 'div'; @endphp
             <{{ $tag }} @if (isset($card['link'])) href="{{ $card['link'] }}" @endif class="card block p-4 {{ isset($card['link']) ? 'transition hover:border-brand-500' : '' }}">
@@ -184,12 +182,7 @@
         </section>
     </div>
 
-    <div class="mt-6 grid gap-6 lg:grid-cols-2">
-        <section class="card p-5">
-            <h2 class="font-semibold">Asistencia y puntualidad diaria</h2>
-            <p class="text-xs text-slate-500">Días laborales, últimos 30 días como máximo</p>
-            <div class="mt-4 h-60"><canvas id="chart-attendance" role="img" aria-label="Gráfica de asistencia y puntualidad"></canvas></div>
-        </section>
+    <div class="mt-6">
         <section class="card p-5">
             <h2 class="font-semibold">Por tipo de actividad</h2>
             <p class="text-xs text-slate-500">Concluidas, no completadas y sin revisar de cada tipo</p>
@@ -284,9 +277,6 @@
                         <th class="table-head text-right">Cumplimiento</th>
                         <th class="table-head text-right">A tiempo</th>
                         <th class="table-head text-right">Días cierre</th>
-                        <th class="table-head text-right">Asistencia</th>
-                        <th class="table-head text-right">Faltas</th>
-                        <th class="table-head text-right">Retardos</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -296,7 +286,7 @@
                                 <a href="{{ route('activities.index', ['assigned_to' => $row->user->id]) }}" class="font-medium whitespace-nowrap text-slate-900 hover:text-brand-600">{{ $row->user->name }}</a>
                                 <span class="block text-xs whitespace-nowrap text-slate-500">{{ $row->user->role->label() }}{{ $row->user->team ? ' · '.$row->user->team->name : '' }}</span>
                             </td>
-                            <td class="table-cell text-right font-medium tabular-nums">{{ $row->assigned }}</td>
+                            <td class="table-cell text-right font-medium tabular-nums">{{ $row->assigned }}<span class="block text-xs font-normal text-slate-500">{{ $row->propias }} propias</span></td>
                             <td class="table-cell text-right tabular-nums">{{ $row->completed }}</td>
                             <td @class(['table-cell text-right tabular-nums', 'font-semibold text-rose-600' => $row->incompletas > 0])>{{ $row->incompletas }}</td>
                             <td @class(['table-cell text-right tabular-nums', 'font-semibold text-rose-600' => $row->overdue > 0])>{{ $row->overdue }}</td>
@@ -304,62 +294,18 @@
                                 <td class="table-cell text-right"><span class="badge tabular-nums {{ $tone[M::status($k, $row->$k)]['chip'] }}">{{ $fmt($row->$k) }}</span></td>
                             @endforeach
                             <td class="table-cell text-right tabular-nums">{{ $fmt($row->dias_cierre, '') }}</td>
-                            <td class="table-cell text-right"><span class="badge tabular-nums {{ $tone[M::status('asistencia', $row->asistencia)]['chip'] }}">{{ $fmt($row->asistencia) }}</span></td>
-                            <td @class(['table-cell text-right tabular-nums', 'font-semibold text-rose-600' => $row->absences >= 2])>{{ $row->absences }}</td>
-                            <td @class(['table-cell text-right tabular-nums', 'font-semibold text-amber-700' => $row->late >= 3])>{{ $row->late }}</td>
                         </tr>
                     @empty
-                        <tr><td colspan="11" class="table-cell py-8 text-center text-slate-500">No hay personal activo con estos filtros.</td></tr>
+                        <tr><td colspan="8" class="table-cell py-8 text-center text-slate-500">No hay encargados activos con estos filtros.</td></tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
     </section>
 
-    {{-- Auditoría de encargados --}}
-    <section class="card mt-6 overflow-hidden">
-        <div class="border-b border-slate-200 px-5 py-4">
-            <h2 class="font-semibold">Auditoría de encargados</h2>
-            <p class="text-xs text-slate-500">Lo que cada encargado asignó en el periodo, cómo se cumplió y la asistencia de su equipo</p>
-        </div>
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-slate-200">
-                <thead class="bg-slate-50">
-                    <tr>
-                        <th class="table-head">Encargado</th>
-                        <th class="table-head text-right">Integrantes</th>
-                        <th class="table-head text-right">Asignó</th>
-                        <th class="table-head text-right">Concluidas</th>
-                        <th class="table-head text-right">Vencidas</th>
-                        <th class="table-head text-right">Cumplimiento</th>
-                        <th class="table-head text-right">A tiempo</th>
-                        <th class="table-head text-right">Asistencia del equipo</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100">
-                    @forelse ($leaders as $leader)
-                        <tr>
-                            <td class="table-cell">
-                                <span class="font-medium whitespace-nowrap text-slate-900">{{ $leader->user->name }}</span>
-                                <span class="block text-xs text-slate-500">{{ $leader->teams ?: 'Sin equipo a cargo' }}</span>
-                            </td>
-                            <td class="table-cell text-right tabular-nums">{{ $leader->members }}</td>
-                            <td class="table-cell text-right font-medium tabular-nums">{{ $leader->assigned }}</td>
-                            <td class="table-cell text-right tabular-nums">{{ $leader->completed }}</td>
-                            <td @class(['table-cell text-right tabular-nums', 'font-semibold text-rose-600' => $leader->overdue > 0])>{{ $leader->overdue }}</td>
-                            <td class="table-cell text-right"><span class="badge tabular-nums {{ $tone[M::status('cumplimiento', $leader->cumplimiento)]['chip'] }}">{{ $fmt($leader->cumplimiento) }}</span></td>
-                            <td class="table-cell text-right"><span class="badge tabular-nums {{ $tone[M::status('a_tiempo', $leader->a_tiempo)]['chip'] }}">{{ $fmt($leader->a_tiempo) }}</span></td>
-                            <td class="table-cell text-right"><span class="badge tabular-nums {{ $tone[M::status('asistencia', $leader->asistencia_equipo)]['chip'] }}">{{ $fmt($leader->asistencia_equipo) }}</span></td>
-                        </tr>
-                    @empty
-                        <tr><td colspan="8" class="table-cell py-6 text-center text-slate-500">No hay encargados registrados.</td></tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </section>
+    @include('dashboard._durations', ['d' => $durations, 'showPerson' => true])
 
-    <div class="mt-6 grid gap-6 lg:grid-cols-2">
+    <div class="mt-6">
         {{-- Movimientos recientes --}}
         <section class="card overflow-hidden">
             <div class="border-b border-slate-200 px-5 py-4">
@@ -370,33 +316,12 @@
                     <li class="flex items-center justify-between gap-3 px-5 py-3">
                         <div class="min-w-0">
                             <a href="{{ route('activities.show', $activity) }}" class="block truncate text-sm font-medium hover:text-brand-600"><span class="font-mono text-xs text-slate-500">{{ $activity->code }}</span> {{ $activity->type?->name }} · {{ $activity->community?->name }}</a>
-                            <span class="block truncate text-xs text-slate-500">{{ $activity->assignee?->name }} · asignada por {{ $activity->creator?->name }} · {{ $activity->updated_at->diffForHumans() }}</span>
+                            <span class="block truncate text-xs text-slate-500">{{ $activity->assignee?->name }} · {{ $activity->isSelfAssigned() ? 'se la cargó él' : 'asignada por '.$activity->creator?->name }} · {{ $activity->updated_at->diffForHumans() }}</span>
                         </div>
                         <span class="badge {{ $activity->status->badge() }}">{{ $activity->status->label() }}</span>
                     </li>
                 @empty
                     <li class="px-5 py-6 text-center text-sm text-slate-500">Aún no hay actividades.</li>
-                @endforelse
-            </ul>
-        </section>
-
-        {{-- Sin entrada hoy --}}
-        <section class="card overflow-hidden">
-            <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
-                <div>
-                    <h2 class="font-semibold">Sin entrada registrada hoy</h2>
-                    <p class="text-xs text-slate-500">{{ now()->translatedFormat('l j \d\e F') }}</p>
-                </div>
-                <span class="badge {{ $absent->isEmpty() ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800' }}">{{ $absent->count() }}</span>
-            </div>
-            <ul class="max-h-96 divide-y divide-slate-100 overflow-y-auto">
-                @forelse ($absent as $person)
-                    <li class="flex items-center justify-between px-5 py-3 text-sm">
-                        <span>{{ $person->name }}</span>
-                        <span class="text-xs text-slate-500">{{ $person->role->label() }}{{ $person->team ? ' · '.$person->team->name : '' }}</span>
-                    </li>
-                @empty
-                    <li class="px-5 py-6 text-center text-sm text-slate-500">Todo el personal registró su entrada, o hoy no es día laboral.</li>
                 @endforelse
             </ul>
         </section>
@@ -429,7 +354,7 @@
         </div>
         <p class="border-t border-slate-200 px-5 py-3 text-xs text-slate-500">
             Semáforo: verde en meta o arriba, ámbar hasta {{ config('auditoria.margen_ambar') }} puntos debajo de la meta, rojo por debajo de eso.
-            Días laborales: {{ collect(config('auditoria.dias_laborales'))->map(fn ($d) => ['', 'lun', 'mar', 'mié', 'jue', 'vie', 'sáb', 'dom'][$d])->join(', ') }}.
+            El checador de asistencia no interviene en ningún indicador.
         </p>
     </details>
 

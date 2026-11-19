@@ -110,15 +110,22 @@ class User extends Authenticatable
         return $this->hasRole(Role::Admin, Role::Gerente);
     }
 
-    /** Todos pueden cargar actividades; el empleado solo para sí mismo. */
+    /** Todos pueden cargar actividades; el encargado solo para sí mismo. */
     public function canCreateActivities(): bool
     {
         return true;
     }
 
+    /** Asignar a otras personas, revisar (verde/rojo) y ver la actividad de todos: administradores y gerentes. */
     public function canManageActivities(): bool
     {
-        return $this->hasRole(Role::Admin, Role::Gerente, Role::Encargado);
+        return $this->seesEverything();
+    }
+
+    /** El encargado (y las cuentas anteriores de empleado) solo se carga actividades a sí mismo. */
+    public function selfAssignOnly(): bool
+    {
+        return ! $this->seesEverything();
     }
 
     /** IDs de los equipos que encabeza (para encargados). */
@@ -142,8 +149,8 @@ class User extends Authenticatable
     /**
      * Usuarios a los que este usuario puede asignar actividades.
      * - Administrador: cualquiera activo.
-     * - Gerente: encargados y empleados.
-     * - Encargado: empleados de sus equipos.
+     * - Gerente: encargados.
+     * - Encargado: solo a sí mismo.
      */
     public function assignableUsers(): Builder
     {
@@ -151,11 +158,8 @@ class User extends Authenticatable
 
         return match ($this->role) {
             Role::Admin => $query,
-            Role::Gerente => $query->whereIn('role', [Role::Encargado->value, Role::Empleado->value]),
-            Role::Encargado => $query->where('role', Role::Empleado->value)
-                ->whereIn('team_id', $this->ledTeamIds() ?: [0]),
-            // Los empleados solo se cargan actividades a sí mismos
-            Role::Empleado => $query->whereKey($this->id),
+            Role::Gerente => $query->where('role', Role::Encargado->value),
+            Role::Encargado, Role::Empleado => $query->whereKey($this->id),
         };
     }
 

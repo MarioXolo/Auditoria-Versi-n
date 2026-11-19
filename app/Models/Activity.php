@@ -136,25 +136,84 @@ class Activity extends Model
             return $query;
         }
 
-        // Encargados: las que ellos asignaron, las que les asignaron a ellos y las que
-        // sus empleados se cargaron a sí mismos (para poder marcarlas).
-        // Empleados: solo las suyas.
-        if ($user->isEncargado()) {
-            $memberIds = $user->teamMemberIds();
+        // Encargado: solo las suyas (las que le asignaron y las que se cargó). No ve las de otros encargados.
+        return $query->where(fn (Builder $q) => $q->where('assigned_to', $user->id)->orWhere('created_by', $user->id));
+    }
 
-            return $query->where(function (Builder $q) use ($user, $memberIds) {
-                $q->where('created_by', $user->id)
-                    ->orWhere('assigned_to', $user->id);
+    // ------------------------------------------------------------------
+    // Duración: desde la fecha de inicio hasta que se marcó «Concluido»
+    // ------------------------------------------------------------------
 
-                if ($memberIds !== []) {
-                    $q->orWhere(fn (Builder $own) => $own
-                        ->whereIn('assigned_to', $memberIds)
-                        ->whereColumn('created_by', 'assigned_to'));
-                }
-            });
+    /** Día en que se terminó (se marcó «Concluido»), o null si no está concluida. */
+    public function finishedOn(): ?\Illuminate\Support\Carbon
+    {
+        if ($this->status !== ActivityStatus::Concluido) {
+            return null;
+        }
+        $at = $this->completed_at ?? $this->marked_at;
+
+        return $at?->copy()->startOfDay();
+    }
+
+    /** Días que duró: de la fecha de inicio al día en que se terminó, contando ambos (mismo día = 1). */
+    public function durationDays(): ?int
+    {
+        $end = $this->finishedOn();
+        if (! $end || ! $this->start_date) {
+            return null;
         }
 
-        return $query->where('assigned_to', $user->id);
+        return max(1, (int) $this->start_date->copy()->startOfDay()->diffInDays($end, false) + 1);
+    }
+
+    /** Días que se tenían planeados: de la fecha de inicio a la fecha de fin, contando ambos. */
+    public function plannedDays(): ?int
+    {
+        if (! $this->start_date || ! $this->end_date) {
+            return null;
+        }
+
+        return max(1, (int) $this->start_date->copy()->startOfDay()->diffInDays($this->end_date->copy()->startOfDay(), false) + 1);
+    }
+
+    /**
+     * Días contra la fecha de fin: negativo = terminó antes, 0 = en la fecha, positivo = después.
+     * Null si no está concluida o no tiene fecha de fin.
+     */
+    public function deadlineDelta(): ?int
+    {
+        $end = $this->finishedOn();
+        if (! $end || ! $this->end_date) {
+            return null;
+        }
+
+        return (int) $this->end_date->copy()->startOfDay()->diffInDays($end, false);
+    }
+
+    /** «antes», «a_tiempo» (el mismo día) o «despues»; null si no aplica. */
+    public function deadlineResult(): ?string
+    {
+        $d = $this->deadlineDelta();
+
+        return match (true) {
+            $d === null => null,
+            $d < 0 => 'antes',
+            $d === 0 => 'a_tiempo',
+            default => 'despues',
+        };
+    }
+
+    public function deadlineLabel(): ?string
+    {
+        $d = $this->deadlineDelta();
+        $dias = fn (int $n) => $n === 1 ? '1 día' : "{$n} días";
+
+        return match (true) {
+            $d === null => null,
+            $d < 0 => 'Terminó '.$dias(-$d).' antes',
+            $d === 0 => 'Terminó en la fecha',
+            default => 'Terminó '.$dias($d).' después',
+        };
     }
 
     /** La cargó la misma persona que la tiene asignada (empleado o encargado). */

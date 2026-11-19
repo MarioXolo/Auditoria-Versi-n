@@ -6,13 +6,12 @@ use App\Models\Activity;
 use App\Models\User;
 
 /**
- * Reglas de acceso a actividades:
- * - Administrador y gerente: ven, editan y marcan todas.
- * - Encargado: ve las que asignó, las que le asignaron y las que sus empleados se cargaron;
- *   edita las que él asignó y marca las de su equipo.
- * - Empleado: ve solo las suyas, puede cargarse actividades a sí mismo y cambiar el estado
- *   (No iniciado, En proceso, Suspendida) de las que tiene asignadas; no edita ni marca.
- * - Nadie marca una actividad asignada a sí mismo: siempre la marca alguien con más privilegios.
+ * Reglas de acceso a actividades (versión 3: Admin, Gerente y Encargado):
+ * - Administrador y gerente: ven, editan y marcan todas; asignan a los encargados.
+ * - Encargado: ve solo las suyas (las que le asignaron y las que se cargó a sí mismo), nunca
+ *   las de otros encargados; edita las que él se cargó y cambia el estado manual
+ *   (No iniciado, En proceso, Suspendida) de las suyas. No marca verde/rojo.
+ * - Nadie marca una actividad asignada a sí mismo: siempre la marca un gerente o administrador.
  */
 class ActivityPolicy
 {
@@ -23,14 +22,9 @@ class ActivityPolicy
 
     public function view(User $user, Activity $activity): bool
     {
-        if ($user->seesEverything() || $activity->assigned_to === $user->id) {
-            return true;
-        }
-
-        return $user->isEncargado() && (
-            $activity->created_by === $user->id
-            || $this->isTeamSelfAssigned($user, $activity)
-        );
+        return $user->seesEverything()
+            || $activity->assigned_to === $user->id
+            || $activity->created_by === $user->id;
     }
 
     public function create(User $user): bool
@@ -45,7 +39,10 @@ class ActivityPolicy
             return true;
         }
 
-        return $user->isEncargado() && $activity->created_by === $user->id;
+        // El encargado edita lo que él mismo se cargó, mientras no la hayan revisado
+        return $activity->created_by === $user->id
+            && $activity->assigned_to === $user->id
+            && ! $activity->status->isMarked();
     }
 
     public function delete(User $user, Activity $activity): bool
@@ -74,20 +71,6 @@ class ActivityPolicy
             return false;
         }
 
-        if ($user->seesEverything()) {
-            return true;
-        }
-
-        return $user->isEncargado() && (
-            $activity->created_by === $user->id
-            || $this->isTeamSelfAssigned($user, $activity)
-        );
-    }
-
-    /** Actividad que un empleado del equipo del encargado se cargó a sí mismo. */
-    private function isTeamSelfAssigned(User $leader, Activity $activity): bool
-    {
-        return $activity->isSelfAssigned()
-            && in_array($activity->assigned_to, $leader->teamMemberIds(), true);
+        return $user->seesEverything();
     }
 }

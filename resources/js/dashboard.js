@@ -84,25 +84,6 @@ if (data) {
         options: { cutout: '68%', plugins: { legend: { position: 'bottom' } } },
     });
 
-    make('chart-attendance', {
-        type: 'line',
-        data: {
-            labels: data.attendance.map((d) => d.label),
-            datasets: [
-                { label: 'Asistencia', data: data.attendance.map((d) => d.asistencia), borderColor: C.brand, backgroundColor: C.brandSoft, fill: true, tension: 0.3, pointRadius: 2 },
-                { label: 'Puntualidad', data: data.attendance.map((d) => d.puntualidad), borderColor: C.amber, backgroundColor: C.amber, tension: 0.3, pointRadius: 2, spanGaps: true },
-            ],
-        },
-        options: { scales: { y: pctAxis, x: { ...noGrid, ticks: { maxRotation: 0, autoSkip: true, maxTicksLimit: 8 } } }, plugins: { legend: { position: 'bottom' } } },
-        plugins: [goalLine(data.goals.asistencia, 'Meta ' + data.goals.asistencia + '%')],
-    });
-
-    const progress = (rows) => [
-        { label: 'Concluidas', data: rows.map((r) => r.completadas), backgroundColor: C.green, borderRadius: 3 },
-        { label: 'No completadas', data: rows.map((r) => r.incompletas), backgroundColor: C.rose, borderRadius: 3 },
-        { label: 'Sin revisar', data: rows.map((r) => r.sin_marcar), backgroundColor: C.amber, borderRadius: 3 },
-    ];
-
     make('chart-types', {
         type: 'bar',
         data: { labels: data.types.map((r) => r.label), datasets: progress(data.types) },

@@ -114,7 +114,7 @@ class CalendarController extends Controller
     {
         $people = match (true) {
             $user->seesEverything() => User::orderBy('name')->get(['id', 'name']),
-            $user->isEncargado() => User::whereIn('id', [...$user->teamMemberIds(), $user->id])->orderBy('name')->get(['id', 'name']),
+
             default => collect(),
         };
 

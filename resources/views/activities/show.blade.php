@@ -13,8 +13,8 @@
             @if ($activity->isOverdue())
                 <span class="badge bg-rose-600 text-white">Vencida</span>
             @endif
-            @if ($activity->isSelfAssigned() && $activity->assignee?->isEmpleado())
-                <span class="badge bg-brand-50 text-brand-700">Cargada por el empleado</span>
+            @if ($activity->isSelfAssigned() && $activity->assignee?->selfAssignOnly())
+                <span class="badge bg-brand-50 text-brand-700">Se la cargó él mismo</span>
             @endif
         </div>
     </div>
@@ -141,12 +141,25 @@
                     'Fecha de fin' => $activity->end_date->format('d/m/Y'),
                     'Creada' => $activity->created_at->format('d/m/Y H:i'),
                     'Concluido el' => $activity->completed_at?->format('d/m/Y H:i') ?? '—',
+                    'Plazo planeado' => $activity->plannedDays() ? $activity->plannedDays().' '.($activity->plannedDays() === 1 ? 'día' : 'días') : '—',
                 ] as $label => $value)
                     <div class="flex justify-between gap-4 px-5 py-3">
                         <dt class="text-slate-500">{{ $label }}</dt>
                         <dd class="text-right font-medium">{{ $value }}</dd>
                     </div>
                 @endforeach
+                @if ($activity->durationDays())
+                    @php $r = $activity->deadlineResult(); @endphp
+                    <div class="flex justify-between gap-4 px-5 py-3">
+                        <dt class="text-slate-500">Duró</dt>
+                        <dd class="text-right">
+                            <span class="font-medium">{{ $activity->durationDays() }} {{ $activity->durationDays() === 1 ? 'día' : 'días' }}</span>
+                            @if ($r)
+                                <span @class(['badge mt-1 block', 'bg-emerald-100 text-emerald-800' => $r === 'antes', 'bg-sky-100 text-sky-800' => $r === 'a_tiempo', 'bg-rose-100 text-rose-800' => $r === 'despues'])>{{ $activity->deadlineLabel() }}</span>
+                            @endif
+                        </dd>
+                    </div>
+                @endif
             </dl>
 
         </aside>

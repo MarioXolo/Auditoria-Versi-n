@@ -15,12 +15,12 @@
 @php
     $me = auth()->user();
     $nav = [];
-    if ($me->seesEverything()) {
-        $nav[] = ['route' => 'dashboard', 'match' => 'dashboard', 'label' => 'Dashboard', 'icon' => 'M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z'];
-    }
+    $nav[] = ['route' => 'dashboard', 'match' => 'dashboard', 'label' => $me->seesEverything() ? 'Dashboard' : 'Mi dashboard', 'icon' => 'M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z'];
     $nav[] = ['route' => 'activities.index', 'match' => 'activities.*', 'label' => 'Actividades', 'icon' => 'M9 11l3 3L22 4M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11'];
     $nav[] = ['route' => 'calendar.index', 'match' => 'calendar.*', 'label' => 'Calendario', 'icon' => 'M8 3v3m8-3v3M4 9h16M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1zm3 8h2m3 0h2m-7 3h2'];
-    $nav[] = ['route' => 'attendance.index', 'match' => 'attendance.*', 'label' => 'Asistencia', 'icon' => 'M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z'];
+    if ($me->isAdmin()) {
+        $nav[] = ['route' => 'attendance.index', 'match' => 'attendance.*', 'label' => 'Asistencia', 'icon' => 'M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z'];
+    }
     if ($me->seesEverything()) {
         $nav[] = ['route' => 'users.index', 'match' => 'users.*', 'label' => 'Usuarios', 'icon' => 'M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m22 0v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75M13 7a4 4 0 11-8 0 4 4 0 018 0z'];
         $nav[] = ['route' => 'teams.index', 'match' => 'teams.*', 'label' => 'Equipos', 'icon' => 'M3 7h18M3 12h18M3 17h18'];

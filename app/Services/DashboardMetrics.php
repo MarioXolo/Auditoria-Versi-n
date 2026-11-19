@@ -7,7 +7,6 @@ use App\Enums\Role;
 use App\Models\Activity;
 use App\Models\ActivityType;
 use App\Models\Community;
-use App\Models\Attendance;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Support\Carbon;
@@ -46,7 +45,7 @@ class DashboardMetrics
         $this->to = now();
 
         if ($this->period === 'all') {
-            $first = Activity::min('created_at') ?? Attendance::min('work_date');
+            $first = Activity::min('created_at');
             $this->from = $first ? Carbon::parse($first)->startOfDay() : today()->subDays(29);
         } else {
             $days = (int) $this->period;
@@ -55,8 +54,9 @@ class DashboardMetrics
             $this->prevFrom = $this->from->copy()->subDays($days);
         }
 
+        // Personal auditado: los encargados (versión 3: ya no hay empleados activos)
         $this->staff = User::active()
-            ->whereIn('role', [Role::Encargado->value, Role::Empleado->value])
+            ->where('role', Role::Encargado->value)
             ->when($this->teamId, fn ($q) => $q->where('team_id', $this->teamId))
             ->with('team:id,name')
             ->orderBy('name')
@@ -76,52 +76,6 @@ class DashboardMetrics
             ->whereBetween('created_at', [$from, $to])
             ->when($this->teamId, fn ($q) => $q->where('team_id', $this->teamId))
             ->get(['id', 'activity_type_id', 'community_id', 'assigned_to', 'created_by', 'team_id', 'status', 'start_date', 'end_date', 'completed_at', 'created_at', 'updated_at']);
-    }
-
-    /** Registros de asistencia del personal dentro del rango. */
-    private function attendances(Carbon $from, Carbon $to): Collection
-    {
-        $key = 'att'.$from->timestamp.'-'.$to->timestamp;
-
-        return $this->cache[$key] ??= Attendance::query()
-            ->whereDate('work_date', '>=', $from->toDateString())
-            ->whereDate('work_date', '<=', $to->toDateString())
-            ->whereIn('user_id', $this->staff->pluck('id'))
-            ->get(['id', 'user_id', 'work_date', 'check_in_at', 'check_out_at']);
-    }
-
-    /** Días laborales entre dos fechas (sin pasar de hoy). */
-    public function workdays(Carbon $from, Carbon $to): Collection
-    {
-        $days = collect();
-        $end = $to->copy()->min(today())->startOfDay();
-        $laborales = config('auditoria.dias_laborales');
-
-        // Hoy solo cuenta cuando ya pasó la hora de entrada más la tolerancia
-        [$h, $m] = array_map('intval', explode(':', config('auditoria.hora_entrada')));
-        if ($end->isToday() && now()->lt(today()->setTime($h, $m)->addMinutes(config('auditoria.tolerancia_minutos')))) {
-            $end->subDay();
-        }
-
-        for ($d = $from->copy()->startOfDay(); $d->lte($end); $d->addDay()) {
-            if (in_array($d->isoWeekday(), $laborales, true)) {
-                $days->push($d->copy());
-            }
-        }
-
-        return $days;
-    }
-
-    private function isLate(Attendance $a): bool
-    {
-        if (! $a->check_in_at) {
-            return false;
-        }
-
-        [$h, $m] = array_map('intval', explode(':', config('auditoria.hora_entrada')));
-        $limit = $a->check_in_at->copy()->setTime($h, $m)->addMinutes(config('auditoria.tolerancia_minutos'));
-
-        return $a->check_in_at->gt($limit);
     }
 
     private function isOverdue(Activity $a): bool
@@ -172,46 +126,12 @@ class DashboardMetrics
         ];
     }
 
-    /** KPI de asistencia para un rango. */
-    public function attendanceKpis(Carbon $from, Carbon $to): array
-    {
-        $workdays = $this->workdays($from, $to);
-        $workdaySet = $workdays->map->toDateString()->flip();
-        $records = $this->attendances($from, $to)
-            ->filter(fn ($r) => $workdaySet->has($r->work_date->toDateString()));
-
-        $expected = $workdays->count() * $this->staff->count();
-        $present = $records->count();
-        $late = $records->filter(fn ($r) => $this->isLate($r))->count();
-
-        $hours = $records
-            ->filter(fn ($r) => $r->check_in_at && $r->check_out_at)
-            ->map(fn ($r) => $r->check_in_at->diffInMinutes($r->check_out_at) / 60);
-
-        return [
-            'expected' => $expected,
-            'present' => $present,
-            'absences' => max(0, $expected - $present),
-            'late' => $late,
-            'asistencia' => self::pct($present, $expected),
-            'puntualidad' => self::pct($present - $late, $present),
-            'horas' => $hours->isEmpty() ? null : round($hours->avg(), 1),
-            'workdays' => $workdays->count(),
-        ];
-    }
-
     /** KPI del periodo actual con su comparativo contra el periodo anterior. */
     public function summary(): array
     {
-        $now = array_merge($this->activityKpis($this->from, $this->to), $this->attendanceKpis($this->from, $this->to));
-        $prev = null;
-
-        if ($this->prevFrom) {
-            $prev = array_merge(
-                $this->activityKpis($this->prevFrom, $this->prevTo),
-                $this->attendanceKpis($this->prevFrom, $this->prevTo),
-            );
-        }
+        // El checador ya no interviene en ningún indicador: solo actividades
+        $now = $this->activityKpis($this->from, $this->to);
+        $prev = $this->prevFrom ? $this->activityKpis($this->prevFrom, $this->prevTo) : null;
 
         $delta = [];
         foreach ($now as $key => $value) {
@@ -278,25 +198,6 @@ class DashboardMetrics
         return array_values($buckets);
     }
 
-    /** Porcentaje de asistencia y puntualidad por día laboral (máximo 30 días). */
-    public function attendanceTrend(): array
-    {
-        $from = $this->from->copy()->max(today()->subDays(29));
-        $records = $this->attendances($from, $this->to)->groupBy(fn ($r) => $r->work_date->toDateString());
-        $staff = max(1, $this->staff->count());
-
-        return $this->workdays($from, $this->to)->map(function (Carbon $day) use ($records, $staff) {
-            $rows = $records->get($day->toDateString(), collect());
-            $late = $rows->filter(fn ($r) => $this->isLate($r))->count();
-
-            return [
-                'label' => $day->translatedFormat('D j'),
-                'asistencia' => round($rows->count() / $staff * 100, 1),
-                'puntualidad' => $rows->count() ? round(($rows->count() - $late) / $rows->count() * 100, 1) : null,
-            ];
-        })->values()->all();
-    }
-
     public function byStatus(): array
     {
         $acts = $this->activities($this->from, $this->to);
@@ -342,7 +243,7 @@ class DashboardMetrics
     // Tablas
     // ------------------------------------------------------------------
 
-    /** Indicadores por persona (encargados y empleados). */
+    /** Indicadores por encargado. */
     public function people(): Collection
     {
         return $this->cache['people'] ??= $this->buildPeople();
@@ -351,14 +252,12 @@ class DashboardMetrics
     private function buildPeople(): Collection
     {
         $acts = $this->activities($this->from, $this->to)->groupBy('assigned_to');
-        $att = $this->attendanceKpiRowsByUser();
 
-        return $this->staff->map(function (User $u) use ($acts, $att) {
+        return $this->staff->map(function (User $u) use ($acts) {
             $mine = $acts->get($u->id, collect());
             $completed = $mine->filter(fn ($a) => $a->status === ActivityStatus::Concluido);
             $effective = $mine->filter(fn ($a) => $a->status !== ActivityStatus::Suspendida)->count();
             $close = $completed->filter(fn ($a) => $a->completed_at)->map(fn ($a) => $a->created_at->diffInMinutes($a->completed_at) / 1440);
-            $a = $att[$u->id];
 
             return (object) [
                 'user' => $u,
@@ -370,81 +269,20 @@ class DashboardMetrics
                 'cumplimiento' => self::pct($completed->count(), $effective),
                 'a_tiempo' => self::pct($completed->filter(fn ($x) => $this->isOnTime($x))->count(), $completed->count()),
                 'dias_cierre' => $close->isEmpty() ? null : round($close->avg(), 1),
-                'asistencia' => $a['asistencia'],
-                'present' => $a['present'],
-                'absences' => $a['absences'],
-                'late' => $a['late'],
+                'propias' => $mine->filter(fn ($x) => $x->created_by === $u->id)->count(),
             ];
         })->sortByDesc('assigned')->values();
     }
 
-    private function attendanceKpiRowsByUser(): array
+    /** Duración de las concluidas en el periodo y si terminaron antes o después de su fecha de fin. */
+    public function durations(): array
     {
-        return $this->cache['attRows'] ??= $this->buildAttendanceRows();
-    }
-
-    private function buildAttendanceRows(): array
-    {
-        $workdays = $this->workdays($this->from, $this->to);
-        $set = $workdays->map->toDateString()->flip();
-        $byUser = $this->attendances($this->from, $this->to)
-            ->filter(fn ($r) => $set->has($r->work_date->toDateString()))
-            ->groupBy('user_id');
-
-        $rows = [];
-        foreach ($this->staff as $u) {
-            $recs = $byUser->get($u->id, collect());
-            $rows[$u->id] = [
-                'present' => $recs->count(),
-                'absences' => max(0, $workdays->count() - $recs->count()),
-                'late' => $recs->filter(fn ($r) => $this->isLate($r))->count(),
-                'asistencia' => self::pct($recs->count(), $workdays->count()),
-            ];
-        }
-
-        return $rows;
-    }
-
-    /** Auditoría de encargados: lo que asignaron y cómo va su equipo. */
-    public function leaders(): Collection
-    {
-        return $this->cache['leaders'] ??= $this->buildLeaders();
-    }
-
-    private function buildLeaders(): Collection
-    {
-        $acts = $this->activities($this->from, $this->to)->groupBy('created_by');
-        $att = $this->attendanceKpiRowsByUser();
-
-        return User::query()
-            ->where('role', Role::Encargado->value)
-            ->with(['ledTeams' => fn ($q) => $q->withCount('members')])
-            ->when($this->teamId, fn ($q) => $q->whereHas('ledTeams', fn ($t) => $t->where('id', $this->teamId)))
-            ->orderBy('name')
-            ->get()
-            ->map(function (User $leader) use ($acts, $att) {
-                $assigned = $acts->get($leader->id, collect());
-                $completed = $assigned->filter(fn ($a) => $a->status === ActivityStatus::Concluido);
-                $effective = $assigned->filter(fn ($a) => $a->status !== ActivityStatus::Suspendida)->count();
-                $memberIds = User::whereIn('team_id', $leader->ledTeams->pluck('id'))->pluck('id');
-                $teamAtt = collect($att)->only($memberIds->all());
-                $present = $teamAtt->sum('present');
-                $expected = $present + $teamAtt->sum('absences');
-
-                return (object) [
-                    'user' => $leader,
-                    'teams' => $leader->ledTeams->pluck('name')->join(', '),
-                    'members' => $leader->ledTeams->sum('members_count'),
-                    'assigned' => $assigned->count(),
-                    'completed' => $completed->count(),
-                    'overdue' => $assigned->filter(fn ($a) => $this->isOverdue($a))->count(),
-                    'cumplimiento' => self::pct($completed->count(), $effective),
-                    'a_tiempo' => self::pct($completed->filter(fn ($a) => $this->isOnTime($a))->count(), $completed->count()),
-                    'asistencia_equipo' => self::pct($present, $expected),
-                ];
-            })
-            ->sortByDesc('assigned')
-            ->values();
+        return ActivityDurations::summarize(
+            ActivityDurations::query($this->from, $this->to)
+                ->when($this->teamId, fn ($q) => $q->where('team_id', $this->teamId))
+                ->with(['assignee:id,name', 'type:id,name'])
+                ->get()
+        );
     }
 
     /**
@@ -488,46 +326,6 @@ class DashboardMetrics
                 ])
                 ->sortByDesc('days')->take(5)->values(),
         ];
-    }
-
-    /** Comparativo entre equipos. */
-    public function teams(): Collection
-    {
-        $acts = $this->activities($this->from, $this->to)->groupBy('team_id');
-        $att = $this->attendanceKpiRowsByUser();
-
-        return Team::query()
-            ->when($this->teamId, fn ($q) => $q->where('id', $this->teamId))
-            ->orderBy('name')
-            ->get(['id', 'name'])
-            ->map(function (Team $team) use ($acts, $att) {
-                $mine = $acts->get($team->id, collect());
-                $completed = $mine->filter(fn ($a) => $a->status === ActivityStatus::Concluido);
-                $effective = $mine->filter(fn ($a) => $a->status !== ActivityStatus::Suspendida)->count();
-                $members = $this->staff->where('team_id', $team->id)->pluck('id');
-                $teamAtt = collect($att)->only($members->all());
-                $present = $teamAtt->sum('present');
-
-                return (object) [
-                    'name' => $team->name,
-                    'assigned' => $mine->count(),
-                    'cumplimiento' => self::pct($completed->count(), $effective) ?? 0,
-                    'a_tiempo' => self::pct($completed->filter(fn ($a) => $this->isOnTime($a))->count(), $completed->count()) ?? 0,
-                    'asistencia' => self::pct($present, $present + $teamAtt->sum('absences')) ?? 0,
-                ];
-            });
-    }
-
-    /** Personal sin registro de entrada hoy (si hoy es día laboral). */
-    public function absentToday(): Collection
-    {
-        if (! in_array(today()->isoWeekday(), config('auditoria.dias_laborales'), true)) {
-            return collect();
-        }
-
-        $present = Attendance::whereDate('work_date', today()->toDateString())->pluck('user_id')->all();
-
-        return $this->staff->whereNotIn('id', $present)->values();
     }
 
     // ------------------------------------------------------------------
@@ -590,57 +388,12 @@ class DashboardMetrics
             ];
         }
 
-        // Faltas recientes
-        $recentDays = $this->workdays(today()->subDays(10), today())->take(-5);
-        if ($recentDays->isNotEmpty()) {
-            $recentSet = $recentDays->map->toDateString()->flip();
-            $records = Attendance::query()
-                ->whereDate('work_date', '>=', $recentDays->first()->toDateString())
-                ->whereIn('user_id', $this->staff->pluck('id'))
-                ->get(['user_id', 'work_date'])
-                ->filter(fn ($r) => $recentSet->has($r->work_date->toDateString()))
-                ->countBy('user_id');
-
-            $absentees = $this->staff->filter(fn ($u) => ($recentDays->count() - ($records[$u->id] ?? 0)) >= $cfg['faltas_recientes']);
-
-            if ($absentees->isNotEmpty()) {
-                $alerts[] = [
-                    'level' => 'warn',
-                    'title' => $absentees->count().' '.($absentees->count() === 1 ? 'persona con' : 'personas con')." {$cfg['faltas_recientes']} o más faltas en los últimos {$recentDays->count()} días laborales",
-                    'detail' => $absentees->take(5)->pluck('name')->join(', '),
-                    'link' => route('attendance.index'),
-                ];
-            }
-        }
-
-        // Retardos frecuentes en el periodo
-        $late = $this->people()->filter(fn ($p) => $p->late >= $cfg['retardos_periodo']);
-        if ($late->isNotEmpty()) {
-            $alerts[] = [
-                'level' => 'warn',
-                'title' => $late->count().' '.($late->count() === 1 ? 'persona con' : 'personas con')." {$cfg['retardos_periodo']} o más retardos en el periodo",
-                'detail' => $late->take(5)->map(fn ($p) => "{$p->user->name} ({$p->late})")->join(', '),
-                'link' => route('attendance.index'),
-            ];
-        }
-
-        // Encargados con bajo cumplimiento de lo que asignaron
-        $weak = $this->leaders()->filter(fn ($l) => $l->assigned >= 3 && $l->cumplimiento !== null && $l->cumplimiento < $cfg['cumplimiento_encargado']);
-        if ($weak->isNotEmpty()) {
-            $alerts[] = [
-                'level' => 'warn',
-                'title' => "Encargados con menos de {$cfg['cumplimiento_encargado']}% de cumplimiento en lo que asignaron",
-                'detail' => $weak->map(fn ($l) => "{$l->user->name} ({$l->cumplimiento}%)")->join(', '),
-                'link' => null,
-            ];
-        }
-
         // Personal sin actividades en el periodo
-        $idle = $this->people()->filter(fn ($p) => $p->assigned === 0 && $p->user->role === Role::Empleado);
+        $idle = $this->people()->filter(fn ($p) => $p->assigned === 0);
         if ($idle->isNotEmpty()) {
             $alerts[] = [
                 'level' => 'info',
-                'title' => $idle->count().' '.($idle->count() === 1 ? 'empleado sin' : 'empleados sin').' actividades asignadas en el periodo',
+                'title' => $idle->count().' '.($idle->count() === 1 ? 'encargado sin' : 'encargados sin').' actividades en el periodo',
                 'detail' => $idle->take(5)->map(fn ($p) => $p->user->name)->join(', '),
                 'link' => null,
             ];
@@ -657,20 +410,17 @@ class DashboardMetrics
     public static function definitions(): array
     {
         $m = config('auditoria.metas');
-        $hora = config('auditoria.hora_entrada');
-        $tol = config('auditoria.tolerancia_minutos');
 
         return [
             ['Cumplimiento', 'Marcadas «Concluido» por un superior ÷ (asignadas − suspendidas) × 100', "≥ {$m['cumplimiento']}%", 'Actividades creadas en el periodo'],
             ['Entrega a tiempo', 'Concluidas en o antes de su fecha de fin ÷ concluidas × 100', "≥ {$m['a_tiempo']}%", 'Actividades concluidas del periodo'],
-            ['Asistencia', "Entradas registradas ÷ (personal activo × días laborales) × 100. Hoy cuenta a partir de las {$hora} + {$tol} min", "≥ {$m['asistencia']}%", 'Registros de asistencia en días laborales'],
-            ['Puntualidad', "Entradas hasta las {$hora} + {$tol} min ÷ entradas registradas × 100", "≥ {$m['puntualidad']}%", 'Hora de entrada de cada registro'],
             ['No completadas', 'Actividades que un superior marcó en rojo (✗) en el periodo', 'Lo más bajo posible', 'Marcado de actividades'],
             ['Vencidas', 'No iniciadas o en proceso con fecha de fin anterior a hoy', 'Lo más bajo posible', 'Actividades creadas en el periodo'],
             ['Tiempo de cierre', 'Promedio de días entre la creación y la marca «Concluido»', 'Tendencia a la baja', 'Actividades concluidas del periodo'],
             ['Calidad de la evidencia', 'Concluidas con fotografía o texto ÷ concluidas × 100', 'Lo más alto posible', 'Evidencia cargada en cada actividad concluida'],
             ['Velocidad de revisión', 'Promedio de días entre la fecha de fin y la marca verde o roja (0 si se revisó a tiempo)', 'Tendencia a la baja', 'Actividades revisadas del periodo'],
-            ['Horas por jornada', 'Promedio de horas entre entrada y salida', 'Referencia', 'Registros con entrada y salida'],
+            ['Duración', 'Días de la fecha de inicio al día en que se marcó «Concluido», contando ambos (mismo día = 1)', 'Cerca de lo planeado', 'Actividades concluidas en el periodo'],
+            ['Antes / en la fecha / después', 'Día en que se terminó comparado con la fecha de fin de cada actividad', 'Antes o en la fecha', 'Actividades concluidas con fecha de fin'],
             ['Comparativo', 'Valor actual − valor del periodo anterior de la misma duración', 'Positivo', 'Mismo cálculo en el periodo previo'],
         ];
     }

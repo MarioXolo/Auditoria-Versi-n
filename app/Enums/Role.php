@@ -30,11 +30,16 @@ enum Role: string
         };
     }
 
-    /** @return array<string, string> */
+    /**
+     * Roles que se pueden asignar (versión 3: Admin, Gerente y Encargado).
+     * «Empleado» queda solo para las cuentas anteriores, que se desactivaron.
+     *
+     * @return array<string, string>
+     */
     public static function options(): array
     {
         $options = [];
-        foreach (self::cases() as $case) {
+        foreach ([self::Admin, self::Gerente, self::Encargado] as $case) {
             $options[$case->value] = $case->label();
         }
 
