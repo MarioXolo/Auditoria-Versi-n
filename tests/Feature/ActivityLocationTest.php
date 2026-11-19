@@ -140,7 +140,7 @@ class ActivityLocationTest extends TestCase
 
     public function test_encargado_cannot_move_the_pin_after_creating_but_gerente_can(): void
     {
-        $this->actingAs($this->encargado)->post('/activities', $this->withPlace())->assertRedirect();
+        $this->actingAs($this->encargado)->post('/activities', $this->withPlace(['destino_precision' => 12]))->assertRedirect();
         $a = Activity::latest('id')->firstOrFail();
         $this->assertTrue($a->requiere_ubicacion);
 
@@ -209,5 +209,22 @@ class ActivityLocationTest extends TestCase
 
         $this->actingAs($this->encargado)->post("/activities/{$a->id}/marcar", ['marca' => 'concluido'])->assertRedirect()->assertSessionHasNoErrors();
         $this->assertTrue($a->fresh()->status->isMarked());
+    }
+
+    public function test_encargado_sets_the_place_only_with_his_gps(): void
+    {
+        // Sin lectura del GPS (punto puesto a mano) se rechaza
+        $this->actingAs($this->encargado)->post('/activities', $this->withPlace())->assertSessionHasErrors('destino_precision');
+        // Con señal imprecisa, también
+        $this->actingAs($this->encargado)->post('/activities', $this->withPlace(['destino_precision' => 350]))->assertSessionHasErrors('destino_precision');
+        $this->assertSame(0, Activity::count());
+
+        // Su formulario no permite tocar el mapa; el del gerente sí
+        $this->actingAs($this->encargado)->get('/activities/create')->assertSee('data-manual="0"', false)->assertSee('El punto se toma del GPS');
+        $this->actingAs($this->gerente)->get('/activities/create')->assertSee('data-manual="1"', false);
+
+        // El gerente lo marca en el mapa sin GPS para asignarlo a distancia
+        $this->actingAs($this->gerente)->post('/activities', $this->withPlace(['assigned_to' => $this->encargado->id]))->assertRedirect()->assertSessionHasNoErrors();
+        $this->assertSame(1, Activity::count());
     }
 }

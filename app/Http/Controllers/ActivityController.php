@@ -329,6 +329,16 @@ class ActivityController extends Controller
             return ['requiere_ubicacion' => false, 'destino_lat' => null, 'destino_lng' => null, 'destino_nombre' => null];
         }
 
+        // El encargado no elige el punto a mano: solo con el GPS de su celular, y con buena señal
+        if ($user->selfAssignOnly()) {
+            $p = $request->validate([
+                'destino_precision' => ['required', 'numeric', 'min:0', 'max:'.Activity::PRECISION_MAXIMA],
+            ], [
+                'destino_precision.required' => 'Usa el botón «Usar mi ubicación actual» para fijar el lugar.',
+                'destino_precision.max' => 'La señal de GPS es muy imprecisa (±:input m). Sal a un lugar abierto, espera unos segundos y vuelve a tocar «Usar mi ubicación actual».',
+            ]);
+        }
+
         $data = [
             'requiere_ubicacion' => true,
             'destino_lat' => round((float) $v['destino_lat'], 7),

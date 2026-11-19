@@ -137,7 +137,7 @@
         $pinLocked = $activity->exists && auth()->user()->selfAssignOnly();
         $needsPlace = (bool) old('requiere_ubicacion', $activity->requiere_ubicacion);
     @endphp
-    <fieldset class="sm:col-span-2 rounded-xl border border-slate-200 p-4" data-map-picker data-toggle="requiere_ubicacion" data-locked="{{ $pinLocked ? 1 : 0 }}">
+    <fieldset class="sm:col-span-2 rounded-xl border border-slate-200 p-4" data-map-picker data-toggle="requiere_ubicacion" data-locked="{{ $pinLocked ? 1 : 0 }}" data-manual="{{ auth()->user()->selfAssignOnly() ? 0 : 1 }}">
         <legend class="px-1 text-sm font-semibold text-slate-700">Ubicación</legend>
         @if ($pinLocked)
             <input type="checkbox" id="requiere_ubicacion" class="hidden" @checked($activity->requiere_ubicacion) disabled>
@@ -171,8 +171,13 @@
                 </div>
                 <div class="flex flex-wrap items-center gap-3 text-xs text-slate-500">
                     <button type="button" class="btn btn-secondary px-3 py-1 text-xs" data-map-here>Usar mi ubicación actual</button>
-                    <span data-map-hint>{{ $activity->destino_lat ? 'Toca el mapa para mover el punto.' : 'Toca el mapa para marcar el lugar.' }}</span>
+                    @if (auth()->user()->selfAssignOnly())
+                        <span data-map-hint>Estando en el lugar, toca «Usar mi ubicación actual». El punto se toma del GPS de tu celular.</span>
+                    @else
+                        <span data-map-hint>{{ $activity->destino_lat ? 'Toca el mapa para mover el punto.' : 'Toca el mapa para marcar el lugar, o usa tu ubicación actual.' }}</span>
+                    @endif
                 </div>
+                <input type="hidden" name="destino_precision" value="{{ old('destino_precision') }}">
             @else
                 <span data-map-hint class="hidden"></span>
                 <input type="hidden" name="destino_radio" value="{{ $activity->destino_radio }}" disabled>

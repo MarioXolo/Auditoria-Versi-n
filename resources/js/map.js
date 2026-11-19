@@ -37,14 +37,22 @@ document.querySelectorAll('[data-map-picker]').forEach((box) => {
         tiles().addTo(map);
         if (has) place(L.latLng(+lat.value, +lng.value));
         if (box.dataset.locked === '1') return;
-        map.on('click', (e) => place(e.latlng));
+        // Gerentes y administradores marcan el lugar tocando el mapa; el encargado solo con su GPS
+        if (box.dataset.manual === '1') map.on('click', (e) => place(e.latlng));
         box.querySelector('[data-map-here]')?.addEventListener('click', () => {
             if (!navigator.geolocation) return (hint.textContent = 'Este navegador no da la ubicación.');
             hint.textContent = 'Buscando tu ubicación…';
             navigator.geolocation.getCurrentPosition(
-                (p) => place(L.latLng(p.coords.latitude, p.coords.longitude), 16),
-                () => (hint.textContent = 'No se pudo obtener tu ubicación. Marca el lugar tocando el mapa.'),
-                { enableHighAccuracy: true, timeout: 15000 },
+                (p) => {
+                    const acc = box.querySelector('[name="destino_precision"]');
+                    if (acc) acc.value = Math.round(p.coords.accuracy);
+                    place(L.latLng(p.coords.latitude, p.coords.longitude), 16);
+                    hint.textContent += ` · precisión ±${Math.round(p.coords.accuracy)} m`;
+                },
+                (err) => (hint.textContent = err.code === 1
+                    ? 'Negaste el acceso a la ubicación. Actívalo en los permisos del navegador para este sitio.'
+                    : 'No se pudo obtener tu ubicación. Revisa que el GPS esté encendido e inténtalo de nuevo.'),
+                { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 },
             );
         });
     };
