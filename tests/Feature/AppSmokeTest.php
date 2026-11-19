@@ -34,8 +34,9 @@ class AppSmokeTest extends TestCase
         $this->encargado = User::factory()->role('encargado')->create();
         $this->team = Team::create(['name' => 'Norte', 'leader_id' => $this->encargado->id]);
         $this->encargado->update(['team_id' => $this->team->id]);
-        $this->empleado = User::factory()->create(['team_id' => $this->team->id]);
-        $this->otroEmpleado = User::factory()->create(); // sin equipo
+        // Versión 3: solo admin, gerente y encargado. «otroEmpleado» es un encargado sin equipo.
+        $this->empleado = User::factory()->role('encargado')->create(['team_id' => $this->team->id]);
+        $this->otroEmpleado = User::factory()->role('encargado')->create();
     }
 
     private function activityFor(User $assignee, User $creator, string $community = 'Comunidad Prueba'): Activity
@@ -64,130 +65,98 @@ class AppSmokeTest extends TestCase
 
     public function test_every_page_renders_for_each_role(): void
     {
-        $activity = $this->activityFor($this->empleado, $this->encargado);
-        Attendance::create(['user_id' => $this->empleado->id, 'work_date' => today()->toDateString(), 'check_in_at' => now()]);
+        $activity = $this->activityFor($this->encargado, $this->gerente);
+        Attendance::create(['user_id' => $this->encargado->id, 'work_date' => today()->toDateString(), 'check_in_at' => now()]);
 
-        foreach (['admin', 'gerente'] as $who) {
-            $u = $this->{$who === 'admin' ? 'admin' : 'gerente'};
+        foreach ([$this->admin, $this->gerente] as $u) {
             $this->actingAs($u)->get('/')->assertRedirect(route('dashboard'));
-            $this->actingAs($u)->get('/dashboard')->assertOk()->assertSee('Dashboard de auditoría');
+            $this->actingAs($u)->get('/dashboard')->assertOk()->assertSee('Dashboard de auditoría')->assertDontSee('Asistencia y puntualidad');
             $this->actingAs($u)->get('/dashboard?period=7&team_id='.$this->team->id)->assertOk();
             $this->actingAs($u)->get('/dashboard?period=all')->assertOk();
         }
 
-        foreach ([$this->admin, $this->gerente, $this->encargado, $this->empleado] as $u) {
+        // El encargado también llega a un dashboard: el suyo
+        $this->actingAs($this->encargado)->get('/')->assertRedirect(route('dashboard'));
+        $this->actingAs($this->encargado)->get('/dashboard')->assertOk()->assertSee('Mi dashboard')->assertDontSee('Dashboard de auditoría');
+
+        foreach ([$this->admin, $this->gerente, $this->encargado] as $u) {
             $this->actingAs($u)->get('/activities')->assertOk();
             $this->actingAs($u)->get('/activities?status=vencida')->assertOk();
             $this->actingAs($u)->get("/activities/{$activity->id}")->assertOk()->assertSee('Comunidad Prueba')->assertSee($activity->code);
-            $this->actingAs($u)->get('/asistencia')->assertOk();
             $this->actingAs($u)->get('/perfil')->assertOk();
         }
 
-        foreach (['/users', '/users/create', "/users/{$this->empleado->id}/edit", '/teams', '/teams/create', "/teams/{$this->team->id}/edit", '/catalogos'] as $url) {
+        foreach (['/asistencia', '/users', '/users/create', "/users/{$this->encargado->id}/edit", '/teams', '/teams/create', "/teams/{$this->team->id}/edit", '/catalogos'] as $url) {
             $this->actingAs($this->admin)->get($url)->assertOk();
         }
 
         $this->actingAs($this->encargado)->get('/activities/create')->assertOk();
-        $this->actingAs($this->encargado)->get("/activities/{$activity->id}/edit")->assertOk();
+        $this->actingAs($this->gerente)->get("/activities/{$activity->id}/edit")->assertOk();
     }
 
     public function test_role_restrictions(): void
     {
-        $this->actingAs($this->empleado)->get('/')->assertRedirect(route('activities.index'));
-        foreach ([$this->encargado, $this->empleado] as $u) {
-            $this->actingAs($u)->get('/dashboard')->assertForbidden();
-            $this->actingAs($u)->get('/users')->assertForbidden();
-            $this->actingAs($u)->get('/teams')->assertForbidden();
-            $this->actingAs($u)->get('/catalogos')->assertForbidden();
-            $this->actingAs($u)->post('/catalogos/tipos', ['name' => 'X'])->assertForbidden();
+        // Solo el administrador ve el checador; no aparece en el menú de los demás
+        foreach ([$this->gerente, $this->encargado] as $u) {
+            $this->actingAs($u)->get('/asistencia')->assertForbidden();
+            $this->actingAs($u)->post('/asistencia/registrar')->assertForbidden();
+            $this->actingAs($u)->get('/activities')->assertDontSee(route('attendance.index'), false);
         }
+        $this->actingAs($this->admin)->get('/activities')->assertSee(route('attendance.index'), false);
+
+        $this->actingAs($this->encargado)->get('/users')->assertForbidden();
+        $this->actingAs($this->encargado)->get('/teams')->assertForbidden();
+        $this->actingAs($this->encargado)->get('/catalogos')->assertForbidden();
+        $this->actingAs($this->encargado)->get('/dashboard/exportar')->assertForbidden();
+        $this->actingAs($this->encargado)->post('/catalogos/tipos', ['name' => 'X'])->assertForbidden();
+
         // Gerente: ve usuarios y administra equipos, pero no crea ni edita usuarios
         $this->actingAs($this->gerente)->get('/users')->assertOk()->assertDontSee('Nuevo usuario');
         $this->actingAs($this->gerente)->get('/users/create')->assertForbidden();
-        $this->actingAs($this->gerente)->get("/users/{$this->empleado->id}/edit")->assertForbidden();
+        $this->actingAs($this->gerente)->get("/users/{$this->encargado->id}/edit")->assertForbidden();
         $this->actingAs($this->gerente)->post('/users', ['name' => 'X', 'email' => 'x@x.mx', 'role' => 'admin', 'password' => 'secreto123', 'password_confirmation' => 'secreto123'])->assertForbidden();
-        $this->actingAs($this->gerente)->patch("/users/{$this->empleado->id}/toggle")->assertForbidden();
+        $this->actingAs($this->gerente)->patch("/users/{$this->encargado->id}/toggle")->assertForbidden();
         $this->actingAs($this->gerente)->get('/teams')->assertOk();
         $this->actingAs($this->gerente)->post('/teams', ['name' => 'Centro'])->assertRedirect(route('teams.index'));
         $this->assertDatabaseHas('teams', ['name' => 'Centro']);
         $this->actingAs($this->gerente)->get("/teams/{$this->team->id}/edit")->assertOk();
-        // El empleado sí puede cargar actividades (solo para sí mismo)
-        $this->actingAs($this->empleado)->get('/activities/create')->assertOk();
-
-        // Empleado no ve actividades ajenas
-        $ajena = $this->activityFor($this->otroEmpleado, $this->gerente);
-        $this->actingAs($this->empleado)->get("/activities/{$ajena->id}")->assertForbidden();
-        // Encargado no ve actividades fuera de su equipo
-        $this->actingAs($this->encargado)->get("/activities/{$ajena->id}")->assertForbidden();
     }
 
-    public function test_teammates_do_not_see_each_others_activities(): void
+    public function test_encargados_do_not_see_each_others_activities(): void
     {
-        $companero = User::factory()->create(['team_id' => $this->team->id]);
-        $mia = $this->activityFor($this->empleado, $this->encargado, 'Actividad de Ana');
-        $deEl = $this->activityFor($companero, $this->encargado, 'Actividad de Beto');
+        $companero = User::factory()->role('encargado')->create(['team_id' => $this->team->id]);
+        $mia = $this->activityFor($this->encargado, $this->gerente, 'Actividad de Ana');
+        $deEl = $this->activityFor($companero, $this->gerente, 'Actividad de Beto');
+        $propia = $this->activityFor($this->encargado, $this->encargado, 'Me la cargué');
 
-        $this->actingAs($this->empleado)->get('/activities')->assertSee($mia->code)->assertDontSee($deEl->code);
-        $this->actingAs($this->empleado)->get("/activities/{$deEl->id}")->assertForbidden();
+        $this->actingAs($this->encargado)->get('/activities')->assertSee($mia->code)->assertSee($propia->code)->assertDontSee($deEl->code);
+        $this->actingAs($this->encargado)->get("/activities/{$deEl->id}")->assertForbidden();
+        $this->actingAs($companero)->get("/activities/{$mia->id}")->assertForbidden();
+        $this->actingAs($companero)->get("/activities/{$propia->id}")->assertForbidden();
+        $this->actingAs($companero)->get('/calendario')->assertOk()->assertDontSee($mia->code);
 
-        // Otro encargado no ve lo que asignó este encargado
-        $otroEncargado = User::factory()->role('encargado')->create();
-        $this->actingAs($otroEncargado)->get('/activities')->assertDontSee($mia->code);
-        $this->actingAs($otroEncargado)->get("/activities/{$mia->id}")->assertForbidden();
-
-        // Un encargado no puede asignar a empleados que no son de su equipo
-        $this->actingAs($otroEncargado)->post('/activities', $this->payload([
-            'assigned_to' => $this->empleado->id,
-        ]))->assertSessionHasErrors('assigned_to');
+        // El gerente ve todas
+        $this->actingAs($this->gerente)->get('/activities')->assertSee($mia->code)->assertSee($deEl->code)->assertSee($propia->code);
     }
 
-    public function test_encargado_only_sees_activities_he_assigned(): void
+    public function test_encargado_only_loads_activities_for_himself(): void
     {
-        $suya = $this->activityFor($this->empleado, $this->encargado, 'Asignada por encargado');
-        // El gerente asigna directo a un empleado del equipo del encargado
-        $delGerente = $this->activityFor($this->empleado, $this->gerente, 'Asignada por gerente');
-        $paraEncargado = $this->activityFor($this->encargado, $this->gerente, 'Tarea del encargado');
-
-        $this->actingAs($this->encargado)->get("/activities/{$suya->id}")->assertOk();
-        $this->actingAs($this->encargado)->get("/activities/{$paraEncargado->id}")->assertOk();
-        $this->actingAs($this->encargado)->get("/activities/{$delGerente->id}")->assertForbidden();
-
-        $this->actingAs($this->encargado)->get('/activities')
-            ->assertSee($suya->code)
-            ->assertSee($paraEncargado->code)
-            ->assertDontSee($delGerente->code);
-
-        // El empleado ve todas las suyas, sin importar quién las asignó
-        $this->actingAs($this->empleado)->get('/activities')
-            ->assertSee($suya->code)
-            ->assertSee($delGerente->code)
-            ->assertDontSee($paraEncargado->code);
-
-        // El encargado no edita lo que no asignó
-        $this->actingAs($this->encargado)->post("/activities/{$delGerente->id}/marcar", ['marca' => 'concluido'])->assertForbidden();
-        $this->actingAs($this->encargado)->post("/activities/{$suya->id}/marcar", ['marca' => 'concluido'])->assertRedirect();
-    }
-
-    public function test_encargado_assigns_only_to_own_team(): void
-    {
-        $this->actingAs($this->encargado)->post('/activities', $this->payload(['assigned_to' => $this->empleado->id]))
-            ->assertRedirect();
-        $this->assertDatabaseHas('activities', ['activity_type_id' => $this->typeId(), 'assigned_to' => $this->empleado->id, 'team_id' => $this->team->id]);
-
-        $this->actingAs($this->encargado)->post('/activities', $this->payload(['assigned_to' => $this->otroEmpleado->id]))
-            ->assertSessionHasErrors('assigned_to');
+        $this->actingAs($this->encargado)->get('/activities/create')->assertOk()->assertDontSee('name="assigned_to"', false);
+        $this->actingAs($this->encargado)->post('/activities', $this->payload(['assigned_to' => $this->otroEmpleado->id]))->assertRedirect();
+        $this->assertDatabaseHas('activities', ['assigned_to' => $this->encargado->id, 'created_by' => $this->encargado->id, 'team_id' => $this->team->id]);
+        $this->assertDatabaseMissing('activities', ['assigned_to' => $this->otroEmpleado->id]);
     }
 
     public function test_evidence_upload_and_protected_download(): void
     {
         $this->actingAs($this->encargado)->post('/activities', $this->payload([
-            'assigned_to' => $this->empleado->id,
-            'evidence' => UploadedFile::fake()->create('foto.jpg', 200, 'image/jpeg'),
+            'evidence' => UploadedFile::fake()->image('foto.jpg', 400, 300),
         ]))->assertRedirect();
 
         $a = Activity::latest('id')->first();
         $this->assertNotNull($a->evidence_path);
-        $this->actingAs($this->empleado)->get("/activities/{$a->id}/evidence")->assertOk();
+        $this->actingAs($this->encargado)->get("/activities/{$a->id}/evidence")->assertOk();
+        $this->actingAs($this->gerente)->get("/activities/{$a->id}/evidence")->assertOk();
         $this->actingAs($this->otroEmpleado)->get("/activities/{$a->id}/evidence")->assertForbidden();
     }
 
@@ -195,56 +164,66 @@ class AppSmokeTest extends TestCase
     {
         $this->travelTo(now()->setTimezone('America/Mexico_City')->next('Wednesday')->setTime(9, 5));
 
-        // Un solo botón, sin foto: primero entrada, luego salida
-        $this->actingAs($this->empleado)->get('/asistencia')->assertOk()->assertSee('Registrar entrada')->assertDontSee('Tomar foto');
-        $this->actingAs($this->empleado)->post('/asistencia/registrar')->assertSessionHasNoErrors()->assertSessionHas('status', 'Entrada registrada a las 09:05.');
-        $this->actingAs($this->empleado)->get('/asistencia')->assertSee('Registrar salida');
+        // Solo el administrador usa el checador: un solo botón, sin foto
+        $this->actingAs($this->admin)->get('/asistencia')->assertOk()->assertSee('Registrar entrada')->assertDontSee('Tomar foto');
+        $this->actingAs($this->admin)->post('/asistencia/registrar')->assertSessionHasNoErrors()->assertSessionHas('status', 'Entrada registrada a las 09:05.');
+        $this->actingAs($this->admin)->get('/asistencia')->assertSee('Registrar salida');
 
         $this->travel(8)->hours();
-        $this->actingAs($this->empleado)->post('/asistencia/registrar', ['notes' => 'Termino en campo'])->assertSessionHasNoErrors();
-        $att = Attendance::where('user_id', $this->empleado->id)->first();
+        $this->actingAs($this->admin)->post('/asistencia/registrar', ['notes' => 'Termino en campo'])->assertSessionHasNoErrors();
+        $att = Attendance::where('user_id', $this->admin->id)->first();
         $this->assertSame('09:05', $att->check_in_at->format('H:i'));
         $this->assertSame('17:05', $att->check_out_at->format('H:i'));
         $this->assertNull($att->check_in_photo);
         $this->assertSame('Termino en campo', $att->notes);
-        $this->actingAs($this->empleado)->get('/asistencia')->assertSee('Jornada completa');
+        $this->actingAs($this->admin)->get('/asistencia')->assertSee('Jornada completa');
 
         // Un tercer registro el mismo día se rechaza
-        $this->actingAs($this->empleado)->post('/asistencia/registrar')->assertSessionHasErrors('asistencia');
+        $this->actingAs($this->admin)->post('/asistencia/registrar')->assertSessionHasErrors('asistencia');
         $this->assertSame(1, Attendance::count());
 
         // Sábado y domingo no se puede checar
+        Attendance::query()->delete();
         foreach (['Saturday', 'Sunday'] as $day) {
             $this->travelTo(now()->next($day)->setTime(10, 0));
-            $this->actingAs($this->otroEmpleado)->get('/asistencia')->assertSee('Hoy no es día laboral')->assertDontSee('Registrar entrada');
-            $this->actingAs($this->otroEmpleado)->post('/asistencia/registrar')->assertSessionHasErrors('asistencia');
+            $this->actingAs($this->admin)->get('/asistencia')->assertSee('Hoy no es día laboral')->assertDontSee('Registrar entrada');
+            $this->actingAs($this->admin)->post('/asistencia/registrar')->assertSessionHasErrors('asistencia');
         }
-        $this->assertSame(0, Attendance::where('user_id', $this->otroEmpleado->id)->count());
+        $this->assertSame(0, Attendance::count());
 
-        // Las fotos de registros anteriores se siguen viendo, con los mismos permisos
-        Storage::fake('local');
+        // El registro del checador no mueve ningún indicador del dashboard
+        $this->travelBack();
+        Attendance::create(['user_id' => $this->encargado->id, 'work_date' => today()->toDateString(), 'check_in_at' => now()]);
+        $kpis = (new \App\Services\DashboardMetrics('30'))->summary()['now'];
+        $this->assertArrayNotHasKey('asistencia', $kpis);
+        $this->assertArrayNotHasKey('puntualidad', $kpis);
+
+        // Las fotos de registros anteriores las ve solo el administrador
         Storage::disk('local')->put('asistencia/vieja.jpg', 'x');
-        $att->update(['check_in_photo' => 'asistencia/vieja.jpg']);
-        $this->actingAs($this->empleado)->get("/asistencia/{$att->id}/foto/entrada")->assertOk();
-        $this->actingAs($this->gerente)->get("/asistencia/{$att->id}/foto/entrada")->assertOk();
-        $this->actingAs($this->encargado)->get("/asistencia/{$att->id}/foto/entrada")->assertOk();
-        $this->actingAs($this->otroEmpleado)->get("/asistencia/{$att->id}/foto/entrada")->assertForbidden();
-        $otroEncargado = User::factory()->role('encargado')->create();
-        $this->actingAs($otroEncargado)->get("/asistencia/{$att->id}/foto/entrada")->assertForbidden();
+        $old = Attendance::first();
+        $old->update(['check_in_photo' => 'asistencia/vieja.jpg']);
+        $this->actingAs($this->admin)->get("/asistencia/{$old->id}/foto/entrada")->assertOk();
+        $this->actingAs($this->gerente)->get("/asistencia/{$old->id}/foto/entrada")->assertForbidden();
+        $this->actingAs($this->encargado)->get("/asistencia/{$old->id}/foto/entrada")->assertForbidden();
 
-        // Encargados ven la asistencia de su equipo; el empleado no
-        $this->actingAs($this->encargado)->get('/asistencia')->assertOk()->assertSee('Asistencia del personal')->assertSee($this->empleado->name);
-        $this->actingAs($this->gerente)->get('/asistencia')->assertOk()->assertSee('Asistencia del personal');
-        $this->actingAs($this->empleado)->get('/asistencia')->assertOk()->assertDontSee('Asistencia del personal');
+        // El administrador ve la asistencia de gerentes y encargados
+        $this->actingAs($this->admin)->get('/asistencia')->assertOk()->assertSee('Asistencia del personal')->assertSee($this->encargado->name);
     }
 
     public function test_admin_manages_users_and_teams(): void
     {
+        $this->actingAs($this->admin)->get('/users/create')->assertOk()->assertDontSee('value="empleado"', false);
         $this->actingAs($this->admin)->post('/users', [
-            'name' => 'Nuevo', 'email' => 'nuevo@test.mx', 'role' => 'empleado', 'team_id' => $this->team->id,
+            'name' => 'Nuevo', 'email' => 'nuevo@test.mx', 'role' => 'encargado', 'team_id' => $this->team->id,
             'password' => 'secreto123', 'password_confirmation' => 'secreto123', 'active' => '1',
         ])->assertRedirect(route('users.index'));
-        $this->assertDatabaseHas('users', ['email' => 'nuevo@test.mx', 'role' => 'empleado']);
+        $this->assertDatabaseHas('users', ['email' => 'nuevo@test.mx', 'role' => 'encargado']);
+
+        // Ya no se pueden crear empleados
+        $this->actingAs($this->admin)->post('/users', [
+            'name' => 'Otro', 'email' => 'otro@test.mx', 'role' => 'empleado',
+            'password' => 'secreto123', 'password_confirmation' => 'secreto123', 'active' => '1',
+        ])->assertSessionHasErrors('role');
 
         $this->actingAs($this->admin)->patch("/users/{$this->admin->id}/toggle")->assertSessionHasErrors();
         $this->assertTrue($this->admin->fresh()->active);

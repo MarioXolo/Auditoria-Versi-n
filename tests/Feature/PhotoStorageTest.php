@@ -52,15 +52,15 @@ class PhotoStorageTest extends TestCase
         $encargado = User::factory()->role('encargado')->create();
         $team = Team::create(['name' => 'Norte', 'leader_id' => $encargado->id]);
         $encargado->update(['team_id' => $team->id]);
-        $empleado = User::factory()->create(['team_id' => $team->id]);
+        $gerente = User::factory()->role('gerente')->create();
 
         $this->actingAs($encargado)->post('/activities', $this->payload([
-            'assigned_to' => $empleado->id,
             'evidence' => UploadedFile::fake()->create('foto.jpg', 200, 'image/jpeg'),
         ]))->assertRedirect();
 
         $activity = Activity::latest('id')->first();
         Storage::disk('s3')->assertExists($activity->evidence_path);
-        $this->actingAs($empleado)->get("/activities/{$activity->id}/evidence")->assertOk();
+        $this->actingAs($encargado)->get("/activities/{$activity->id}/evidence")->assertOk();
+        $this->actingAs($gerente)->get("/activities/{$activity->id}/evidence")->assertOk();
     }
 }

@@ -58,10 +58,8 @@ class DashboardMetricsTest extends TestCase
         $this->act($emp, $leader, 'no_iniciado', '2026-11-10');
         $this->act($emp, $leader, 'suspendida', null);
 
-        // Lunes 9 y martes 10: el empleado llega a las 8:55 y 9:30 (retardo). El encargado solo el lunes.
-        Attendance::create(['user_id' => $emp->id, 'work_date' => '2026-11-09', 'check_in_at' => '2026-11-09 08:55:00', 'check_out_at' => '2026-11-09 17:55:00']);
-        Attendance::create(['user_id' => $emp->id, 'work_date' => '2026-11-10', 'check_in_at' => '2026-11-10 09:30:00', 'check_out_at' => '2026-11-10 17:30:00']);
-        Attendance::create(['user_id' => $leader->id, 'work_date' => '2026-11-09', 'check_in_at' => '2026-11-09 09:05:00']);
+        // El checador ya no interviene: un registro de asistencia no cambia ningún indicador
+        Attendance::create(['user_id' => $emp->id, 'work_date' => '2026-11-09', 'check_in_at' => '2026-11-09 09:30:00']);
 
         $m = new DashboardMetrics('7');
         $a = $m->activityKpis($m->from, $m->to);
@@ -72,20 +70,15 @@ class DashboardMetricsTest extends TestCase
         $this->assertEqualsWithDelta(66.7, $a['cumplimiento'], 0.05); // 2 / (4 - 1)
         $this->assertEqualsWithDelta(50.0, $a['a_tiempo'], 0.05);     // 1 / 2
 
-        // Últimos 7 días: jue 5 a mié 11 → 6 días laborales (sin domingo) × 2 personas
-        $t = $m->attendanceKpis($m->from, $m->to);
-        $this->assertSame(6, $t['workdays']);
-        $this->assertSame(12, $t['expected']);
-        $this->assertSame(3, $t['present']);
-        $this->assertSame(1, $t['late']);
-        $this->assertEqualsWithDelta(25.0, $t['asistencia'], 0.05);   // 3 / 12
-        $this->assertEqualsWithDelta(66.7, $t['puntualidad'], 0.05);  // 2 / 3
-        $this->assertEqualsWithDelta(8.5, $t['horas'], 0.05);         // (9 + 8) / 2
+        $kpis = $m->summary()['now'];
+        $this->assertArrayNotHasKey('asistencia', $kpis);
+        $this->assertArrayNotHasKey('puntualidad', $kpis);
 
-        $leaderRow = $m->leaders()->first();
-        $this->assertSame(4, $leaderRow->assigned);
+        // Indicadores por encargado: cuántas tiene y cuántas se cargó él mismo
+        $row = $m->people()->firstWhere('user.id', $emp->id);
+        $this->assertSame(4, $row->assigned);
+        $this->assertSame(0, $row->propias);
 
-        $this->assertSame('bad', DashboardMetrics::status('asistencia', 25.0));
         $this->assertSame('ok', DashboardMetrics::status('cumplimiento', 90.0));
         $this->assertSame('warn', DashboardMetrics::status('cumplimiento', 70.0));
     }
@@ -106,10 +99,11 @@ class DashboardMetricsTest extends TestCase
         $response->assertOk();
         $csv = $response->streamedContent();
         $this->assertStringContainsString('Cumplimiento %', $csv);
-        $this->assertStringContainsString('empleado.norte@demo.test', $csv);
+        $this->assertStringContainsString('promotor.norte@demo.test', $csv);
+        $this->assertStringNotContainsString('Asistencia %', $csv);
 
-        $empleado = User::where('email', 'empleado.norte@demo.test')->first();
-        $this->actingAs($empleado)->get('/dashboard/exportar')->assertForbidden();
+        $encargado = User::where('email', 'promotor.norte@demo.test')->first();
+        $this->actingAs($encargado)->get('/dashboard/exportar')->assertForbidden();
     }
 
     public function test_dashboard_shows_every_status_and_no_team_comparison(): void
@@ -162,5 +156,76 @@ class DashboardMetricsTest extends TestCase
         // La liga abre solo las concluidas sin evidencia
         $this->actingAs($gerente)->get('/activities?status=concluido&evidencia=sin')->assertOk()
             ->assertSee('sin evidencia')->assertViewHas('activities', fn ($p) => $p->total() === 1);
+    }
+
+    public function test_duration_and_before_or_after_deadline(): void
+    {
+        $gerente = User::factory()->role('gerente')->create();
+        $enc = User::factory()->role('encargado')->create(['name' => 'Elena']);
+
+        // Inicio 8 nov. Fin 10 nov. Terminada el 9 (1 día antes), el 10 (en la fecha) y el 11 (1 día después)
+        $antes = $this->act($enc, $gerente, 'concluido', '2026-11-10', '2026-11-09 10:00');
+        $enFecha = $this->act($enc, $gerente, 'concluido', '2026-11-10', '2026-11-10 18:00');
+        $despues = $this->act($enc, $gerente, 'concluido', '2026-11-10', '2026-11-11 09:00');
+        $abierta = $this->act($enc, $gerente, 'en_proceso', '2026-11-10');
+
+        $this->assertSame([2, 3, 4], [$antes->durationDays(), $enFecha->durationDays(), $despues->durationDays()]);
+        $this->assertSame(3, $antes->plannedDays());
+        $this->assertSame([-1, 0, 1], [$antes->deadlineDelta(), $enFecha->deadlineDelta(), $despues->deadlineDelta()]);
+        $this->assertSame(['antes', 'a_tiempo', 'despues'], [$antes->deadlineResult(), $enFecha->deadlineResult(), $despues->deadlineResult()]);
+        $this->assertSame('Terminó 1 día después', $despues->deadlineLabel());
+        $this->assertSame('Terminó 1 día antes', $antes->deadlineLabel());
+        $this->assertNull($abierta->durationDays());
+
+        // Mismo día de inicio y fin, terminada ese día: dura 1 día y queda «en la fecha»
+        $rapida = $this->act($enc, $gerente, 'concluido', '2026-11-08', '2026-11-08 12:00');
+        $this->assertSame(1, $rapida->durationDays());
+
+        $d = (new DashboardMetrics('30'))->durations();
+        $this->assertSame(4, $d['total']);
+        $this->assertSame([1, 2, 1], [$d['antes'], $d['en_fecha'], $d['despues']]);
+        $this->assertEqualsWithDelta(2.5, $d['duracion'], 0.05);     // (2 + 3 + 4 + 1) / 4
+        $this->assertEqualsWithDelta(75.0, $d['a_tiempo_pct'], 0.05); // 3 de 4 antes o en la fecha
+        $this->assertEqualsWithDelta(1.0, $d['dias_retraso'], 0.05);
+
+        $this->actingAs($gerente)->get('/dashboard?period=30')->assertOk()
+            ->assertSee('Duración de las actividades')->assertSee('Terminó 1 día después')->assertSee('Elena');
+        $this->actingAs($gerente)->get("/activities/{$despues->id}")->assertSee('Duró')->assertSee('Terminó 1 día después');
+    }
+
+    public function test_encargado_has_his_own_dashboard_with_only_his_activities(): void
+    {
+        $gerente = User::factory()->role('gerente')->create(['name' => 'Gerardo Gerente']);
+        $yo = User::factory()->role('encargado')->create();
+        $otro = User::factory()->role('encargado')->create();
+
+        // Me asignaron 3 (una concluida antes de tiempo, una vencida) y me cargué 2
+        $this->act($yo, $gerente, 'concluido', '2026-11-10', '2026-11-09 10:00');
+        $this->act($yo, $gerente, 'no_iniciado', '2026-11-10');
+        $this->act($yo, $gerente, 'en_proceso', '2026-11-14');
+        $this->act($yo, $yo, 'en_proceso', '2026-11-20');
+        $this->act($yo, $yo, 'suspendida', '2026-11-20');
+        // Del otro encargado: no debe contar ni verse
+        $ajena = $this->act($otro, $gerente, 'no_iniciado', '2026-11-05');
+
+        $html = $this->actingAs($yo)->get('/dashboard')->assertOk()
+            ->assertSee('Mi dashboard')->assertSee('Me las asignaron')->assertSee('Me las cargué yo')
+            ->assertSee('Gerardo Gerente (3)')
+            ->assertSee('Estado de mis actividades')
+            ->assertSee('Duración de las actividades')->assertSee('Terminó 1 día antes')
+            ->assertDontSee($ajena->code)
+            ->viewData('total');
+        $this->assertSame(5, $html);
+
+        $v = $this->actingAs($yo)->get('/dashboard');
+        $this->assertSame(3, $v->viewData('asignadas'));
+        $this->assertSame(2, $v->viewData('propias'));
+        $this->assertSame([1, 2, 1, 1, 0], array_column($v->viewData('byStatus'), 'value'));
+        $this->assertCount(1, $v->viewData('overdue'));                       // la que vencía el 10
+        $this->assertSame(1, $v->viewData('durations')['antes']);
+        $this->assertEqualsWithDelta(25.0, $v->viewData('cumplimiento'), 0.05); // 1 / (5 − 1 suspendida)
+
+        // El dashboard de auditoría no es para él
+        $this->actingAs($yo)->get('/dashboard')->assertDontSee('Dashboard de auditoría');
     }
 }

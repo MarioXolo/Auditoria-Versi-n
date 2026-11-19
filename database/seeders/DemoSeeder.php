@@ -19,7 +19,7 @@ use Illuminate\Database\Seeder;
  */
 class DemoSeeder extends Seeder
 {
-    /** Nombres para los empleados demo (3 por equipo). */
+    /** Nombres para los encargados demo (3 por equipo). */
     private const PEOPLE = [
         'Norte' => ['Lucía Hernández', 'Diego Ramírez', 'Fernanda Torres'],
         'Sur' => ['Jorge Castillo', 'Ana Sofía Morales', 'Ricardo Vega'],
@@ -76,10 +76,10 @@ class DemoSeeder extends Seeder
             ]);
             $leader->update(['team_id' => $team->id]);
 
-            // Un empleado con correo fijo para poder entrar con ese rol
-            User::factory()->create([
-                'name' => "Empleado {$zone}",
-                'email' => "empleado.{$slug}@demo.test",
+            // Otro encargado con correo fijo (versión 3: ya no hay empleados)
+            User::factory()->role('encargado')->create([
+                'name' => "Promotor {$zone}",
+                'email' => "promotor.{$slug}@demo.test",
                 'team_id' => $team->id,
             ]);
 
@@ -95,17 +95,15 @@ class DemoSeeder extends Seeder
         });
 
         foreach ($teams as $team) {
-            $members = $team->members()->where('role', 'empleado')->get();
+            $members = $team->members()->where('role', 'encargado')->get();
 
             foreach ($members as $member) {
                 foreach (range(1, rand(6, 12)) as $i) {
-                    $this->createActivity($member, $team, [$team->leader_id, $gerente->id], $types->random(), $communities->random());
+                    $this->createActivity($member, $team, [$gerente->id], $types->random(), $communities->random());
                 }
 
                 $this->createAttendance($member);
             }
-
-            $this->createAttendance($team->leader);
         }
 
         // Guardar en orden de creación para que los folios de cada equipo (ID1.0001…) sigan la cronología
@@ -128,10 +126,10 @@ class DemoSeeder extends Seeder
             ActivityStatus::NoIniciado, ActivityStatus::NoIniciado, ActivityStatus::EnProceso, ActivityStatus::Suspendida,
         ]);
 
-        // 1 de cada 4 la carga el propio empleado; el resto su encargado o el gerente
-        $selfAssigned = rand(1, 4) === 1;
+        // 1 de cada 3 se la carga el propio encargado; el resto se la asigna el gerente, que es quien revisa
+        $selfAssigned = rand(1, 3) === 1;
         $creator = $selfAssigned ? $member->id : fake()->randomElement($creators);
-        $marker = $selfAssigned ? $team->leader_id : $creator;
+        $marker = $creators[0];
 
         // Creada en los últimos 45 días, en horario laboral
         $created = now()->subDays(rand(1, 45))->setTime(rand(8, 17), rand(0, 59));

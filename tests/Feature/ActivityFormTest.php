@@ -29,7 +29,8 @@ class ActivityFormTest extends TestCase
         $this->encargado = User::factory()->role('encargado')->create();
         $team = Team::create(['name' => 'Norte', 'leader_id' => $this->encargado->id]);
         $this->encargado->update(['team_id' => $team->id]);
-        $this->empleado = User::factory()->create(['team_id' => $team->id]);
+        // Versión 3: ya no hay empleados; el «compañero» es otro encargado del mismo equipo
+        $this->empleado = User::factory()->role('encargado')->create(['team_id' => $team->id]);
     }
 
     public function test_form_shows_automatic_id_and_fields_in_order(): void
@@ -48,8 +49,10 @@ class ActivityFormTest extends TestCase
         sort($sorted);
         $this->assertSame($sorted, $positions, 'Orden: ID, tipo, comunidad, evidencia, inicio, fin, estado');
 
+        // El encargado se la carga a sí mismo (aunque mande a otra persona)
         $this->actingAs($this->encargado)->post('/activities', $this->payload(['assigned_to' => $this->empleado->id]))
-            ->assertSessionHas('status', 'Actividad ID1.0001 creada y asignada.');
+            ->assertSessionHas('status', 'Actividad ID1.0001 cargada. Un gerente la marcará cuando la revise.');
+        $this->assertSame($this->encargado->id, Activity::first()->assigned_to);
         $this->actingAs($this->encargado)->get('/activities/create')->assertSee('ID1.0002');
     }
 
@@ -75,7 +78,7 @@ class ActivityFormTest extends TestCase
 
         $a = Activity::firstOrFail();
         $this->assertSame('Se visitaron 18 domicilios.', $a->evidence_text);
-        $this->actingAs($this->encargado)->get("/activities/{$a->id}")
+        $this->actingAs($this->gerente)->get("/activities/{$a->id}")
             ->assertSee('Se visitaron 18 domicilios.')
             ->assertSee('ID1.0001')
             ->assertSee('Visita domiciliaria')
