@@ -356,6 +356,24 @@ class DashboardMetrics
             ];
         }
 
+        // Actividades que exigían acudir a un lugar y no se validó (o se validó fuera)
+        $located = Activity::query()
+            ->withLocationAlert()
+            ->whereNotIn('status', [ActivityStatus::Suspendida->value])
+            ->when($this->teamId, fn ($q) => $q->where('team_id', $this->teamId))
+            ->with('assignee:id,name')
+            ->orderBy('end_date')
+            ->get();
+
+        if ($located->isNotEmpty()) {
+            $alerts[] = [
+                'level' => 'bad',
+                'title' => $located->count().' '.($located->count() === 1 ? 'actividad requiere ubicación y no está validada' : 'actividades requieren ubicación y no están validadas'),
+                'detail' => $located->take(3)->map(fn ($a) => "{$a->code} ({$a->assignee?->name}: ".($a->locationStatus() === 'fuera' ? "fuera, a {$a->ubicacion_distancia} m" : 'sin validar').')')->join(' · '),
+                'link' => route('activities.index', ['ubicacion' => 'alerta']),
+            ];
+        }
+
         // Actividades marcadas como incompletas en el periodo
         $failed = $this->activities($this->from, $this->to)
             ->filter(fn ($a) => $a->status === ActivityStatus::NoCompletada);

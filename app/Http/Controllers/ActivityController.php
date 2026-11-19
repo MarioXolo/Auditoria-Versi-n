@@ -55,6 +55,7 @@ class ActivityController extends Controller
             })
             ->when($request->input('evidencia') === 'sin', fn ($q) => $q->whereNull('evidence_path')
                 ->where(fn ($w) => $w->whereNull('evidence_text')->orWhere('evidence_text', '')))
+            ->when($request->input('ubicacion') === 'alerta', fn ($q) => $q->withLocationAlert())
             ->when($request->filled('assigned_to'), fn ($q) => $q->where('assigned_to', $request->integer('assigned_to')))
             ->when($request->filled('team_id'), fn ($q) => $q->where('team_id', $request->integer('team_id')));
 
@@ -294,7 +295,84 @@ class ActivityController extends Controller
 
         unset($data['evidence'], $data['activity_type_new'], $data['community_new']);
 
+        return $data + $this->destination($request, $user, $activity);
+    }
+
+    /**
+     * Lugar al que hay que acudir (opcional). Lo define quien crea la actividad; después,
+     * el encargado ya no lo puede mover: solo gerentes y administradores.
+     */
+    private function destination(Request $request, User $user, ?Activity $activity): array
+    {
+        if ($activity && $user->selfAssignOnly()) {
+            return [];
+        }
+
+        $v = $request->validate([
+            'requiere_ubicacion' => ['nullable', 'boolean'],
+            'destino_lat' => ['nullable', 'required_if:requiere_ubicacion,1', 'numeric', 'between:-90,90'],
+            'destino_lng' => ['nullable', 'required_if:requiere_ubicacion,1', 'numeric', 'between:-180,180'],
+            'destino_radio' => ['nullable', 'integer', 'min:50', 'max:20000'],
+            'destino_nombre' => ['nullable', 'string', 'max:150'],
+        ], [
+            'destino_lat.required_if' => 'Marca en el mapa el lugar al que hay que acudir.',
+            'destino_lng.required_if' => 'Marca en el mapa el lugar al que hay que acudir.',
+        ], ['destino_radio' => 'radio permitido', 'destino_nombre' => 'nombre del lugar']);
+
+        if (! $request->boolean('requiere_ubicacion')) {
+            return ['requiere_ubicacion' => false, 'destino_lat' => null, 'destino_lng' => null, 'destino_nombre' => null];
+        }
+
+        $data = [
+            'requiere_ubicacion' => true,
+            'destino_lat' => round((float) $v['destino_lat'], 7),
+            'destino_lng' => round((float) $v['destino_lng'], 7),
+            'destino_radio' => (int) ($v['destino_radio'] ?? 300),
+            'destino_nombre' => filled($v['destino_nombre'] ?? null) ? trim($v['destino_nombre']) : null,
+        ];
+
+        // Si cambió el destino, la validación anterior ya no aplica a ese punto: se recalcula la distancia
+        if ($activity?->ubicacion_at) {
+            $data['ubicacion_distancia'] = Activity::distanceMeters($data['destino_lat'], $data['destino_lng'], $activity->ubicacion_lat, $activity->ubicacion_lng);
+        }
+
         return $data;
+    }
+
+    /** El encargado asignado valida, con el GPS del celular, que está en el lugar. */
+    public function validateLocation(Request $request, Activity $activity): RedirectResponse
+    {
+        abort_unless($activity->assigned_to === $request->user()->id, 403);
+
+        if (! $activity->requiere_ubicacion || $activity->destino_lat === null) {
+            return back()->withErrors(['ubicacion' => 'Esta actividad no requiere validar ubicación.']);
+        }
+        if ($activity->status->isMarked()) {
+            return back()->withErrors(['ubicacion' => 'La actividad ya fue revisada; ya no se puede validar la ubicación.']);
+        }
+
+        $v = $request->validate([
+            'lat' => ['required', 'numeric', 'between:-90,90'],
+            'lng' => ['required', 'numeric', 'between:-180,180'],
+            'precision' => ['required', 'numeric', 'min:0'],
+        ], ['lat.required' => 'No se recibió la ubicación del celular. Permite el acceso a la ubicación e inténtalo de nuevo.']);
+
+        if ((float) $v['precision'] > Activity::PRECISION_MAXIMA) {
+            return back()->withErrors(['ubicacion' => 'La señal de GPS es muy imprecisa (±'.round($v['precision']).' m). Sal a un lugar abierto, espera unos segundos e inténtalo otra vez.']);
+        }
+
+        $distance = Activity::distanceMeters($activity->destino_lat, $activity->destino_lng, (float) $v['lat'], (float) $v['lng']);
+        $activity->forceFill([
+            'ubicacion_lat' => round((float) $v['lat'], 7),
+            'ubicacion_lng' => round((float) $v['lng'], 7),
+            'ubicacion_precision' => (int) round($v['precision']),
+            'ubicacion_distancia' => $distance,
+            'ubicacion_at' => now(),
+        ])->save();
+
+        return back()->with('status', $activity->locationStatus() === 'verificada'
+            ? "Ubicación verificada: estás a {$distance} m del lugar."
+            : 'Quedó registrada tu ubicación, pero estás fuera del lugar ('.$activity->locationLabel().'). La actividad queda en alerta.');
     }
 
     /**

@@ -23,6 +23,12 @@
 @endsection
 
 @section('content')
+    @if ($sinUbicacion->isNotEmpty())
+        <a href="{{ route('activities.index', ['ubicacion' => 'alerta']) }}" class="mb-6 block rounded-xl border border-rose-300 bg-rose-50 p-4 text-sm text-rose-900 hover:border-rose-500">
+            <p class="font-semibold">{{ $sinUbicacion->count() }} {{ $sinUbicacion->count() === 1 ? 'actividad requiere' : 'actividades requieren' }} validar tu ubicación</p>
+            <p class="mt-1">{{ $sinUbicacion->take(3)->map(fn ($a) => $a->code.' · '.($a->destino_nombre ?: $a->type?->name))->join(' · ') }}. Ábrela desde tu celular estando en el lugar y toca «Validar mi ubicación».</p>
+        </a>
+    @endif
     {{-- Cuántas tiene y de dónde vienen --}}
     <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <a href="{{ route('activities.index') }}" class="card block p-5 transition hover:border-brand-500">

@@ -131,9 +131,62 @@
             </select>
         @endif
     </div>
+
+    {{-- 8. Lugar al que hay que acudir (opcional) --}}
+    @php
+        $pinLocked = $activity->exists && auth()->user()->selfAssignOnly();
+        $needsPlace = (bool) old('requiere_ubicacion', $activity->requiere_ubicacion);
+    @endphp
+    <fieldset class="sm:col-span-2 rounded-xl border border-slate-200 p-4" data-map-picker data-toggle="requiere_ubicacion" data-locked="{{ $pinLocked ? 1 : 0 }}">
+        <legend class="px-1 text-sm font-semibold text-slate-700">Ubicación</legend>
+        @if ($pinLocked)
+            <input type="checkbox" id="requiere_ubicacion" class="hidden" @checked($activity->requiere_ubicacion) disabled>
+            @if ($activity->requiere_ubicacion)
+                <p class="text-sm text-slate-600">Hay que acudir a <strong>{{ $activity->destino_nombre ?: 'el lugar marcado' }}</strong> (radio de {{ number_format($activity->destino_radio) }} m). Solo un gerente puede cambiar el lugar.</p>
+            @else
+                <p class="text-sm text-slate-500">Esta actividad no requiere acudir a un lugar.</p>
+            @endif
+        @else
+            <label class="inline-flex items-center gap-2 text-sm font-medium text-slate-700">
+                <input type="hidden" name="requiere_ubicacion" value="0">
+                <input type="checkbox" id="requiere_ubicacion" name="requiere_ubicacion" value="1" class="rounded border-slate-300" @checked($needsPlace)>
+                Requiere acudir al lugar
+            </label>
+            <p class="mt-1 text-xs text-slate-500">Si la marcas, el encargado tendrá que validar desde su celular que estuvo ahí. Si no la valida o está fuera del radio, la actividad se marca en rojo.</p>
+        @endif
+
+        <div data-map-panel @class(['mt-3 space-y-3', 'hidden' => ! $needsPlace])>
+            @unless ($pinLocked)
+                <div class="grid gap-3 sm:grid-cols-3">
+                    <div class="sm:col-span-2">
+                        <label for="destino_nombre" class="label">Nombre del lugar</label>
+                        <input id="destino_nombre" name="destino_nombre" maxlength="150" class="input" placeholder="Ej. Plaza principal de San Pedro"
+                               value="{{ old('destino_nombre', $activity->destino_nombre) }}">
+                    </div>
+                    <div>
+                        <label for="destino_radio" class="label">Radio permitido (m)</label>
+                        <input id="destino_radio" type="number" name="destino_radio" min="50" max="20000" step="50" class="input"
+                               value="{{ old('destino_radio', $activity->destino_radio ?? 300) }}">
+                    </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                    <button type="button" class="btn btn-secondary px-3 py-1 text-xs" data-map-here>Usar mi ubicación actual</button>
+                    <span data-map-hint>{{ $activity->destino_lat ? 'Toca el mapa para mover el punto.' : 'Toca el mapa para marcar el lugar.' }}</span>
+                </div>
+            @else
+                <span data-map-hint class="hidden"></span>
+                <input type="hidden" name="destino_radio" value="{{ $activity->destino_radio }}" disabled>
+            @endunless
+            <input type="hidden" name="destino_lat" value="{{ old('destino_lat', $activity->destino_lat) }}" @disabled($pinLocked)>
+            <input type="hidden" name="destino_lng" value="{{ old('destino_lng', $activity->destino_lng) }}" @disabled($pinLocked)>
+            <div data-map class="h-72 w-full overflow-hidden rounded-lg border border-slate-200"></div>
+            @error('destino_lat')<p class="text-sm text-rose-600">{{ $message }}</p>@enderror
+        </div>
+    </fieldset>
 </div>
 
 @push('scripts')
+@vite('resources/js/map.js')
 <script>
     document.querySelectorAll('[data-evidence]').forEach((box) => {
         box.addEventListener('change', (e) => {

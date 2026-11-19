@@ -82,7 +82,12 @@
                             <p @class(['font-medium', 'text-rose-900' => $failed])>{{ $activity->type?->name }}</p>
                             <p class="text-sm text-slate-600">{{ $activity->community?->name }}</p>
                         </div>
-                        <span class="badge {{ $activity->status->badge() }}">{{ $activity->status->label() }}</span>
+                        <div class="shrink-0 text-right">
+                            <span class="badge {{ $activity->status->badge() }}">{{ $activity->status->label() }}</span>
+                            @if ($activity->locationAlert())
+                                <span class="badge mt-1 block bg-rose-600 text-white">{{ $activity->locationStatus() === 'fuera' ? 'Fuera del lugar' : 'Ubicación sin validar' }}</span>
+                            @endif
+                        </div>
                     </div>
                     <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
                         <span>{{ $activity->assignee?->name }}</span>
@@ -146,6 +151,9 @@
                         </td>
                         <td class="table-cell">
                             <span class="badge {{ $activity->status->badge() }}">{{ $activity->status->label() }}</span>
+                            @if ($activity->locationAlert())
+                                <span class="badge mt-1 block bg-rose-600 text-white">{{ $activity->locationStatus() === 'fuera' ? 'Fuera del lugar' : 'Ubicación sin validar' }}</span>
+                            @endif
                             @if ($activity->isSelfAssigned() && $activity->assignee?->selfAssignOnly())
                                 <span class="mt-1 block text-xs text-slate-500">Se la cargó él mismo</span>
                             @endif

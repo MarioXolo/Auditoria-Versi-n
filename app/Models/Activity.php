@@ -27,6 +27,16 @@ class Activity extends Model
         'marked_by',
         'marked_at',
         'mark_notes',
+        'requiere_ubicacion',
+        'destino_lat',
+        'destino_lng',
+        'destino_radio',
+        'destino_nombre',
+        'ubicacion_lat',
+        'ubicacion_lng',
+        'ubicacion_precision',
+        'ubicacion_distancia',
+        'ubicacion_at',
     ];
 
     protected function casts(): array
@@ -40,6 +50,15 @@ class Activity extends Model
             'status' => ActivityStatus::class,
             'start_date' => 'date',
             'end_date' => 'date',
+            'requiere_ubicacion' => 'boolean',
+            'destino_lat' => 'float',
+            'destino_lng' => 'float',
+            'destino_radio' => 'integer',
+            'ubicacion_lat' => 'float',
+            'ubicacion_lng' => 'float',
+            'ubicacion_precision' => 'integer',
+            'ubicacion_distancia' => 'integer',
+            'ubicacion_at' => 'datetime',
             'completed_at' => 'datetime',
             'marked_by' => 'integer',
             'marked_at' => 'datetime',
@@ -138,6 +157,64 @@ class Activity extends Model
 
         // Encargado: solo las suyas (las que le asignaron y las que se cargó). No ve las de otros encargados.
         return $query->where(fn (Builder $q) => $q->where('assigned_to', $user->id)->orWhere('created_by', $user->id));
+    }
+
+    // ------------------------------------------------------------------
+    // Geolocalización
+    // ------------------------------------------------------------------
+
+    /** Precisión mínima aceptada del GPS del celular, en metros. */
+    public const PRECISION_MAXIMA = 100;
+
+    /** Distancia en metros entre dos puntos (fórmula de Haversine). */
+    public static function distanceMeters(float $lat1, float $lng1, float $lat2, float $lng2): int
+    {
+        $r = 6371000;
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLng = deg2rad($lng2 - $lng1);
+        $a = sin($dLat / 2) ** 2 + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLng / 2) ** 2;
+
+        return (int) round(2 * $r * asin(min(1, sqrt($a))));
+    }
+
+    /**
+     * Estado de la ubicación: null si la actividad no la requiere; «pendiente» si aún no se
+     * valida; «fuera» si se validó lejos del destino; «verificada» si estaba dentro del radio.
+     * Pendiente y fuera son alertas (rojo).
+     */
+    public function locationStatus(): ?string
+    {
+        if (! $this->requiere_ubicacion) {
+            return null;
+        }
+        if (! $this->ubicacion_at) {
+            return 'pendiente';
+        }
+
+        return $this->ubicacion_distancia !== null && $this->ubicacion_distancia <= $this->destino_radio ? 'verificada' : 'fuera';
+    }
+
+    public function locationAlert(): bool
+    {
+        return in_array($this->locationStatus(), ['pendiente', 'fuera'], true);
+    }
+
+    public function locationLabel(): ?string
+    {
+        $m = fn (int $v) => $v >= 1000 ? number_format($v / 1000, 1).' km' : $v.' m';
+
+        return match ($this->locationStatus()) {
+            null => null,
+            'pendiente' => 'Ubicación no validada',
+            'fuera' => 'Fuera del lugar ('.$m($this->ubicacion_distancia).' del destino)',
+            'verificada' => 'Ubicación verificada ('.$m($this->ubicacion_distancia).')',
+        };
+    }
+
+    public function scopeWithLocationAlert(Builder $q): Builder
+    {
+        return $q->where('requiere_ubicacion', true)
+            ->where(fn ($w) => $w->whereNull('ubicacion_at')->orWhereColumn('ubicacion_distancia', '>', 'destino_radio'));
     }
 
     // ------------------------------------------------------------------

@@ -13,6 +13,11 @@
             @if ($activity->isOverdue())
                 <span class="badge bg-rose-600 text-white">Vencida</span>
             @endif
+            @if ($activity->locationAlert())
+                <span class="badge bg-rose-600 text-white">{{ $activity->locationLabel() }}</span>
+            @elseif ($activity->locationStatus() === 'verificada')
+                <span class="badge bg-emerald-100 text-emerald-800">Ubicación verificada</span>
+            @endif
             @if ($activity->isSelfAssigned() && $activity->assignee?->selfAssignOnly())
                 <span class="badge bg-brand-50 text-brand-700">Se la cargó él mismo</span>
             @endif
@@ -53,6 +58,42 @@
                     <p class="mt-3 whitespace-pre-line text-slate-800">{{ $activity->evidence_text }}</p>
                 @endif
             </section>
+
+            @if ($activity->requiere_ubicacion && $activity->destino_lat)
+                @php $loc = $activity->locationStatus(); @endphp
+                <section @class([
+                    'card p-6',
+                    'border-rose-300 bg-rose-50' => $activity->locationAlert(),
+                    'border-emerald-300 bg-emerald-50' => $loc === 'verificada',
+                ])>
+                    <div class="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                            <h2 class="text-sm font-semibold text-slate-500 uppercase">Ubicación</h2>
+                            <p class="mt-1 text-slate-800">Hay que acudir a <strong>{{ $activity->destino_nombre ?: 'el lugar marcado' }}</strong>
+                                <span class="text-sm text-slate-500">(radio de {{ number_format($activity->destino_radio) }} m)</span></p>
+                        </div>
+                        <span @class(['badge', 'bg-rose-600 text-white' => $activity->locationAlert(), 'bg-emerald-600 text-white' => $loc === 'verificada'])>{{ $activity->locationLabel() }}</span>
+                    </div>
+                    @if ($activity->ubicacion_at)
+                        <p class="mt-2 text-xs text-slate-600">Validada el {{ $activity->ubicacion_at->format('d/m/Y H:i') }} · precisión del GPS ±{{ $activity->ubicacion_precision }} m</p>
+                    @endif
+
+                    <div class="mt-4 h-64 w-full overflow-hidden rounded-lg border border-slate-200" data-map-view
+                         data-dest-lat="{{ $activity->destino_lat }}" data-dest-lng="{{ $activity->destino_lng }}" data-radius="{{ $activity->destino_radio }}"
+                         @if ($activity->ubicacion_at) data-me-lat="{{ $activity->ubicacion_lat }}" data-me-lng="{{ $activity->ubicacion_lng }}" data-ok="{{ $loc === 'verificada' ? 1 : 0 }}" @endif></div>
+
+                    @if (auth()->id() === $activity->assigned_to && ! $activity->status->isMarked())
+                        <form method="POST" action="{{ route('activities.location', $activity) }}" class="mt-4" data-geo-validate>
+                            @csrf
+                            <input type="hidden" name="lat">
+                            <input type="hidden" name="lng">
+                            <input type="hidden" name="precision">
+                            <button class="btn btn-primary w-full sm:w-auto">{{ $activity->ubicacion_at ? 'Volver a validar mi ubicación' : 'Validar mi ubicación' }}</button>
+                            <p class="mt-2 text-xs text-slate-600" data-geo-msg>Hazlo desde tu celular cuando estés en el lugar. Se toma tu ubicación en ese momento.</p>
+                        </form>
+                    @endif
+                </section>
+            @endif
         </div>
 
         <aside class="space-y-6">
@@ -165,3 +206,7 @@
         </aside>
     </div>
 @endsection
+
+@push('scripts')
+@vite('resources/js/map.js')
+@endpush

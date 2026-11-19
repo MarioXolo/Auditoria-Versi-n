@@ -110,6 +110,7 @@ class DashboardController extends Controller
         $effective = $assignedToMe->filter(fn ($a) => $a->status !== ActivityStatus::Suspendida)->count();
         $open = $assignedToMe->filter(fn ($a) => $a->status->isOpen());
         $overdue = $open->filter(fn ($a) => $a->end_date && $a->end_date->lt(today()));
+        $sinUbicacion = $assignedToMe->filter(fn ($a) => $a->locationAlert() && $a->status !== ActivityStatus::Suspendida);
 
         $byStatus = collect(ActivityStatus::cases())->map(fn ($s) => [
             'key' => $s->value,
@@ -128,6 +129,7 @@ class DashboardController extends Controller
             'periods' => $periods,
             'period' => $period,
             'total' => $assignedToMe->count(),
+            'sinUbicacion' => $sinUbicacion,
             'propias' => $propias->count(),
             'asignadas' => $asignadas->count(),
             'asignadasPor' => $asignadas->groupBy(fn ($a) => $a->creator?->name ?? '—')->map->count()->sortDesc(),
