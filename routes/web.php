@@ -46,6 +46,8 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::patch('/activities/{activity}/estado', [ActivityController::class, 'updateStatus'])->name('activities.status');
     Route::get('/activities/{activity}/evidence', [ActivityController::class, 'evidence'])->name('activities.evidence');
     Route::post('/activities/{activity}/ubicacion', [ActivityController::class, 'validateLocation'])->middleware('throttle:20,1')->name('activities.location');
+    Route::post('/activities/{activity}/ubicacion/manual', [ActivityController::class, 'validateLocationManually'])->name('activities.location.manual');
+    Route::delete('/activities/{activity}/ubicacion/manual', [ActivityController::class, 'revokeManualLocation'])->name('activities.location.revoke');
 
     // Calendario de actividades (cada quien ve lo que su rol le permite); se imprime a PDF desde el navegador
     Route::get('/calendario', CalendarController::class)->name('calendar.index');

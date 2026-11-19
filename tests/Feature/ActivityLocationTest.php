@@ -227,4 +227,41 @@ class ActivityLocationTest extends TestCase
         $this->actingAs($this->gerente)->post('/activities', $this->withPlace(['assigned_to' => $this->encargado->id]))->assertRedirect()->assertSessionHasNoErrors();
         $this->assertSame(1, Activity::count());
     }
+
+    public function test_admin_or_gerente_validates_by_hand_without_being_near_even_if_concluded(): void
+    {
+        $admin = User::factory()->role('admin')->create();
+        $a = $this->assignedByGerente();
+        $this->actingAs($admin)->post("/activities/{$a->id}/marcar", ['marca' => 'concluido'])->assertRedirect();
+        $this->assertTrue($a->fresh()->locationAlert());
+
+        // El encargado no puede validarse a mano; sin motivo no se acepta
+        $this->actingAs($this->encargado)->post("/activities/{$a->id}/ubicacion/manual", ['ubicacion_nota' => 'Estuve ahí'])->assertForbidden();
+        $this->actingAs($admin)->get("/activities/{$a->id}")->assertSee('Validar a mano (sin GPS)');
+        $this->actingAs($admin)->post("/activities/{$a->id}/ubicacion/manual", ['ubicacion_nota' => ''])->assertSessionHasErrors('ubicacion_nota');
+
+        $this->actingAs($admin)->post("/activities/{$a->id}/ubicacion/manual", ['ubicacion_nota' => 'Lo vi en la junta'])->assertRedirect()->assertSessionHasNoErrors();
+        $a->refresh();
+        $this->assertSame('manual', $a->locationStatus());
+        $this->assertFalse($a->locationAlert());
+        $this->assertSame(0, Activity::withLocationAlert()->count());
+        $this->actingAs($this->encargado)->get("/activities/{$a->id}")->assertSee('Validada a mano por')->assertSee('Lo vi en la junta');
+
+        // Se puede quitar y vuelve la alerta
+        $this->actingAs($this->gerente)->delete("/activities/{$a->id}/ubicacion/manual")->assertRedirect();
+        $this->assertTrue($a->fresh()->locationAlert());
+    }
+
+    public function test_manual_validation_lets_the_encargado_conclude_and_gps_replaces_it(): void
+    {
+        $a = $this->assignedByGerente();
+        $this->actingAs($this->gerente)->post("/activities/{$a->id}/ubicacion/manual", ['ubicacion_nota' => 'Se le descompuso el GPS']);
+        $this->assertFalse($a->fresh()->locationBlocksSelfConclusion($this->encargado));
+
+        // Si después valida con GPS, queda el dato del GPS
+        $this->actingAs($this->encargado)->post("/activities/{$a->id}/ubicacion", ['lat' => self::LAT, 'lng' => self::LNG, 'precision' => 10]);
+        $a->refresh();
+        $this->assertSame('verificada', $a->locationStatus());
+        $this->assertNull($a->ubicacion_validada_por);
+    }
 }

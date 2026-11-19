@@ -17,6 +17,8 @@
                 <span class="badge bg-rose-600 text-white">{{ $activity->locationLabel() }}</span>
             @elseif ($activity->locationStatus() === 'verificada')
                 <span class="badge bg-emerald-100 text-emerald-800">Ubicación verificada</span>
+            @elseif ($activity->locationStatus() === 'manual')
+                <span class="badge bg-sky-100 text-sky-800">Ubicación validada a mano</span>
             @endif
             @if ($activity->isSelfAssigned() && $activity->assignee?->selfAssignOnly())
                 <span class="badge bg-brand-50 text-brand-700">Se la cargó él mismo</span>
@@ -65,6 +67,7 @@
                     'card p-6',
                     'border-rose-300 bg-rose-50' => $activity->locationAlert(),
                     'border-emerald-300 bg-emerald-50' => $loc === 'verificada',
+                    'border-sky-300 bg-sky-50' => $loc === 'manual',
                 ])>
                     <div class="flex flex-wrap items-start justify-between gap-3">
                         <div>
@@ -72,16 +75,42 @@
                             <p class="mt-1 text-slate-800">Hay que acudir a <strong>{{ $activity->destino_nombre ?: 'el lugar marcado' }}</strong>
                                 <span class="text-sm text-slate-500">(radio de {{ number_format($activity->destino_radio) }} m)</span></p>
                         </div>
-                        <span @class(['badge', 'bg-rose-600 text-white' => $activity->locationAlert(), 'bg-emerald-600 text-white' => $loc === 'verificada'])>{{ $activity->locationLabel() }}</span>
+                        <span @class(['badge', 'bg-rose-600 text-white' => $activity->locationAlert(), 'bg-emerald-600 text-white' => $loc === 'verificada', 'bg-sky-600 text-white' => $loc === 'manual'])>{{ $activity->locationLabel() }}</span>
                     </div>
                     @if ($activity->ubicacion_at)
-                        <p class="mt-2 text-xs text-slate-600">Validada el {{ $activity->ubicacion_at->format('d/m/Y H:i') }} · precisión del GPS ±{{ $activity->ubicacion_precision }} m</p>
+                        <p class="mt-2 text-xs text-slate-600">GPS del encargado: {{ $activity->ubicacion_at->format('d/m/Y H:i') }} · precisión ±{{ $activity->ubicacion_precision }} m · a {{ number_format($activity->ubicacion_distancia) }} m del lugar</p>
+                    @endif
+                    @if ($loc === 'manual')
+                        <div class="mt-3 rounded-lg border border-sky-200 bg-white px-3 py-2 text-sm">
+                            <p class="font-medium text-sky-900">Validada a mano por {{ $activity->locationValidator?->name }} · {{ $activity->ubicacion_validada_at?->format('d/m/Y H:i') }}</p>
+                            <p class="mt-1 whitespace-pre-line text-slate-700">{{ $activity->ubicacion_nota }}</p>
+                            @if (auth()->user()->seesEverything())
+                                <form method="POST" action="{{ route('activities.location.revoke', $activity) }}" class="mt-2" onsubmit="return confirm('¿Quitar la validación manual? La actividad volverá a quedar en alerta si no tiene GPS válido.')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="text-xs font-medium text-rose-700 hover:underline">Quitar validación manual</button>
+                                </form>
+                            @endif
+                        </div>
                     @endif
 
                     <div class="mt-4 h-64 w-full overflow-hidden rounded-lg border border-slate-200" data-map-view
                          data-dest-lat="{{ $activity->destino_lat }}" data-dest-lng="{{ $activity->destino_lng }}" data-radius="{{ $activity->destino_radio }}"
                          @if ($activity->ubicacion_at) data-me-lat="{{ $activity->ubicacion_lat }}" data-me-lng="{{ $activity->ubicacion_lng }}" data-ok="{{ $loc === 'verificada' ? 1 : 0 }}" @endif></div>
 
+                    @if (auth()->user()->seesEverything() && $activity->locationAlert())
+                        <details class="mt-4 rounded-lg border border-slate-200 bg-white p-3" @if ($errors->has('ubicacion_nota')) open @endif>
+                            <summary class="cursor-pointer text-sm font-medium text-slate-800">Validar a mano (sin GPS)</summary>
+                            <form method="POST" action="{{ route('activities.location.manual', $activity) }}" class="mt-3 space-y-2">
+                                @csrf
+                                <label for="ubicacion_nota" class="label">¿Cómo confirmaste que estuvo en el lugar? *</label>
+                                <textarea id="ubicacion_nota" name="ubicacion_nota" rows="2" maxlength="500" required class="input"
+                                          placeholder="Ej. Lo vi en la junta; foto del evento en el grupo; se le descompuso el GPS">{{ old('ubicacion_nota') }}</textarea>
+                                <button class="btn btn-secondary">Validar ubicación</button>
+                                <p class="text-xs text-slate-500">No necesitas estar cerca del lugar. Queda registrado quién la validó y el motivo.</p>
+                            </form>
+                        </details>
+                    @endif
                     @if (auth()->id() === $activity->assigned_to && ! $activity->status->isMarked())
                         <form method="POST" action="{{ route('activities.location', $activity) }}" class="mt-4" data-geo-validate>
                             @csrf

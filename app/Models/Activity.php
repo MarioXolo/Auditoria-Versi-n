@@ -59,6 +59,8 @@ class Activity extends Model
             'ubicacion_precision' => 'integer',
             'ubicacion_distancia' => 'integer',
             'ubicacion_at' => 'datetime',
+            'ubicacion_validada_por' => 'integer',
+            'ubicacion_validada_at' => 'datetime',
             'completed_at' => 'datetime',
             'marked_by' => 'integer',
             'marked_at' => 'datetime',
@@ -187,11 +189,20 @@ class Activity extends Model
         if (! $this->requiere_ubicacion) {
             return null;
         }
+        if ($this->ubicacion_validada_por) {
+            return 'manual';
+        }
         if (! $this->ubicacion_at) {
             return 'pendiente';
         }
 
         return $this->ubicacion_distancia !== null && $this->ubicacion_distancia <= $this->destino_radio ? 'verificada' : 'fuera';
+    }
+
+    /** Administrador o gerente que validó la ubicación a mano. */
+    public function locationValidator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'ubicacion_validada_por');
     }
 
     public function locationAlert(): bool
@@ -208,6 +219,7 @@ class Activity extends Model
             'pendiente' => 'Ubicación no validada',
             'fuera' => 'Fuera del lugar ('.$m($this->ubicacion_distancia).' del destino)',
             'verificada' => 'Ubicación verificada ('.$m($this->ubicacion_distancia).')',
+            'manual' => 'Ubicación validada por '.($this->locationValidator?->name ?? 'un administrador'),
         };
     }
 
@@ -219,12 +231,13 @@ class Activity extends Model
     {
         return $this->assigned_to === $user->id
             && $this->requiere_ubicacion
-            && $this->locationStatus() !== 'verificada';
+            && ! in_array($this->locationStatus(), ['verificada', 'manual'], true);
     }
 
     public function scopeWithLocationAlert(Builder $q): Builder
     {
         return $q->where('requiere_ubicacion', true)
+            ->whereNull('ubicacion_validada_por')
             ->where(fn ($w) => $w->whereNull('ubicacion_at')->orWhereColumn('ubicacion_distancia', '>', 'destino_radio'));
     }
 

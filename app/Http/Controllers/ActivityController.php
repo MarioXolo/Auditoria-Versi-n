@@ -123,7 +123,7 @@ class ActivityController extends Controller
     public function show(Activity $activity): View
     {
         $this->authorize('view', $activity);
-        $activity->load(['assignee', 'creator', 'team', 'marker', 'type', 'community']);
+        $activity->load(['assignee', 'creator', 'team', 'marker', 'type', 'community', 'locationValidator']);
 
         return view('activities.show', ['activity' => $activity]);
     }
@@ -355,6 +355,44 @@ class ActivityController extends Controller
         return $data;
     }
 
+    /**
+     * Un administrador o gerente da por buena la ubicación sin GPS (no necesita estar cerca)
+     * y deja el motivo. Sirve también para actividades ya concluidas.
+     */
+    public function validateLocationManually(Request $request, Activity $activity): RedirectResponse
+    {
+        abort_unless($request->user()->seesEverything(), 403);
+
+        if (! $activity->requiere_ubicacion || $activity->destino_lat === null) {
+            return back()->withErrors(['ubicacion' => 'Esta actividad no requiere validar ubicación.']);
+        }
+
+        $v = $request->validate([
+            'ubicacion_nota' => ['required', 'string', 'min:5', 'max:500'],
+        ], [
+            'ubicacion_nota.required' => 'Escribe por qué validas la ubicación a mano (por ejemplo, cómo confirmaste que estuvo ahí).',
+            'ubicacion_nota.min' => 'Escribe un motivo un poco más claro (al menos 5 letras).',
+        ]);
+
+        $activity->forceFill([
+            'ubicacion_validada_por' => $request->user()->id,
+            'ubicacion_validada_at' => now(),
+            'ubicacion_nota' => trim($v['ubicacion_nota']),
+        ])->save();
+
+        return back()->with('status', 'Ubicación validada a mano. La actividad ya no está en alerta.');
+    }
+
+    /** Quita una validación manual: la actividad vuelve a quedar en alerta si no tiene GPS válido. */
+    public function revokeManualLocation(Request $request, Activity $activity): RedirectResponse
+    {
+        abort_unless($request->user()->seesEverything(), 403);
+
+        $activity->forceFill(['ubicacion_validada_por' => null, 'ubicacion_validada_at' => null, 'ubicacion_nota' => null])->save();
+
+        return back()->with('status', 'Se quitó la validación manual de la ubicación.');
+    }
+
     /** El encargado asignado valida, con el GPS del celular, que está en el lugar. */
     public function validateLocation(Request $request, Activity $activity): RedirectResponse
     {
@@ -384,6 +422,10 @@ class ActivityController extends Controller
             'ubicacion_precision' => (int) round($v['precision']),
             'ubicacion_distancia' => $distance,
             'ubicacion_at' => now(),
+            // Si ya la valida él con GPS, la validación manual deja de aplicar
+            'ubicacion_validada_por' => null,
+            'ubicacion_validada_at' => null,
+            'ubicacion_nota' => null,
         ])->save();
 
         return back()->with('status', $activity->locationStatus() === 'verificada'
