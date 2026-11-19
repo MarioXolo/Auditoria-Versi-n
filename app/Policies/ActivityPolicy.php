@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\ActivityStatus;
 use App\Models\Activity;
 use App\Models\User;
 
@@ -11,7 +12,8 @@ use App\Models\User;
  * - Encargado: ve solo las suyas (las que le asignaron y las que se cargó a sí mismo), nunca
  *   las de otros encargados; edita las que él se cargó y cambia el estado manual
  *   (No iniciado, En proceso, Suspendida) de las suyas. No marca verde/rojo.
- * - Nadie marca una actividad asignada a sí mismo: siempre la marca un gerente o administrador.
+ * - Administrador y gerente marcan cualquier actividad, también las suyas.
+ * - «Concluido» es definitivo: ya nadie la edita, le cambia el estado ni le quita la marca.
  */
 class ActivityPolicy
 {
@@ -35,6 +37,9 @@ class ActivityPolicy
     /** Editar datos de la actividad (no marcarla). */
     public function update(User $user, Activity $activity): bool
     {
+        if ($activity->status === ActivityStatus::Concluido) {
+            return false;
+        }
         if ($user->seesEverything()) {
             return true;
         }
@@ -47,7 +52,8 @@ class ActivityPolicy
 
     public function delete(User $user, Activity $activity): bool
     {
-        return $this->update($user, $activity);
+        // Una concluida solo la puede borrar el administrador (por si se cargó por error)
+        return $user->isAdmin() || $this->update($user, $activity);
     }
 
     /**
@@ -67,7 +73,7 @@ class ActivityPolicy
     /** Checkbox de un superior: ✓ Concluido (verde) o ✗ No completada (rojo). */
     public function mark(User $user, Activity $activity): bool
     {
-        if ($activity->assigned_to === $user->id || $activity->status === \App\Enums\ActivityStatus::Suspendida) {
+        if (in_array($activity->status, [ActivityStatus::Suspendida, ActivityStatus::Concluido], true)) {
             return false;
         }
 

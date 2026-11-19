@@ -132,11 +132,14 @@
                         {{ $done ? 'Concluido' : 'No completada' }} · marcada por {{ $activity->marker?->name }}
                     </p>
                     <p class="text-xs text-slate-500">{{ $activity->marked_at->format('d/m/Y H:i') }}</p>
+                    @if ($done)
+                        <p class="mt-2 text-xs font-medium text-emerald-800">Concluida: ya no se puede modificar.</p>
+                    @endif
                     @if ($activity->mark_notes)
                         <p class="mt-2 whitespace-pre-line text-sm text-slate-700">{{ $activity->mark_notes }}</p>
                     @endif
                 @else
-                    <p class="mt-2 text-sm text-slate-600">Sin revisar. Su encargado, un gerente o el administrador la marca en verde («Concluido») o en rojo («No completada»).</p>
+                    <p class="mt-2 text-sm text-slate-600">Sin revisar. Un gerente o el administrador la marca en verde («Concluido», definitivo) o en rojo («No completada»).</p>
                 @endif
 
                 @can('mark', $activity)
@@ -147,14 +150,14 @@
                             <textarea id="mark_notes" name="mark_notes" rows="2" class="input" placeholder="Ej. Falta la evidencia de la segunda visita">{{ old('mark_notes', $activity->mark_notes) }}</textarea>
                         </div>
                         <div class="grid gap-2">
-                            <button name="marca" value="{{ $done ? 'sin_marcar' : 'concluido' }}" role="checkbox" aria-checked="{{ $done ? 'true' : 'false' }}"
+                            <button name="marca" value="concluido" data-confirm="¿Seguro que quieres marcarla como Concluido? Después ya no podrás hacerle ningún cambio." onclick="return confirm(this.dataset.confirm)" role="checkbox" aria-checked="{{ $done ? 'true' : 'false' }}"
                                     @class(['flex items-center gap-3 rounded-lg border-2 px-3 py-2.5 text-left text-sm font-medium transition',
                                         'border-emerald-600 bg-emerald-600 text-white' => $done,
                                         'border-slate-300 bg-white text-slate-700 hover:border-emerald-500' => ! $done])>
                                 <span @class(['grid size-5 place-items-center rounded border-2', 'border-white' => $done, 'border-slate-400' => ! $done])>
                                     @if ($done)<svg class="size-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>@endif
                                 </span>
-                                {{ $done ? 'Concluido (tocar para quitar)' : 'Marcar como concluido' }}
+                                Marcar como concluido
                             </button>
                             <button name="marca" value="{{ $failed ? 'sin_marcar' : 'no_completada' }}" role="checkbox" aria-checked="{{ $failed ? 'true' : 'false' }}"
                                     @class(['flex items-center gap-3 rounded-lg border-2 px-3 py-2.5 text-left text-sm font-medium transition',

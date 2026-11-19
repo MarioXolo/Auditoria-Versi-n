@@ -73,12 +73,6 @@ class ActivityMarkingTest extends TestCase
     {
         $a = $this->selfLoaded();
 
-        $this->actingAs($this->gerente)->post("/activities/{$a->id}/marcar", ['marca' => 'concluido'])->assertRedirect();
-        $a->refresh();
-        $this->assertSame(ActivityStatus::Concluido, $a->status);
-        $this->assertSame($this->gerente->id, $a->marked_by);
-        $this->assertNotNull($a->completed_at);
-
         // Incompleta: fila roja en el listado y comentario visible para el encargado
         $this->actingAs($this->admin)->post("/activities/{$a->id}/marcar", ['marca' => 'no_completada', 'mark_notes' => 'Falta la evidencia'])->assertRedirect();
         $a->refresh();
@@ -89,20 +83,55 @@ class ActivityMarkingTest extends TestCase
         $this->actingAs($this->gerente)->get('/activities')->assertSee('bg-rose-100', false);
         $this->actingAs($this->encargado)->get("/activities/{$a->id}")->assertSee('Falta la evidencia')->assertSee('No completada');
 
-        // Volver a tocar la marca la quita
+        // El rojo sí se puede quitar
         $this->actingAs($this->admin)->post("/activities/{$a->id}/marcar", ['marca' => 'sin_marcar'])->assertRedirect();
         $a->refresh();
         $this->assertSame(ActivityStatus::EnProceso, $a->status);
         $this->assertNull($a->marked_by);
+
+        // Verde: Concluido pide confirmación y es definitivo
+        $this->actingAs($this->gerente)->get("/activities/{$a->id}")->assertSee('ya no podrás hacerle ningún cambio');
+        $this->actingAs($this->gerente)->post("/activities/{$a->id}/marcar", ['marca' => 'concluido'])->assertRedirect();
+        $a->refresh();
+        $this->assertSame(ActivityStatus::Concluido, $a->status);
+        $this->assertSame($this->gerente->id, $a->marked_by);
+        $this->assertNotNull($a->completed_at);
     }
 
-    public function test_nobody_marks_their_own_activity_and_encargados_cannot_mark(): void
+    public function test_concluded_is_final_for_everyone(): void
     {
-        // Actividad del administrador para el gerente: el gerente no se la marca, el admin sí
-        $this->actingAs($this->admin)->post('/activities', $this->payload(['assigned_to' => $this->gerente->id]))->assertRedirect();
+        $a = $this->selfLoaded();
+        $this->actingAs($this->gerente)->post("/activities/{$a->id}/marcar", ['marca' => 'concluido'])->assertRedirect();
+
+        foreach ([$this->admin, $this->gerente] as $user) {
+            $this->actingAs($user)->post("/activities/{$a->id}/marcar", ['marca' => 'sin_marcar'])->assertForbidden();
+            $this->actingAs($user)->post("/activities/{$a->id}/marcar", ['marca' => 'no_completada'])->assertForbidden();
+            $this->actingAs($user)->get("/activities/{$a->id}/edit")->assertForbidden();
+            $this->actingAs($user)->put("/activities/{$a->id}", $this->payload(['assigned_to' => $this->encargado->id]))->assertForbidden();
+            $this->actingAs($user)->patch("/activities/{$a->id}/estado", ['status' => 'en_proceso'])->assertForbidden();
+        }
+        $this->assertSame(ActivityStatus::Concluido, $a->fresh()->status);
+        $this->actingAs($this->gerente)->get("/activities/{$a->id}")->assertSee('ya no se puede modificar')->assertDontSee('Editar</a>', false);
+
+        // Solo el administrador la puede borrar (por si se cargó por error); el gerente no
+        $this->actingAs($this->gerente)->delete("/activities/{$a->id}")->assertForbidden();
+        $this->actingAs($this->admin)->delete("/activities/{$a->id}")->assertRedirect();
+        $this->assertNull(Activity::find($a->id));
+    }
+
+    public function test_managers_mark_their_own_activities_and_encargados_cannot_mark(): void
+    {
+        // Actividad que el administrador se asignó a sí mismo: él mismo la puede concluir
+        $this->actingAs($this->admin)->post('/activities', $this->payload(['assigned_to' => $this->admin->id]))->assertRedirect();
         $a = Activity::latest('id')->firstOrFail();
-        $this->actingAs($this->gerente)->post("/activities/{$a->id}/marcar", ['marca' => 'concluido'])->assertForbidden();
+        $this->actingAs($this->admin)->get('/activities')->assertSee('Marcar como concluido');
         $this->actingAs($this->admin)->post("/activities/{$a->id}/marcar", ['marca' => 'concluido'])->assertRedirect();
+        $this->assertSame(ActivityStatus::Concluido, $a->fresh()->status);
+
+        // Y el gerente la que le asignaron
+        $this->actingAs($this->admin)->post('/activities', $this->payload(['assigned_to' => $this->gerente->id]))->assertRedirect();
+        $b = Activity::latest('id')->firstOrFail();
+        $this->actingAs($this->gerente)->post("/activities/{$b->id}/marcar", ['marca' => 'concluido'])->assertRedirect();
 
         // El encargado no ve controles de marcado; el gerente sí
         $this->selfLoaded('Otra propia');
@@ -164,9 +193,8 @@ class ActivityMarkingTest extends TestCase
         // Ya marcada, el encargado no la cambia
         $this->actingAs($this->encargado)->patch("/activities/{$a->id}/estado", ['status' => 'en_proceso'])->assertForbidden();
 
-        // Rojo: No completada
-        $this->actingAs($this->gerente)->post("/activities/{$a->id}/marcar", ['marca' => 'no_completada'])->assertRedirect();
-        $this->assertSame(ActivityStatus::NoCompletada, $a->fresh()->status);
-        $this->assertSame(1, (new \App\Services\DashboardMetrics('30', null))->summary()['now']['incompletas']);
+        // Concluida ya no pasa a rojo
+        $this->actingAs($this->gerente)->post("/activities/{$a->id}/marcar", ['marca' => 'no_completada'])->assertForbidden();
+        $this->assertSame(ActivityStatus::Concluido, $a->fresh()->status);
     }
 }

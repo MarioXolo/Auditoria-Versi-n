@@ -72,9 +72,9 @@
         @forelse ($activities as $activity)
             @php $failed = $activity->status === \App\Enums\ActivityStatus::NoCompletada; @endphp
             <div @class(['card flex items-start gap-3 p-4', 'border-rose-300 bg-rose-50' => $failed])>
-                @can('mark', $activity)
+                @if (auth()->user()->can('mark', $activity) || ($canMarkAny && $activity->status === \App\Enums\ActivityStatus::Concluido))
                     <x-mark-controls :activity="$activity" />
-                @endcan
+                @endif
                 <a href="{{ route('activities.show', $activity) }}" class="min-w-0 flex-1">
                     <div class="flex items-start justify-between gap-3">
                         <div class="min-w-0">
@@ -127,11 +127,11 @@
                     ])>
                         @if ($canMarkAny)
                             <td class="table-cell">
-                                @can('mark', $activity)
+                                @if (auth()->user()->can('mark', $activity) || $activity->status === \App\Enums\ActivityStatus::Concluido)
                                     <x-mark-controls :activity="$activity" />
                                 @else
                                     <span class="text-xs text-slate-400" title="La marca un superior">—</span>
-                                @endcan
+                                @endif
                             </td>
                         @endif
                         <td class="table-cell whitespace-nowrap">
