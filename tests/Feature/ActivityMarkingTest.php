@@ -54,9 +54,10 @@ class ActivityMarkingTest extends TestCase
         $this->assertSame($this->encargado->team_id, $a->team_id);
         $this->assertSame(ActivityStatus::NoIniciado, $a->status);
 
-        // La puede editar mientras no la revisen, pero no marcarla
+        // La puede editar mientras no esté marcada, pero no ponerla en rojo
         $this->actingAs($this->encargado)->get("/activities/{$a->id}/edit")->assertOk();
-        $this->actingAs($this->encargado)->post("/activities/{$a->id}/marcar", ['marca' => 'concluido'])->assertForbidden();
+        $this->actingAs($this->encargado)->post("/activities/{$a->id}/marcar", ['marca' => 'no_completada'])->assertForbidden();
+        $this->assertSame(ActivityStatus::NoIniciado, $a->fresh()->status);
 
         // Otro encargado (aunque sea del mismo equipo) no la ve; el gerente sí
         $this->actingAs($this->otroEncargado)->get("/activities/{$a->id}")->assertForbidden();
@@ -119,7 +120,7 @@ class ActivityMarkingTest extends TestCase
         $this->assertNull(Activity::find($a->id));
     }
 
-    public function test_managers_mark_their_own_activities_and_encargados_cannot_mark(): void
+    public function test_everyone_concludes_their_own_activities_but_only_managers_mark_red(): void
     {
         // Actividad que el administrador se asignó a sí mismo: él mismo la puede concluir
         $this->actingAs($this->admin)->post('/activities', $this->payload(['assigned_to' => $this->admin->id]))->assertRedirect();
@@ -133,10 +134,21 @@ class ActivityMarkingTest extends TestCase
         $b = Activity::latest('id')->firstOrFail();
         $this->actingAs($this->gerente)->post("/activities/{$b->id}/marcar", ['marca' => 'concluido'])->assertRedirect();
 
-        // El encargado no ve controles de marcado; el gerente sí
-        $this->selfLoaded('Otra propia');
-        $this->actingAs($this->encargado)->get('/activities')->assertDontSee('Marcar como concluido');
-        $this->actingAs($this->gerente)->get('/activities')->assertSee('Marcar como concluido');
+        // El encargado concluye las suyas (con confirmación), pero no ve el rojo; el gerente ve ambos
+        $c = $this->selfLoaded('Otra propia');
+        $this->actingAs($this->encargado)->get('/activities')->assertSee('Marcar como concluido')->assertDontSee('Marcar como no completada');
+        $this->actingAs($this->gerente)->get('/activities')->assertSee('Marcar como concluido')->assertSee('Marcar como no completada');
+        $this->actingAs($this->encargado)->post("/activities/{$c->id}/marcar", ['marca' => 'concluido'])->assertRedirect();
+        $c->refresh();
+        $this->assertSame(ActivityStatus::Concluido, $c->status);
+        $this->assertSame($this->encargado->id, $c->marked_by);
+        // y ya no la puede cambiar
+        $this->actingAs($this->encargado)->get("/activities/{$c->id}/edit")->assertForbidden();
+        $this->actingAs($this->encargado)->post("/activities/{$c->id}/marcar", ['marca' => 'sin_marcar'])->assertForbidden();
+
+        // Un encargado no marca las de otro
+        $d = $this->selfLoaded('Una más');
+        $this->actingAs($this->otroEncargado)->post("/activities/{$d->id}/marcar", ['marca' => 'concluido'])->assertForbidden();
     }
 
     public function test_gerente_assigns_only_to_encargados(): void

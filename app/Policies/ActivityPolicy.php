@@ -11,8 +11,8 @@ use App\Models\User;
  * - Administrador y gerente: ven, editan y marcan todas; asignan a los encargados.
  * - Encargado: ve solo las suyas (las que le asignaron y las que se cargó a sí mismo), nunca
  *   las de otros encargados; edita las que él se cargó y cambia el estado manual
- *   (No iniciado, En proceso, Suspendida) de las suyas. No marca verde/rojo.
- * - Administrador y gerente marcan cualquier actividad, también las suyas.
+ *   (No iniciado, En proceso, Suspendida) de las suyas y las marca como Concluido. No las pone en rojo.
+ * - Administrador y gerente marcan cualquier actividad (verde o rojo), también las suyas.
  * - «Concluido» es definitivo: ya nadie la edita, le cambia el estado ni le quita la marca.
  */
 class ActivityPolicy
@@ -77,6 +77,13 @@ class ActivityPolicy
             return false;
         }
 
-        return $user->seesEverything();
+        // Gerentes y administradores marcan cualquiera; cada quien concluye las suyas
+        return $user->seesEverything() || $activity->assigned_to === $user->id;
+    }
+
+    /** Rojo (No completada) o quitar el rojo: solo gerentes y administradores. */
+    public function markFailed(User $user, Activity $activity): bool
+    {
+        return $user->seesEverything() && $this->mark($user, $activity);
     }
 }

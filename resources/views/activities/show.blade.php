@@ -139,7 +139,7 @@
                         <p class="mt-2 whitespace-pre-line text-sm text-slate-700">{{ $activity->mark_notes }}</p>
                     @endif
                 @else
-                    <p class="mt-2 text-sm text-slate-600">Sin revisar. Un gerente o el administrador la marca en verde («Concluido», definitivo) o en rojo («No completada»).</p>
+                    <p class="mt-2 text-sm text-slate-600">Sin marcar. La persona asignada, un gerente o el administrador la marca en verde («Concluido», definitivo); el rojo («No completada») lo pone un gerente o el administrador.</p>
                 @endif
 
                 @can('mark', $activity)
@@ -159,6 +159,7 @@
                                 </span>
                                 Marcar como concluido
                             </button>
+                            @can('markFailed', $activity)
                             <button name="marca" value="{{ $failed ? 'sin_marcar' : 'no_completada' }}" role="checkbox" aria-checked="{{ $failed ? 'true' : 'false' }}"
                                     @class(['flex items-center gap-3 rounded-lg border-2 px-3 py-2.5 text-left text-sm font-medium transition',
                                         'border-rose-600 bg-rose-600 text-white' => $failed,
@@ -168,6 +169,7 @@
                                 </span>
                                 {{ $failed ? 'No completada (tocar para quitar)' : 'Marcar como no completada' }}
                             </button>
+                            @endcan
                         </div>
                     </form>
                 @endcan

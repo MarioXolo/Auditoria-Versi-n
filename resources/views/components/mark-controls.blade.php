@@ -21,7 +21,7 @@
     @endif
 
     {{-- ✗ No completada: pinta la actividad de rojo --}}
-    @unless ($done)
+    @if (! $done && auth()->user()->can('markFailed', $activity))
     <form method="POST" action="{{ route('activities.mark', $activity) }}">
         @csrf
         <input type="hidden" name="marca" value="{{ $failed ? 'sin_marcar' : 'no_completada' }}">
@@ -36,5 +36,5 @@
             <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 6l12 12M18 6L6 18"/></svg>
         </button>
     </form>
-    @endunless
+    @endif
 </div>

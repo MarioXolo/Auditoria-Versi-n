@@ -74,7 +74,7 @@ class ActivityController extends Controller
             'statuses' => ActivityStatus::options(),
             'types' => ActivityType::orderBy('name')->get(['id', 'name']),
             'communities' => Community::orderBy('name')->get(['id', 'name']),
-            'canMarkAny' => $user->canManageActivities(),
+            'canMarkAny' => true,
         ]);
     }
 
@@ -182,6 +182,10 @@ class ActivityController extends Controller
             'marca' => ['required', 'in:concluido,no_completada,sin_marcar'],
             'mark_notes' => ['nullable', 'string', 'max:2000'],
         ], [], ['mark_notes' => 'comentario']);
+
+        if ($data['marca'] !== 'concluido') {
+            $this->authorize('markFailed', $activity);
+        }
 
         if ($data['marca'] === 'sin_marcar') {
             $activity->status = ActivityStatus::EnProceso;
