@@ -182,4 +182,32 @@ class ActivityLocationTest extends TestCase
             'lat' => self::LAT, 'lng' => self::LNG, 'precision' => 10,
         ])->assertSessionHasErrors('ubicacion');
     }
+
+    public function test_own_location_activity_can_only_be_concluded_after_validating_inside(): void
+    {
+        $a = $this->assignedByGerente();
+
+        // Sin validar: no la puede concluir él mismo
+        $this->actingAs($this->encargado)->get("/activities/{$a->id}")->assertSee('primero valida tu ubicación');
+        $this->actingAs($this->encargado)->post("/activities/{$a->id}/marcar", ['marca' => 'concluido'])->assertSessionHasErrors('marca');
+        $this->assertFalse($a->fresh()->status->isMarked());
+
+        // Fuera del radio: tampoco
+        $this->actingAs($this->encargado)->post("/activities/{$a->id}/ubicacion", ['lat' => self::LAT + 0.01, 'lng' => self::LNG, 'precision' => 10]);
+        $this->actingAs($this->encargado)->post("/activities/{$a->id}/marcar", ['marca' => 'concluido'])->assertSessionHasErrors('marca');
+
+        // Dentro del radio: ya puede
+        $this->actingAs($this->encargado)->post("/activities/{$a->id}/ubicacion", ['lat' => self::LAT, 'lng' => self::LNG, 'precision' => 10]);
+        $this->actingAs($this->encargado)->post("/activities/{$a->id}/marcar", ['marca' => 'concluido'])->assertRedirect()->assertSessionHasNoErrors();
+        $this->assertTrue($a->fresh()->status->isMarked());
+    }
+
+    public function test_activities_without_location_are_concluded_freely(): void
+    {
+        $this->actingAs($this->gerente)->post('/activities', $this->payload(['assigned_to' => $this->encargado->id]))->assertRedirect();
+        $a = Activity::latest('id')->firstOrFail();
+
+        $this->actingAs($this->encargado)->post("/activities/{$a->id}/marcar", ['marca' => 'concluido'])->assertRedirect()->assertSessionHasNoErrors();
+        $this->assertTrue($a->fresh()->status->isMarked());
+    }
 }

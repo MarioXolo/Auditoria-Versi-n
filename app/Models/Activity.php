@@ -211,6 +211,17 @@ class Activity extends Model
         };
     }
 
+    /**
+     * Quien concluye su propia actividad de ubicación necesita haberla validado dentro del radio.
+     * Un gerente o administrador que revisa la de otra persona no tiene esta restricción.
+     */
+    public function locationBlocksSelfConclusion(User $user): bool
+    {
+        return $this->assigned_to === $user->id
+            && $this->requiere_ubicacion
+            && $this->locationStatus() !== 'verificada';
+    }
+
     public function scopeWithLocationAlert(Builder $q): Builder
     {
         return $q->where('requiere_ubicacion', true)

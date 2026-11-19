@@ -9,6 +9,11 @@
         <span class="grid {{ $size }} place-items-center rounded-md border-2 border-emerald-600 bg-emerald-600 text-white" title="Concluido · ya no se puede cambiar" aria-label="Concluido">
             <svg class="size-4" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
         </span>
+    @elseif ($activity->locationBlocksSelfConclusion(auth()->user()))
+        <span class="grid {{ $size }} cursor-not-allowed place-items-center rounded-md border-2 border-dashed border-rose-300 bg-rose-50 text-rose-400"
+              title="Valida tu ubicación en el lugar para poder concluirla" aria-label="Concluir: primero valida tu ubicación">
+            <svg class="size-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21s-6-5.3-6-10a6 6 0 1112 0c0 4.7-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg>
+        </span>
     @else
         <form method="POST" action="{{ route('activities.mark', $activity) }}" data-confirm="¿Seguro que quieres marcarla como Concluido? Después ya no podrás hacerle ningún cambio." onsubmit="return confirm(this.dataset.confirm)">
             @csrf

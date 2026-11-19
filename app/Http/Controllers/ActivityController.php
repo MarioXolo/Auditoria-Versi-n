@@ -185,6 +185,8 @@ class ActivityController extends Controller
 
         if ($data['marca'] !== 'concluido') {
             $this->authorize('markFailed', $activity);
+        } elseif ($activity->locationBlocksSelfConclusion($request->user())) {
+            return back()->withErrors(['marca' => 'Primero valida tu ubicación en el lugar; después podrás marcarla como Concluido.']);
         }
 
         if ($data['marca'] === 'sin_marcar') {

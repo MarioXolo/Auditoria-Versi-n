@@ -150,6 +150,9 @@
                             <textarea id="mark_notes" name="mark_notes" rows="2" class="input" placeholder="Ej. Falta la evidencia de la segunda visita">{{ old('mark_notes', $activity->mark_notes) }}</textarea>
                         </div>
                         <div class="grid gap-2">
+                            @if ($activity->locationBlocksSelfConclusion(auth()->user()))
+                                <p class="rounded-lg border-2 border-dashed border-rose-300 bg-rose-50 px-3 py-2.5 text-sm font-medium text-rose-800">Para marcarla como concluida, primero valida tu ubicación en el lugar.</p>
+                            @else
                             <button name="marca" value="concluido" data-confirm="¿Seguro que quieres marcarla como Concluido? Después ya no podrás hacerle ningún cambio." onclick="return confirm(this.dataset.confirm)" role="checkbox" aria-checked="{{ $done ? 'true' : 'false' }}"
                                     @class(['flex items-center gap-3 rounded-lg border-2 px-3 py-2.5 text-left text-sm font-medium transition',
                                         'border-emerald-600 bg-emerald-600 text-white' => $done,
@@ -159,6 +162,7 @@
                                 </span>
                                 Marcar como concluido
                             </button>
+                            @endif
                             @can('markFailed', $activity)
                             <button name="marca" value="{{ $failed ? 'sin_marcar' : 'no_completada' }}" role="checkbox" aria-checked="{{ $failed ? 'true' : 'false' }}"
                                     @class(['flex items-center gap-3 rounded-lg border-2 px-3 py-2.5 text-left text-sm font-medium transition',
