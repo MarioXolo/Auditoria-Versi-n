@@ -150,7 +150,7 @@ class AppSmokeTest extends TestCase
     public function test_evidence_upload_and_protected_download(): void
     {
         $this->actingAs($this->encargado)->post('/activities', $this->payload([
-            'evidence' => UploadedFile::fake()->image('foto.jpg', 400, 300),
+            'evidence' => UploadedFile::fake()->create('foto.jpg', 200, 'image/jpeg'),
         ]))->assertRedirect();
 
         $a = Activity::latest('id')->first();

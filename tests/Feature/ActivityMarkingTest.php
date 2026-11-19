@@ -60,8 +60,9 @@ class ActivityMarkingTest extends TestCase
 
         // Otro encargado (aunque sea del mismo equipo) no la ve; el gerente sí
         $this->actingAs($this->otroEncargado)->get("/activities/{$a->id}")->assertForbidden();
-        $this->actingAs($this->otroEncargado)->get('/activities')->assertDontSee('Visita a cliente propia');
-        $this->actingAs($this->gerente)->get('/activities')->assertSee('Visita a cliente propia');
+        // (el nombre de la comunidad sí sale en el filtro del catálogo; por eso se compara por folio)
+        $this->actingAs($this->otroEncargado)->get('/activities')->assertDontSee($a->code);
+        $this->actingAs($this->gerente)->get('/activities')->assertSee($a->code);
 
         // Ya revisada, el encargado ya no la edita
         $this->actingAs($this->gerente)->post("/activities/{$a->id}/marcar", ['marca' => 'concluido'])->assertRedirect();
