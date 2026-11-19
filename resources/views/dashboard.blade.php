@@ -96,8 +96,8 @@
         @foreach ([
             ['label' => 'Actividades', 'value' => $kpi['total'], 'sub' => $kpi['sin_marcar'].' sin revisar · '.$kpi['incompletas'].' no completadas', 'delta' => $deltaHtml($delta['total'], ''), 'link' => route('activities.index')],
             ['label' => 'Vencidas', 'value' => $kpi['overdue'], 'sub' => 'abiertas con fecha de fin pasada', 'delta' => $deltaHtml($delta['overdue'], '', true), 'link' => route('activities.index', ['status' => 'vencida']), 'alert' => $kpi['overdue'] > 0],
-            ['label' => 'Tiempo de cierre', 'value' => $fmt($kpi['dias_cierre'], ' días'), 'sub' => 'promedio de creación a completado', 'delta' => $deltaHtml($delta['dias_cierre'], 'días', true)],
-            ['label' => 'Duración promedio', 'value' => $fmt($durations['duracion'], ' días'), 'sub' => 'de la fecha de inicio a concluida · planeado '.$fmt($durations['planeado'], ' días'), 'delta' => ''],
+            ['label' => 'Duración promedio', 'value' => $fmt($kpi['duracion'], ' días'), 'sub' => 'de la fecha de inicio a concluida · planeado '.$fmt($durations['planeado'], ' días'), 'delta' => $deltaHtml($delta['duracion'], 'días', true)],
+            ['label' => 'Contra su fecha de fin', 'value' => $fmt($durations['a_tiempo_pct']), 'sub' => $durations['antes'].' antes · '.$durations['en_fecha'].' en la fecha · '.$durations['despues'].' después', 'delta' => '', 'alert' => $durations['despues'] > 0 && $durations['despues'] >= $durations['antes'] + $durations['en_fecha']],
         ] as $card)
             @php $tag = isset($card['link']) ? 'a' : 'div'; @endphp
             <{{ $tag }} @if (isset($card['link'])) href="{{ $card['link'] }}" @endif class="card block p-4 {{ isset($card['link']) ? 'transition hover:border-brand-500' : '' }}">
@@ -276,7 +276,7 @@
                         <th class="table-head text-right">Vencidas</th>
                         <th class="table-head text-right">Cumplimiento</th>
                         <th class="table-head text-right">A tiempo</th>
-                        <th class="table-head text-right">Días cierre</th>
+                        <th class="table-head text-right">Duración (días)</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -293,7 +293,7 @@
                             @foreach (['cumplimiento', 'a_tiempo'] as $k)
                                 <td class="table-cell text-right"><span class="badge tabular-nums {{ $tone[M::status($k, $row->$k)]['chip'] }}">{{ $fmt($row->$k) }}</span></td>
                             @endforeach
-                            <td class="table-cell text-right tabular-nums">{{ $fmt($row->dias_cierre, '') }}</td>
+                            <td class="table-cell text-right tabular-nums">{{ $fmt($row->duracion, '') }}</td>
                         </tr>
                     @empty
                         <tr><td colspan="8" class="table-cell py-8 text-center text-slate-500">No hay encargados activos con estos filtros.</td></tr>

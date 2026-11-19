@@ -30,7 +30,7 @@
         </a>
     @endif
     {{-- Cuántas tiene y de dónde vienen --}}
-    <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+    <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
         <a href="{{ route('activities.index') }}" class="card block p-5 transition hover:border-brand-500">
             <p class="text-xs font-semibold tracking-wide text-slate-500 uppercase">Mis actividades</p>
             <p class="mt-1 text-4xl font-semibold tabular-nums">{{ $total }}</p>
@@ -52,6 +52,11 @@
             <p class="text-xs font-semibold tracking-wide text-slate-500 uppercase">Cumplimiento</p>
             <p class="mt-1 text-4xl font-semibold tabular-nums">{{ $cumplimiento === null ? '—' : $cumplimiento.'%' }}</p>
             <p class="mt-1 text-xs text-slate-500">concluidas ÷ (todas − suspendidas)</p>
+        </div>
+        <div class="card p-5">
+            <p class="text-xs font-semibold tracking-wide text-slate-500 uppercase">Duración promedio</p>
+            <p class="mt-1 text-4xl font-semibold tabular-nums">{{ $durations['duracion'] === null ? '—' : rtrim(rtrim(number_format($durations['duracion'], 1), '0'), '.') }}<span class="text-lg font-medium text-slate-500"> días</span></p>
+            <p class="mt-1 text-xs text-slate-500">de la fecha de inicio a concluida{{ $durations['planeado'] !== null ? ' · planeado '.rtrim(rtrim(number_format($durations['planeado'], 1), '0'), '.').' días' : '' }}</p>
         </div>
     </div>
 

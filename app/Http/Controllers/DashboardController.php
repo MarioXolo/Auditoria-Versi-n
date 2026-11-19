@@ -74,14 +74,14 @@ class DashboardController extends Controller
             Csv::put($out, []);
             Csv::put($out, [
                 'Nombre', 'Correo', 'Rol', 'Equipo', 'Actividades', 'Se las cargó él', 'Concluidas', 'No completadas', 'Sin revisar', 'Vencidas',
-                'Cumplimiento %', 'A tiempo %', 'Días promedio de cierre',
+                'Cumplimiento %', 'A tiempo %', 'Duración promedio (días)',
             ]);
 
             foreach ($people as $p) {
                 Csv::put($out, [
                     $p->user->name, $p->user->email, $p->user->role->label(), $p->user->team?->name,
                     $p->assigned, $p->propias, $p->completed, $p->incompletas, $p->open, $p->overdue,
-                    $p->cumplimiento, $p->a_tiempo, $p->dias_cierre,
+                    $p->cumplimiento, $p->a_tiempo, $p->duracion,
                 ]);
             }
 

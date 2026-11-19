@@ -108,9 +108,8 @@ class DashboardMetrics
         $cancelled = $acts->filter(fn ($a) => $a->status === ActivityStatus::Suspendida)->count();
         $effective = $acts->count() - $cancelled;
 
-        $closeDays = $completed
-            ->filter(fn ($a) => $a->completed_at)
-            ->map(fn ($a) => $a->created_at->diffInMinutes($a->completed_at) / 1440);
+        // Duración: de la fecha de inicio al día en que se concluyó, contando ambos días
+        $durations = $completed->map(fn ($a) => $a->durationDays())->filter(fn ($d) => $d !== null);
 
         return [
             'total' => $acts->count(),
@@ -120,7 +119,7 @@ class DashboardMetrics
             'overdue' => $acts->filter(fn ($a) => $this->isOverdue($a))->count(),
             'cumplimiento' => self::pct($completed->count(), $effective),
             'a_tiempo' => self::pct($completed->filter(fn ($a) => $this->isOnTime($a))->count(), $completed->count()),
-            'dias_cierre' => $closeDays->isEmpty() ? null : round($closeDays->avg(), 1),
+            'duracion' => $durations->isEmpty() ? null : round($durations->avg(), 1),
             'incompletas' => $acts->filter(fn ($a) => $a->status === ActivityStatus::NoCompletada)->count(),
             'sin_marcar' => $acts->filter(fn ($a) => $a->status->isOpen())->count(),
         ];
@@ -257,7 +256,7 @@ class DashboardMetrics
             $mine = $acts->get($u->id, collect());
             $completed = $mine->filter(fn ($a) => $a->status === ActivityStatus::Concluido);
             $effective = $mine->filter(fn ($a) => $a->status !== ActivityStatus::Suspendida)->count();
-            $close = $completed->filter(fn ($a) => $a->completed_at)->map(fn ($a) => $a->created_at->diffInMinutes($a->completed_at) / 1440);
+            $durations = $completed->map(fn ($a) => $a->durationDays())->filter(fn ($d) => $d !== null);
 
             return (object) [
                 'user' => $u,
@@ -268,7 +267,7 @@ class DashboardMetrics
                 'overdue' => $mine->filter(fn ($x) => $this->isOverdue($x))->count(),
                 'cumplimiento' => self::pct($completed->count(), $effective),
                 'a_tiempo' => self::pct($completed->filter(fn ($x) => $this->isOnTime($x))->count(), $completed->count()),
-                'dias_cierre' => $close->isEmpty() ? null : round($close->avg(), 1),
+                'duracion' => $durations->isEmpty() ? null : round($durations->avg(), 1),
                 'propias' => $mine->filter(fn ($x) => $x->created_by === $u->id)->count(),
             ];
         })->sortByDesc('assigned')->values();
@@ -434,7 +433,7 @@ class DashboardMetrics
             ['Entrega a tiempo', 'Concluidas en o antes de su fecha de fin ÷ concluidas × 100', "≥ {$m['a_tiempo']}%", 'Actividades concluidas del periodo'],
             ['No completadas', 'Actividades que un superior marcó en rojo (✗) en el periodo', 'Lo más bajo posible', 'Marcado de actividades'],
             ['Vencidas', 'No iniciadas o en proceso con fecha de fin anterior a hoy', 'Lo más bajo posible', 'Actividades creadas en el periodo'],
-            ['Tiempo de cierre', 'Promedio de días entre la creación y la marca «Concluido»', 'Tendencia a la baja', 'Actividades concluidas del periodo'],
+            ['Duración promedio', 'Promedio de días desde la fecha de inicio hasta el día en que se marcó «Concluido» (contando ambos)', 'Igual o menor que lo planeado', 'Actividades concluidas del periodo'],
             ['Calidad de la evidencia', 'Concluidas con fotografía o texto ÷ concluidas × 100', 'Lo más alto posible', 'Evidencia cargada en cada actividad concluida'],
             ['Velocidad de revisión', 'Promedio de días entre la fecha de fin y la marca verde o roja (0 si se revisó a tiempo)', 'Tendencia a la baja', 'Actividades revisadas del periodo'],
             ['Duración', 'Días de la fecha de inicio al día en que se marcó «Concluido», contando ambos (mismo día = 1)', 'Cerca de lo planeado', 'Actividades concluidas en el periodo'],

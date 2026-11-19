@@ -69,6 +69,9 @@ class DashboardMetricsTest extends TestCase
         $this->assertSame(1, $a['overdue']);
         $this->assertEqualsWithDelta(66.7, $a['cumplimiento'], 0.05); // 2 / (4 - 1)
         $this->assertEqualsWithDelta(50.0, $a['a_tiempo'], 0.05);     // 1 / 2
+        // Duración: inicio 08/11 → concluidas el 09/11 (2 días) y el 10/11 (3 días)
+        $this->assertEqualsWithDelta(2.5, $a['duracion'], 0.05);
+        $this->assertArrayNotHasKey('dias_cierre', $a);
 
         $kpis = $m->summary()['now'];
         $this->assertArrayNotHasKey('asistencia', $kpis);
@@ -78,6 +81,7 @@ class DashboardMetricsTest extends TestCase
         $row = $m->people()->firstWhere('user.id', $emp->id);
         $this->assertSame(4, $row->assigned);
         $this->assertSame(0, $row->propias);
+        $this->assertEqualsWithDelta(2.5, $row->duracion, 0.05);
 
         $this->assertSame('ok', DashboardMetrics::status('cumplimiento', 90.0));
         $this->assertSame('warn', DashboardMetrics::status('cumplimiento', 70.0));
@@ -91,7 +95,7 @@ class DashboardMetricsTest extends TestCase
         foreach (['7', '30', '90', 'all'] as $period) {
             $this->actingAs($admin)->get('/dashboard?period='.$period)
                 ->assertOk()
-                ->assertSee('Cumplimiento')
+                ->assertSee('Cumplimiento')->assertSee('Duración promedio')->assertSee('Contra su fecha de fin')->assertDontSee('Tiempo de cierre')
                 ->assertSee('Cómo se calcula cada indicador');
         }
 
@@ -209,7 +213,7 @@ class DashboardMetricsTest extends TestCase
         $ajena = $this->act($otro, $gerente, 'no_iniciado', '2026-11-05');
 
         $html = $this->actingAs($yo)->get('/dashboard')->assertOk()
-            ->assertSee('Mi dashboard')->assertSee('Me las asignaron')->assertSee('Me las cargué yo')
+            ->assertSee('Mi dashboard')->assertSee('Me las asignaron')->assertSee('Me las cargué yo')->assertSee('Duración promedio')
             ->assertSee('Gerardo Gerente (3)')
             ->assertSee('Estado de mis actividades')
             ->assertSee('Duración de las actividades')->assertSee('Terminó 1 día antes')
