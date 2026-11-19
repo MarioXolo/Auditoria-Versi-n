@@ -74,6 +74,13 @@ document.querySelectorAll('[data-map-view]').forEach((el) => {
     tiles().addTo(map);
     L.circle(dest, { radius: +d.radius, color: BRAND, weight: 1, fillOpacity: 0.12 }).addTo(map);
     dot(dest, BRAND, 'Lugar al que había que acudir').addTo(map);
+    // Al cargar en el celular el contenedor cambia de tamaño: se recalcula para que el lugar quede centrado
+    const recenter = () => {
+        map.invalidateSize();
+        d.meLat ? map.fitBounds(L.latLngBounds([dest, L.latLng(+d.meLat, +d.meLng)]).pad(0.3), { maxZoom: 17 }) : map.setView(dest, 15);
+    };
+    setTimeout(recenter, 300);
+    window.addEventListener('load', recenter, { once: true });
     if (d.meLat) {
         const me = L.latLng(+d.meLat, +d.meLng);
         const ok = d.ok === '1';
