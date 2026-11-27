@@ -214,7 +214,7 @@ class DashboardMetricsTest extends TestCase
 
         $html = $this->actingAs($yo)->get('/dashboard')->assertOk()
             ->assertSee('Mi dashboard')->assertSee('Me las asignaron')->assertSee('Me las cargué yo')->assertSee('Duración promedio')
-            ->assertSee('Gerardo Gerente (3)')
+            ->assertSee('Gerencia (3)')->assertDontSee('Gerardo Gerente')
             ->assertSee('Estado de mis actividades')
             ->assertSee('Duración de las actividades')->assertSee('Terminó 1 día antes')
             ->assertDontSee($ajena->code)

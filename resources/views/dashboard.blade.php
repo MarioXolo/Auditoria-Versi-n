@@ -47,14 +47,20 @@
                 <option value="{{ $value }}" @selected($period === (string) $value)>{{ $label }}</option>
             @endforeach
         </select>
-        <select name="team_id" class="input w-auto" onchange="this.form.submit()" aria-label="Equipo">
-            <option value="">Todos los equipos</option>
-            @foreach ($teams as $team)
-                <option value="{{ $team->id }}" @selected($teamId === $team->id)>{{ $team->name }}</option>
+        <select name="area" class="input w-auto" onchange="this.form.submit()" aria-label="Área que encomendó">
+            <option value="">Todas las áreas</option>
+            @foreach ($areas as $a)
+                <option value="{{ $a }}" @selected($area === $a)>{{ $a }}</option>
+            @endforeach
+        </select>
+        <select name="encargado" class="input w-auto" onchange="this.form.submit()" aria-label="Encargado">
+            <option value="">Todos los encargados</option>
+            @foreach ($encargados as $e)
+                <option value="{{ $e->id }}" @selected($encargadoId === $e->id)>{{ $e->folioLabel() ? $e->folioLabel().' · ' : '' }}{{ $e->name }}</option>
             @endforeach
         </select>
         <noscript><button class="btn btn-secondary">Aplicar</button></noscript>
-        <a href="{{ route('dashboard.export', request()->only('period', 'team_id')) }}" class="btn btn-secondary">
+        <a href="{{ route('dashboard.export', request()->only('period', 'area', 'encargado')) }}" class="btn btn-secondary">
             <svg class="size-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
             Exportar CSV
         </a>
@@ -168,6 +174,8 @@
         </section>
     @endif
 
+    @include('dashboard._pulse')
+
     {{-- Gráficas --}}
     <div class="mt-6 grid gap-6 lg:grid-cols-3">
         <section class="card p-5 lg:col-span-2">
@@ -263,7 +271,7 @@
                 <h2 class="font-semibold">Indicadores por persona</h2>
                 <p class="text-xs text-slate-500">Ordenado por carga de trabajo. Los colores comparan contra la meta de cada indicador.</p>
             </div>
-            <a href="{{ route('dashboard.export', request()->only('period', 'team_id')) }}" class="text-xs font-medium text-brand-600 hover:underline">Descargar esta tabla (CSV)</a>
+            <a href="{{ route('dashboard.export', request()->only('period', 'area', 'encargado')) }}" class="text-xs font-medium text-brand-600 hover:underline">Descargar esta tabla (CSV)</a>
         </div>
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-slate-200">
@@ -284,7 +292,7 @@
                         <tr class="hover:bg-slate-50">
                             <td class="table-cell">
                                 <a href="{{ route('activities.index', ['assigned_to' => $row->user->id]) }}" class="font-medium whitespace-nowrap text-slate-900 hover:text-brand-600">{{ $row->user->name }}</a>
-                                <span class="block text-xs whitespace-nowrap text-slate-500">{{ $row->user->role->label() }}{{ $row->user->team ? ' · '.$row->user->team->name : '' }}</span>
+                                <span class="block text-xs whitespace-nowrap text-slate-500">{{ $row->user->role->label() }}{{ $row->user->folioLabel() ? ' · '.$row->user->folioLabel() : '' }}</span>
                             </td>
                             <td class="table-cell text-right font-medium tabular-nums">{{ $row->assigned }}<span class="block text-xs font-normal text-slate-500">{{ $row->propias }} propias</span></td>
                             <td class="table-cell text-right tabular-nums">{{ $row->completed }}</td>

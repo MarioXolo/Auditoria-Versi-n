@@ -47,6 +47,8 @@ return [
         'faltas_recientes' => 2,       // faltas en los últimos 5 días laborales
         'retardos_periodo' => 3,       // retardos en el periodo
         'cumplimiento_encargado' => 50, // % mínimo de lo que asignó un encargado
+        'dias_sin_movimiento' => (int) env('ALERTA_DIAS_SIN_MOVIMIENTO', 5),        // encargado sin cargar, concluir ni checar
+        'dias_comunidad_olvidada' => (int) env('ALERTA_DIAS_COMUNIDAD_OLVIDADA', 15), // comunidad sin actividades ni registros
     ],
 
     // Agenda reportada al IEEQ: con cuántos días de anticipación se reporta cada evento

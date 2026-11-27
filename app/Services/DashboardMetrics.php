@@ -7,7 +7,6 @@ use App\Enums\Role;
 use App\Models\Activity;
 use App\Models\ActivityType;
 use App\Models\Community;
-use App\Models\Team;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -39,8 +38,14 @@ class DashboardMetrics
 
     private array $cache = [];
 
-    public function __construct(public string $period = '30', public ?int $teamId = null)
+    /** Áreas de los gerentes, en el orden del organigrama; otras que se capturen van al final. */
+    public const AREAS = ['Coordinación', 'Territorial', 'Técnica', 'Agenda'];
+
+    private ?array $areaCreators = null;
+
+    public function __construct(public string $period = '30', public ?string $area = null, public ?int $encargadoId = null)
     {
+        $this->area = filled($area) ? $area : null;
         $this->period = array_key_exists($period, self::PERIODS) ? $period : '30';
         $this->to = now();
 
@@ -57,15 +62,42 @@ class DashboardMetrics
         // Personal auditado: los encargados (versión 3: ya no hay empleados activos)
         $this->staff = User::active()
             ->where('role', Role::Encargado->value)
-            ->when($this->teamId, fn ($q) => $q->where('team_id', $this->teamId))
-            ->with('team:id,name')
-            ->orderBy('name')
+            ->when($this->encargadoId, fn ($q) => $q->whereKey($this->encargadoId))
+            ->orderBy('folio_number')
             ->get();
     }
 
     // ------------------------------------------------------------------
     // Datos base
     // ------------------------------------------------------------------
+
+    /** Áreas que existen (las 4 del organigrama primero). */
+    public static function areas(): array
+    {
+        $capturadas = User::where('role', Role::Gerente->value)->whereNotNull('area')->distinct()->pluck('area')->all();
+
+        return array_values(array_unique(array_merge(array_intersect(self::AREAS, $capturadas), $capturadas)));
+    }
+
+    /** Filtro del tablero: por área (lo que encomendaron sus gerentes) y por encargado (lo que tiene asignado). */
+    public function scope($q)
+    {
+        if ($this->area) {
+            $this->areaCreators ??= User::where('role', Role::Gerente->value)->where('area', $this->area)->pluck('id')->all();
+            $q->whereIn('created_by', $this->areaCreators ?: [0])->whereColumn('created_by', '!=', 'assigned_to');
+        }
+        if ($this->encargadoId) {
+            $q->where('assigned_to', $this->encargadoId);
+        }
+
+        return $q;
+    }
+
+    /** ¿Hay algún filtro de área o encargado activo? */
+    public function filtered(): bool
+    {
+        return $this->area !== null || $this->encargadoId !== null;
+    }
 
     /** Actividades creadas dentro del rango. */
     private function activities(Carbon $from, Carbon $to): Collection
@@ -74,7 +106,7 @@ class DashboardMetrics
 
         return $this->cache[$key] ??= Activity::query()
             ->whereBetween('created_at', [$from, $to])
-            ->when($this->teamId, fn ($q) => $q->where('team_id', $this->teamId))
+            ->tap(fn ($q) => $this->scope($q))
             ->get(['id', 'activity_type_id', 'community_id', 'assigned_to', 'created_by', 'team_id', 'status', 'start_date', 'end_date', 'completed_at', 'created_at', 'updated_at']);
     }
 
@@ -183,7 +215,7 @@ class DashboardMetrics
         $completed = Activity::query()
             ->where('status', ActivityStatus::Concluido->value)
             ->whereBetween('completed_at', [$this->from, $this->to])
-            ->when($this->teamId, fn ($q) => $q->where('team_id', $this->teamId))
+            ->tap(fn ($q) => $this->scope($q))
             ->pluck('completed_at');
 
         foreach ($completed as $c) {
@@ -278,7 +310,7 @@ class DashboardMetrics
     {
         return ActivityDurations::summarize(
             ActivityDurations::query($this->from, $this->to)
-                ->when($this->teamId, fn ($q) => $q->where('team_id', $this->teamId))
+                ->tap(fn ($q) => $this->scope($q))
                 ->with(['assignee:id,name', 'type:id,name'])
                 ->get()
         );
@@ -294,7 +326,7 @@ class DashboardMetrics
     {
         $acts = Activity::query()
             ->whereBetween('created_at', [$this->from, $this->to])
-            ->when($this->teamId, fn ($q) => $q->where('team_id', $this->teamId))
+            ->tap(fn ($q) => $this->scope($q))
             ->get(['id', 'status', 'end_date', 'evidence_path', 'evidence_text', 'marked_by', 'marked_at']);
 
         $concluded = $acts->filter(fn ($a) => $a->status === ActivityStatus::Concluido);
@@ -327,6 +359,75 @@ class DashboardMetrics
         ];
     }
 
+    /**
+     * Cumplimiento por área: lo que encomendó cada área de gerencia (y lo que se cargaron
+     * los propios encargados), con su cumplimiento, entrega a tiempo y vencidas.
+     */
+    public function byArea(): array
+    {
+        $acts = $this->activities($this->from, $this->to);
+        $creators = User::whereIn('id', $acts->pluck('created_by')->unique())->get(['id', 'role', 'area'])->keyBy('id');
+
+        $grupo = function (Activity $a) use ($creators): string {
+            if ($a->created_by === $a->assigned_to) {
+                return 'Cargadas por el propio encargado';
+            }
+            $c = $creators->get($a->created_by);
+
+            return match ($c?->role) {
+                Role::Gerente => $c->area ?: 'Gerencia sin área',
+                Role::Admin => 'Administración',
+                default => 'Otros',
+            };
+        };
+
+        $rows = $acts->groupBy($grupo)->map(function (Collection $g, string $label) {
+            $completed = $g->filter(fn ($a) => $a->status === ActivityStatus::Concluido);
+            $effective = $g->filter(fn ($a) => $a->status !== ActivityStatus::Suspendida)->count();
+
+            return (object) [
+                'label' => $label,
+                'total' => $g->count(),
+                'completed' => $completed->count(),
+                'incompletas' => $g->filter(fn ($a) => $a->status === ActivityStatus::NoCompletada)->count(),
+                'overdue' => $g->filter(fn ($a) => $this->isOverdue($a))->count(),
+                'cumplimiento' => self::pct($completed->count(), $effective),
+                'a_tiempo' => self::pct($completed->filter(fn ($a) => $this->isOnTime($a))->count(), $completed->count()),
+            ];
+        });
+
+        $order = array_flip(array_merge(self::AREAS, ['Gerencia sin área', 'Administración', 'Cargadas por el propio encargado', 'Otros']));
+
+        return $rows->sortBy(fn ($r) => $order[$r->label] ?? 50)->values()->all();
+    }
+
+    /**
+     * Control de ubicación de las actividades del periodo que exigían acudir a un lugar:
+     * verificadas con GPS dentro del radio, validadas a mano, fuera del radio y sin validar.
+     */
+    public function location(): array
+    {
+        $acts = Activity::query()
+            ->whereBetween('created_at', [$this->from, $this->to])
+            ->tap(fn ($q) => $this->scope($q))
+            ->where('requiere_ubicacion', true)
+            ->where('status', '!=', ActivityStatus::Suspendida->value)
+            ->get(['id', 'requiere_ubicacion', 'ubicacion_validada_por', 'ubicacion_at', 'ubicacion_distancia', 'destino_radio']);
+
+        $c = $acts->countBy(fn ($a) => $a->locationStatus());
+        $total = $acts->count();
+
+        return [
+            'total' => $total,
+            'verificada' => $c['verificada'] ?? 0,
+            'manual' => $c['manual'] ?? 0,
+            'fuera' => $c['fuera'] ?? 0,
+            'pendiente' => $c['pendiente'] ?? 0,
+            'pct_gps' => self::pct($c['verificada'] ?? 0, $total),
+            'pct_comprobadas' => self::pct(($c['verificada'] ?? 0) + ($c['manual'] ?? 0), $total),
+        ];
+    }
+
     // ------------------------------------------------------------------
     // Alertas
     // ------------------------------------------------------------------
@@ -341,7 +442,7 @@ class DashboardMetrics
         $critical = Activity::query()
             ->overdue()
             ->whereDate('end_date', '<', today()->subDays($cfg['dias_vencida_critica']))
-            ->when($this->teamId, fn ($q) => $q->where('team_id', $this->teamId))
+            ->tap(fn ($q) => $this->scope($q))
             ->with(['assignee:id,name', 'type:id,name'])
             ->orderBy('end_date')
             ->get();
@@ -359,7 +460,7 @@ class DashboardMetrics
         $located = Activity::query()
             ->withLocationAlert()
             ->whereNotIn('status', [ActivityStatus::Suspendida->value])
-            ->when($this->teamId, fn ($q) => $q->where('team_id', $this->teamId))
+            ->tap(fn ($q) => $this->scope($q))
             ->with('assignee:id,name')
             ->orderBy('end_date')
             ->get();
@@ -393,7 +494,7 @@ class DashboardMetrics
         $unmarked = Activity::query()
             ->overdue()
             ->whereDate('end_date', '<', today()->subDays(1))
-            ->when($this->teamId, fn ($q) => $q->where('team_id', $this->teamId))
+            ->tap(fn ($q) => $this->scope($q))
             ->count();
 
         if ($unmarked > 0) {
@@ -439,6 +540,10 @@ class DashboardMetrics
             ['Duración', 'Días de la fecha de inicio al día en que se marcó «Concluido», contando ambos (mismo día = 1)', 'Cerca de lo planeado', 'Actividades concluidas en el periodo'],
             ['Antes / en la fecha / después', 'Día en que se terminó comparado con la fecha de fin de cada actividad', 'Antes o en la fecha', 'Actividades concluidas con fecha de fin'],
             ['Comparativo', 'Valor actual − valor del periodo anterior de la misma duración', 'Positivo', 'Mismo cálculo en el periodo previo'],
+            ['Cumplimiento por área', 'Lo que encomendaron los gerentes de cada área (o se cargó el propio encargado), con el mismo cálculo de cumplimiento y entrega a tiempo', "≥ {$m['cumplimiento']}%", 'Actividades creadas en el periodo'],
+            ['Ubicación comprobada', '(Verificadas con GPS dentro del radio + validadas a mano) ÷ actividades que exigían acudir × 100', 'Lo más alto posible', 'Actividades con ubicación del periodo'],
+            ['Encargados sin movimiento', 'Días desde la última actividad que cargó, concluyó o le cargaron, o desde su último checado', 'Menos de '.config('auditoria.alertas.dias_sin_movimiento', 5).' días', 'Actividades y asistencia'],
+            ['Comunidades olvidadas', 'Comunidades activas sin actividades ni registros del Cuaderno en '.config('auditoria.alertas.dias_comunidad_olvidada', 15).' días', 'Ninguna', 'Actividades y Cuaderno Maestro'],
         ];
     }
 }

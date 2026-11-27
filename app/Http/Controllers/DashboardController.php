@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Support\Csv;
 use App\Models\Activity;
-use App\Models\Team;
+use App\Enums\Role;
+use App\Models\User;
+use App\Services\DashboardPulse;
 use App\Services\ActivityDurations;
 use App\Services\DashboardMetrics;
 use App\Enums\ActivityStatus;
@@ -40,8 +42,18 @@ class DashboardController extends Controller
             'metrics' => $metrics,
             'periods' => DashboardMetrics::PERIODS,
             'period' => $metrics->period,
-            'teams' => Team::orderBy('name')->get(['id', 'name']),
-            'teamId' => $metrics->teamId,
+            'areas' => DashboardMetrics::areas(),
+            'encargados' => User::active()->where('role', Role::Encargado->value)->orderBy('folio_number')->get(['id', 'name', 'folio_number', 'role']),
+            'area' => $metrics->area,
+            'encargadoId' => $metrics->encargadoId,
+            'byArea' => $metrics->byArea(),
+            'location' => $metrics->location(),
+            'pulse' => $pulse = new DashboardPulse($request->user(), $metrics),
+            'cuaderno' => $pulse->cuaderno(),
+            'upcoming' => $pulse->upcoming(),
+            'ghosts' => $pulse->ghosts(),
+            'forgotten' => $pulse->forgottenCommunities(),
+            'commitments' => $pulse->commitments(),
             'kpi' => $summary['now'],
             'delta' => $summary['delta'],
             'hasPrev' => $summary['prev'] !== null,
@@ -52,7 +64,7 @@ class DashboardController extends Controller
             'quality' => $metrics->evidenceAndReview(),
             'definitions' => DashboardMetrics::definitions(),
             'recent' => Activity::with(['assignee:id,name', 'creator:id,name', 'type:id,name', 'community:id,name'])
-                ->when($metrics->teamId, fn ($q) => $q->where('team_id', $metrics->teamId))
+                ->tap(fn ($q) => $metrics->scope($q))
                 ->latest('updated_at')
                 ->limit(8)
                 ->get(),
@@ -73,13 +85,13 @@ class DashboardController extends Controller
             Csv::put($out, ['Periodo', $metrics->from->format('d/m/Y').' - '.$metrics->to->format('d/m/Y')]);
             Csv::put($out, []);
             Csv::put($out, [
-                'Nombre', 'Correo', 'Rol', 'Equipo', 'Actividades', 'Se las cargó él', 'Concluidas', 'No completadas', 'Sin revisar', 'Vencidas',
+                'Nombre', 'Correo', 'Rol', 'Número', 'Actividades', 'Se las cargó él', 'Concluidas', 'No completadas', 'Sin revisar', 'Vencidas',
                 'Cumplimiento %', 'A tiempo %', 'Duración promedio (días)',
             ]);
 
             foreach ($people as $p) {
                 Csv::put($out, [
-                    $p->user->name, $p->user->email, $p->user->role->label(), $p->user->team?->name,
+                    $p->user->name, $p->user->email, $p->user->role->label(), $p->user->folioLabel(),
                     $p->assigned, $p->propias, $p->completed, $p->incompletas, $p->open, $p->overdue,
                     $p->cumplimiento, $p->a_tiempo, $p->duracion,
                 ]);
@@ -100,7 +112,7 @@ class DashboardController extends Controller
         $mine = Activity::query()
             ->where(fn ($q) => $q->where('assigned_to', $user->id)->orWhere('created_by', $user->id))
             ->when($from, fn ($q) => $q->where('created_at', '>=', $from))
-            ->with(['type:id,name', 'community:id,name', 'creator:id,name'])
+            ->with(['type:id,name', 'community:id,name', 'creator:id,name,role,area'])
             ->get();
 
         $assignedToMe = $mine->where('assigned_to', $user->id);
@@ -132,7 +144,8 @@ class DashboardController extends Controller
             'sinUbicacion' => $sinUbicacion,
             'propias' => $propias->count(),
             'asignadas' => $asignadas->count(),
-            'asignadasPor' => $asignadas->groupBy(fn ($a) => $a->creator?->name ?? '—')->map->count()->sortDesc(),
+            // El encargado ve el área que le encomendó (Técnica, Territorial…), no el nombre del gerente
+            'asignadasPor' => $asignadas->groupBy(fn ($a) => $a->creator?->areaLabel() ?? '—')->map->count()->sortDesc(),
             'byStatus' => $byStatus,
             'cumplimiento' => $effective > 0 ? round($concluded->count() / $effective * 100, 1) : null,
             'overdue' => $overdue->sortBy('end_date')->values(),
@@ -145,7 +158,8 @@ class DashboardController extends Controller
     {
         return new DashboardMetrics(
             (string) $request->input('period', '30'),
-            $request->integer('team_id') ?: null,
+            $request->filled('area') ? (string) $request->input('area') : null,
+            $request->integer('encargado') ?: null,
         );
     }
 }

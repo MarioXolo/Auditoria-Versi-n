@@ -184,3 +184,15 @@ Nadie lo captura: sale de las fechas, estatus y capturas que ya existen (`App\Se
 - **Verde**: tiene información y nada de lo anterior. **Gris**: sin información.
 
 Se ve en cada burbuja (con el motivo), en un resumen arriba de las burbujas, en cada libro de los puntos 11–18 («N vencidos») y en cada fila (punto de color junto a la fecha). Los listados se pueden filtrar por «Vencidos» y «Vencen pronto».
+
+## Dashboard: pulso de la campaña
+
+Paneles nuevos (todo automático, `App\Services\DashboardPulse` y `DashboardMetrics::byArea()/location()`):
+
+- **Filtros**: por área (lo que encomendaron sus gerentes) y por encargado (ID). Sustituyen al filtro de equipos.
+- **Cuaderno Maestro**: semáforo de las hojas con las que están en rojo/amarillo, votos identificados vs. meta, promotores y días al cierre (2 jun 2027).
+- **Próximos 7 días**: actividades que vencen, eventos de campaña, eventos por reportar al IEEQ y Agenda del Presidente (admin y gerentes).
+- **Cumplimiento por área**: Coordinación, Territorial, Técnica, Agenda, Administración y lo que se cargó cada encargado.
+- **Control de ubicación**: % comprobadas (GPS + a mano), fuera del radio y sin validar.
+- **Encargados sin movimiento** (`ALERTA_DIAS_SIN_MOVIMIENTO`, 5 días), **comunidades olvidadas** (`ALERTA_DIAS_COMUNIDAD_OLVIDADA`, 15 días) y **compromisos de minutas vencidos**.
+- En el dashboard del encargado, «Me las asignaron» muestra el área, no el nombre del gerente.

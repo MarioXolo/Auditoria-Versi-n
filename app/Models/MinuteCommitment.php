@@ -12,6 +12,11 @@ class MinuteCommitment extends Model
 
     protected $fillable = ['orden', 'actividad', 'responsable', 'fecha_limite', 'estatus'];
 
+    public function minute(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Minute::class);
+    }
+
     /** La fecha límite como fecha, si lo es (en el Excel a veces es texto: «Noviembre»). */
     public function fechaLimiteDate(): ?Carbon
     {
