@@ -57,6 +57,42 @@ class PresidentAgendaController extends Controller
         ]);
     }
 
+    /** Calendario propio de la Agenda del Presidente: cada actividad aparece en todos los días que dura. */
+    public function calendar(Request $request): View
+    {
+        $month = preg_match('/^\d{4}-\d{2}$/', (string) $request->input('mes'))
+            ? \Carbon\CarbonImmutable::parse($request->input('mes').'-01')
+            : today()->toImmutable()->startOfMonth();
+        $gridStart = $month->startOfWeek(\Carbon\CarbonInterface::MONDAY);
+        $gridEnd = $month->endOfMonth()->endOfWeek(\Carbon\CarbonInterface::SUNDAY);
+
+        $activities = PresidentActivity::with(['type:id,name', 'community:id,name', 'assignee:id,name'])
+            ->whereDate('start_date', '<=', $gridEnd)
+            ->whereDate('end_date', '>=', $gridStart)
+            ->when(ActivityStatus::tryFrom((string) $request->input('status')), fn ($q, $s) => $q->where('status', $s->value))
+            ->when($request->filled('community_id'), fn ($q) => $q->where('community_id', $request->integer('community_id')))
+            ->orderBy('start_date')->orderBy('id')
+            ->get();
+
+        $days = [];
+        foreach ($activities as $a) {
+            $from = $a->start_date->max($gridStart);
+            $to = $a->end_date->min($gridEnd);
+            for ($d = $from->copy(); $d->lte($to); $d->addDay()) {
+                $days[$d->toDateString()][] = $a;
+            }
+        }
+
+        return view('president.calendar', [
+            'month' => $month,
+            'gridStart' => $gridStart,
+            'gridEnd' => $gridEnd,
+            'days' => $days,
+            'inMonth' => $activities->filter(fn ($a) => $a->start_date->lte($month->endOfMonth()) && $a->end_date->gte($month)),
+            'communities' => Community::orderBy('name')->get(['id', 'name']),
+        ]);
+    }
+
     public function create(): View
     {
         return view('president.create', $this->formData(new PresidentActivity([

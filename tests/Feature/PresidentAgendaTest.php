@@ -97,4 +97,17 @@ class PresidentAgendaTest extends TestCase
         $this->actingAs($this->gerente)->get('/agenda-presidente?mes=2027-01')->assertSee('AP-0002')->assertDontSee('AP-0001');
         $this->actingAs($this->gerente)->get('/agenda-presidente?q=Informe')->assertSee('AP-0002')->assertDontSee('AP-0001');
     }
+
+    public function test_own_calendar_shows_each_day_of_the_activity(): void
+    {
+        $this->actingAs($this->gerente)->post('/agenda-presidente', $this->payload(['start_date' => '2026-12-30', 'end_date' => '2027-01-02']));
+        $this->actingAs($this->gerente)->get('/agenda-presidente');
+
+        $dic = $this->actingAs($this->gerente)->get('/agenda-presidente/calendario?mes=2026-12')->assertOk()->assertSee('Gira de trabajo · Huimilpan')->assertSee('1</b> actividad', false);
+        $this->actingAs($this->gerente)->get('/agenda-presidente/calendario?mes=2027-01')->assertOk()->assertSee('Gira de trabajo · Huimilpan');
+        $this->actingAs($this->gerente)->get('/agenda-presidente/calendario?mes=2027-02')->assertOk()->assertSee('0</b> actividades', false);
+        $this->actingAs(User::factory()->role('encargado')->create())->get('/agenda-presidente/calendario')->assertForbidden();
+        // El calendario general no la muestra
+        $this->actingAs($this->gerente)->get('/calendario?mes=2026-12')->assertDontSee('Gira de trabajo · Huimilpan');
+    }
 }

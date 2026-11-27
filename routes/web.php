@@ -46,6 +46,7 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::middleware('role:admin,gerente')->prefix('/agenda-presidente')->name('president.')->group(function () {
         Route::get('/', [PresidentAgendaController::class, 'index'])->name('index');
         Route::get('/nueva', [PresidentAgendaController::class, 'create'])->name('create');
+        Route::get('/calendario', [PresidentAgendaController::class, 'calendar'])->name('calendar');
         Route::post('/', [PresidentAgendaController::class, 'store'])->name('store');
         Route::get('/{activity}', [PresidentAgendaController::class, 'show'])->name('show');
         Route::get('/{activity}/editar', [PresidentAgendaController::class, 'edit'])->name('edit');

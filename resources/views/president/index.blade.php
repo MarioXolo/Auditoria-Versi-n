@@ -11,6 +11,8 @@
 @endsection
 
 @section('content')
+    @include('president._tabs')
+
     <div class="mb-4 grid grid-cols-2 gap-3 lg:grid-cols-4">
         @foreach ([['Actividades', $counts['total'], ''], ['Abiertas', $counts['abiertas'], ''], ['Vencidas', $counts['vencidas'], 'vencidas'], ['Concluidas', $counts['concluidas'], 'concluido']] as [$label, $n, $filter])
             <a href="{{ route('president.index', $filter ? ['status' => $filter] : []) }}" @class(['card p-4 hover:border-brand-500', 'border-rose-300 bg-rose-50' => $filter === 'vencidas' && $n > 0])>
