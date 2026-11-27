@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Enums\ActivityStatus;
 use App\Models\Activity;
 use App\Models\ActivityType;
+use App\Models\PresidentActivityType;
 use App\Models\Community;
 use App\Models\PresidentActivity;
 use App\Models\User;
@@ -18,7 +19,7 @@ class PresidentAgendaTest extends TestCase
 
     private User $admin;
     private User $gerente;
-    private ActivityType $type;
+    private PresidentActivityType $type;
     private Community $community;
 
     protected function setUp(): void
@@ -26,7 +27,7 @@ class PresidentAgendaTest extends TestCase
         parent::setUp();
         $this->admin = User::factory()->role('admin')->create();
         $this->gerente = User::factory()->role('gerente')->create();
-        $this->type = ActivityType::create(['name' => 'Gira de trabajo', 'active' => true]);
+        $this->type = PresidentActivityType::create(['name' => 'Gira de trabajo', 'active' => true]);
         $this->community = Community::create(['name' => 'Huimilpan', 'active' => true]);
     }
 
@@ -59,7 +60,8 @@ class PresidentAgendaTest extends TestCase
         $this->actingAs($this->gerente)->post('/agenda-presidente', $this->payload(['assigned_to' => $encargado->id]))->assertSessionHasErrors('assigned_to');
         // Tipo y comunidad nuevos se agregan al catálogo
         $this->actingAs($this->admin)->post('/agenda-presidente', $this->payload(['activity_type_id' => 'otro', 'activity_type_new' => 'Audiencia pública']))->assertSessionHasNoErrors();
-        $this->assertTrue(ActivityType::where('name', 'Audiencia pública')->exists());
+        $this->assertTrue(PresidentActivityType::where('name', 'Audiencia pública')->exists());
+        $this->assertFalse(ActivityType::where('name', 'Audiencia pública')->exists());   // no llega al catálogo general
         $this->assertSame('AP-0002', PresidentActivity::latest('id')->first()->folio);
     }
 
@@ -109,5 +111,19 @@ class PresidentAgendaTest extends TestCase
         $this->actingAs(User::factory()->role('encargado')->create())->get('/agenda-presidente/calendario')->assertForbidden();
         // El calendario general no la muestra
         $this->actingAs($this->gerente)->get('/calendario?mes=2026-12')->assertDontSee('Gira de trabajo · Huimilpan');
+    }
+
+    public function test_type_list_is_private_both_ways(): void
+    {
+        // Lo que escriben los demás en Actividades no aparece en la Agenda del Presidente
+        ActivityType::create(['name' => 'Platica con Jacinto', 'active' => true]);
+        $this->actingAs($this->gerente)->get('/agenda-presidente/nueva')->assertOk()->assertSee('Gira de trabajo')->assertDontSee('Platica con Jacinto');
+
+        // Y lo que se escribe en la Agenda del Presidente no aparece en Actividades ni en Catálogos
+        $this->actingAs($this->gerente)->post('/agenda-presidente', $this->payload(['activity_type_id' => 'otro', 'activity_type_new' => 'Reunión privada con el gobernador']))->assertSessionHasNoErrors();
+        $this->actingAs($this->gerente)->get('/agenda-presidente');
+        $this->actingAs($this->gerente)->get('/activities/create')->assertDontSee('Reunión privada con el gobernador');
+        $this->actingAs($this->admin)->get('/catalogos')->assertDontSee('Reunión privada con el gobernador');
+        $this->actingAs($this->gerente)->get('/agenda-presidente')->assertSee('Reunión privada con el gobernador');
     }
 }

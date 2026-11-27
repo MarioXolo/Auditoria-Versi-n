@@ -4,10 +4,11 @@
         <label for="activity_type_id" class="label">Tipo de actividad *</label>
         <select id="activity_type_id" name="activity_type_id" class="input" required data-otro="activity_type_new">
             <option value="">— Elige —</option>
-            @foreach ($types as $t)<option value="{{ $t->id }}" @selected((string) old('activity_type_id', $activity->activity_type_id) === (string) $t->id)>{{ $t->name }}</option>@endforeach
+            @foreach ($types as $t)<option value="{{ $t->id }}" @selected((string) old('activity_type_id', $activity->president_type_id) === (string) $t->id)>{{ $t->name }}</option>@endforeach
             <option value="otro" @selected(old('activity_type_id') === 'otro')>Otro… (escribirlo)</option>
         </select>
         <input id="activity_type_new" name="activity_type_new" value="{{ old('activity_type_new') }}" maxlength="120" placeholder="Nuevo tipo de actividad" @class(['input mt-2', 'hidden' => old('activity_type_id') !== 'otro'])>
+        <p class="mt-1 text-xs text-slate-500">Lista privada de esta agenda: lo que escribas aquí no aparece en las actividades de los demás.</p>
     </div>
     <div>
         <label for="community_id" class="label">Comunidad *</label>

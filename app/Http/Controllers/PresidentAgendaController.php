@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Enums\ActivityStatus;
 use App\Enums\Role;
-use App\Models\ActivityType;
+use App\Models\PresidentActivityType;
 use App\Models\Community;
 use App\Models\PresidentActivity;
 use App\Models\User;
@@ -17,6 +17,7 @@ use Illuminate\View\View;
 /**
  * Agenda del Presidente: administradores y gerentes. Mismos campos y reglas que Actividades
  * (tipo, comunidad, asignada a, inicio–fin, estado, evidencia, marcar Concluido/No completada),
+ * con su propia lista privada de tipos de actividad (no la comparte con el catálogo general),
  * pero totalmente aparte de las actividades de los demás usuarios.
  */
 class PresidentAgendaController extends Controller
@@ -34,7 +35,7 @@ class PresidentAgendaController extends Controller
             ->when(ActivityStatus::tryFrom((string) $request->input('status')), fn ($q, $s) => $q->where('status', $s->value))
             ->when($request->input('status') === 'vencidas', fn ($q) => $q->whereIn('status', [ActivityStatus::NoIniciado->value, ActivityStatus::EnProceso->value])->whereDate('end_date', '<', today()))
             ->when($request->filled('community_id'), fn ($q) => $q->where('community_id', $request->integer('community_id')))
-            ->when($request->filled('activity_type_id'), fn ($q) => $q->where('activity_type_id', $request->integer('activity_type_id')))
+            ->when($request->filled('activity_type_id'), fn ($q) => $q->where('president_type_id', $request->integer('activity_type_id')))
             ->when($request->filled('mes') && preg_match('/^\d{4}-\d{2}$/', (string) $request->input('mes')), function ($q) use ($request) {
                 $from = \Carbon\Carbon::parse($request->input('mes').'-01');
                 $q->whereDate('start_date', '<=', $from->copy()->endOfMonth())->whereDate('end_date', '>=', $from);
@@ -52,7 +53,7 @@ class PresidentAgendaController extends Controller
                 'vencidas' => $all->filter(fn ($a) => $a->isOverdue())->count(),
                 'concluidas' => $all->where('status', ActivityStatus::Concluido)->count(),
             ],
-            'types' => ActivityType::orderBy('name')->get(['id', 'name']),
+            'types' => PresidentActivityType::orderBy('name')->get(['id', 'name']),
             'communities' => Community::orderBy('name')->get(['id', 'name']),
         ]);
     }
@@ -211,14 +212,14 @@ class PresidentAgendaController extends Controller
         return [
             'activity' => $activity,
             'people' => $this->people($activity),
-            'types' => ActivityType::active()->orWhere('id', $activity->activity_type_id)->orderBy('name')->get(['id', 'name']),
+            'types' => PresidentActivityType::active()->orWhere('id', $activity->president_type_id)->orderBy('name')->get(['id', 'name']),
             'communities' => Community::active()->orWhere('id', $activity->community_id)->orderBy('name')->get(['id', 'name']),
         ];
     }
 
     private function validated(Request $request, ?PresidentActivity $activity = null): array
     {
-        $typeIds = ActivityType::active()->pluck('id')->push($activity?->activity_type_id)->filter()->all();
+        $typeIds = PresidentActivityType::active()->pluck('id')->push($activity?->president_type_id)->filter()->all();
         $communityIds = Community::active()->pluck('id')->push($activity?->community_id)->filter()->all();
 
         $data = $request->validate([
@@ -245,13 +246,13 @@ class PresidentAgendaController extends Controller
             'evidence' => 'fotografía', 'evidence_text' => 'evidencia en texto', 'start_date' => 'fecha de inicio', 'end_date' => 'fecha de fin',
         ]);
 
-        $data['activity_type_id'] = $this->catalogId(ActivityType::class, $data['activity_type_id'], $data['activity_type_new'] ?? null);
+        $data['president_type_id'] = $this->catalogId(PresidentActivityType::class, $data['activity_type_id'], $data['activity_type_new'] ?? null);
         $data['community_id'] = $this->catalogId(Community::class, $data['community_id'], $data['community_new'] ?? null);
         $data['status'] = $data['status'] ?? ($activity?->status?->value ?? ActivityStatus::NoIniciado->value);
         if ($activity?->status?->isMarked()) {
             $data['status'] = $activity->status->value;   // la marca se cambia con los botones, no en el formulario
         }
-        unset($data['activity_type_new'], $data['community_new'], $data['evidence']);
+        unset($data['activity_type_id'], $data['activity_type_new'], $data['community_new'], $data['evidence']);
 
         return $data;
     }

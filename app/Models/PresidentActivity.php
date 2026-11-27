@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class PresidentActivity extends Model
 {
     protected $fillable = [
-        'folio', 'folio_seq', 'activity_type_id', 'community_id', 'assigned_to', 'created_by', 'status',
+        'folio', 'folio_seq', 'president_type_id', 'community_id', 'assigned_to', 'created_by', 'status',
         'start_date', 'end_date', 'completed_at', 'evidence_path', 'evidence_text', 'marked_by', 'marked_at', 'mark_notes',
     ];
 
@@ -40,7 +40,7 @@ class PresidentActivity extends Model
 
     public function type(): BelongsTo
     {
-        return $this->belongsTo(ActivityType::class, 'activity_type_id');
+        return $this->belongsTo(PresidentActivityType::class, 'president_type_id');
     }
 
     public function community(): BelongsTo

@@ -45,7 +45,7 @@ Las fotos y evidencias se guardan en `storage/app/private` y solo se muestran a 
 
 ### Agenda del Presidente
 
-Sección propia del menú, solo para administradores y gerentes. Sus actividades tienen los mismos campos que «Actividades» (tipo, comunidad, asignada a, inicio–fin, estado, evidencia en foto o texto, marca ✓ Concluido / ✗ No completada; Concluido es definitivo y pide confirmación), con folio propio `AP-0001`, vista de lista y su propio calendario mensual (cada actividad aparece en todos los días que dura; se imprime a PDF). Viven en su propia tabla: no aparecen en Actividades, dashboards, calendario ni métricas de los demás usuarios. Se asignan solo a administradores o gerentes; una concluida solo la puede borrar el administrador.
+Sección propia del menú, solo para administradores y gerentes. Sus actividades tienen los mismos campos que «Actividades» (tipo, comunidad, asignada a, inicio–fin, estado, evidencia en foto o texto, marca ✓ Concluido / ✗ No completada; Concluido es definitivo y pide confirmación), con folio propio `AP-0001`, su propia lista privada de tipos de actividad (lo que se escribe ahí no aparece en Actividades ni en Catálogos, y viceversa), vista de lista y su propio calendario mensual (cada actividad aparece en todos los días que dura; se imprime a PDF). Viven en su propia tabla: no aparecen en Actividades, dashboards, calendario ni métricas de los demás usuarios. Se asignan solo a administradores o gerentes; una concluida solo la puede borrar el administrador.
 
 ### Puntos 12 a 18 · cada uno es una burbuja del Cuaderno
 

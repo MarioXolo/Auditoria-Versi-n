@@ -23,7 +23,7 @@ class ActivityType extends Model
 
     public function inUse(): bool
     {
-        return $this->activities()->exists() || PresidentActivity::where('activity_type_id', $this->id)->exists();
+        return $this->activities()->exists();
     }
 
     public function scopeActive(Builder $query): Builder
