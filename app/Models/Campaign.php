@@ -122,6 +122,11 @@ class Campaign extends Model
         return $this->hasMany(CampaignActor::class);
     }
 
+    public function strategyRecords(): HasMany
+    {
+        return $this->hasMany(StrategyRecord::class);
+    }
+
     public function pollingStations(): HasMany
     {
         return $this->hasMany(CampaignPollingStation::class);

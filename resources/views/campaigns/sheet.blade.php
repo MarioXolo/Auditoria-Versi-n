@@ -19,7 +19,15 @@
 @section('content')
     @include('campaigns._nav')
 
-    <p class="mb-4 text-sm text-slate-500">{{ $sheet['intro'] }}</p>
+    @if ($key === 'defensa-del-voto' && isset(\App\Services\StrategyBooks::CASILLAS[request('tipo')]))
+        <div class="mb-4">
+            <a href="{{ route('campaigns.strategy.hub', $campaign) }}" class="text-sm text-slate-500 hover:text-slate-800">← Libros de estrategia</a>
+            <h2 class="mt-1 text-xl font-semibold">🗳️ {{ \App\Services\StrategyBooks::CASILLAS[request('tipo')][0] }}</h2>
+            <p class="text-sm text-slate-500">{{ \App\Services\StrategyBooks::CASILLAS[request('tipo')][1] }} Es la misma tabla de Defensa del Voto, filtrada por tipo.</p>
+        </div>
+    @else
+        <p class="mb-4 text-sm text-slate-500">{{ $sheet['intro'] }}</p>
+    @endif
 
     {{-- Resumen --}}
     <div class="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -74,7 +82,7 @@
             @foreach ($sheet['fields'] as $name => $f)
                 <div @class(['sm:col-span-2' => in_array($name, ['notas', 'frase', 'tarea', 'logro', 'nombre'])])>
                     <label for="new-{{ $name }}" class="label">{{ $f['label'] }}@if ($f['required'] ?? false) *@endif</label>
-                    @include('campaigns.sheets._input', ['f' => $f, 'name' => $name, 'value' => old($name, $f['default'] ?? null), 'form' => null, 'compact' => false])
+                    @include('campaigns.sheets._input', ['f' => $f, 'name' => $name, 'value' => old($name, ($name === 'tipo' && request('tipo')) ? request('tipo') : ($f['default'] ?? null)), 'form' => null, 'compact' => false])
                 </div>
             @endforeach
             <div class="flex items-end sm:col-span-2 lg:col-span-4 lg:justify-end">

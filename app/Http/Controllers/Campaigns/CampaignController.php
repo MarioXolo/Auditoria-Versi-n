@@ -79,7 +79,7 @@ class CampaignController extends Controller
     }
 
     /**
-     * Las 10 hojas del cuaderno (mismo índice que el Excel) como burbujas:
+     * Las hojas del cuaderno (1-10 del Excel, 11 Estrategia y 20 Agenda IEEQ) (mismo índice que el Excel) como burbujas:
      * [número, título, descripción, URL, ¿ya tiene información?, dato de avance].
      */
     public static function bubbles(Campaign $campaign, ?object $summary = null): array
@@ -94,6 +94,9 @@ class CampaignController extends Controller
         $hechas = $campaign->tasks()->where('estatus', 'Hecho')->count();
         $logros = $campaign->achievements()->count();
         $kpis = $campaign->kpis()->where('valor', '>', 0)->count();
+        $registros = $campaign->strategyRecords()->count();
+        $eventos = $campaign->strategyRecords()->where('es_evento', true)->count();
+        $porReportar = $campaign->strategyRecords()->pendientesIeeq()->count();
 
         return [
             [1, 'Meta de Votos', 'Calculadora: define tu número objetivo y cuántos promotores necesitas. Empieza aquí.', route('campaigns.edit', $campaign), $campaign->listado_nominal > 0, 'Meta: '.$n(round($campaign->metaConColchon())).' votos'],
@@ -106,6 +109,8 @@ class CampaignController extends Controller
             [8, 'Cronograma', 'Fases y tareas rumbo a la jornada.', $sheet('cronograma'), $tareas > 0, $tareas > 0 ? $n($hechas).' de '.$count($tareas, 'tarea hecha', 'tareas hechas') : '0 tareas'],
             [9, 'Tablero KPI', 'Seguimiento semanal de los indicadores clave.', route('campaigns.kpis.index', $campaign), $kpis > 0, 'Semáforo de indicadores'],
             [10, 'Logros Comunicables', 'Inventario de obra del gobierno, munición para el mensaje.', $sheet('logros'), $logros > 0, $count($logros, 'logro', 'logros')],
+            [11, 'Estrategia de Campaña', 'Los libros: prioridades, mítines, bardas, lonas, puerta por puerta, casillas…', route('campaigns.strategy.hub', $campaign), $registros > 0, $count($registros, 'registro', 'registros')],
+            [20, 'Agenda IEEQ', 'Los eventos de los libros llegan solos; controla qué falta reportar.', route('campaigns.agenda.index', $campaign), $eventos > 0, $porReportar > 0 ? $count($porReportar, 'evento por reportar', 'eventos por reportar') : $count($eventos, 'evento', 'eventos')],
         ];
     }
 

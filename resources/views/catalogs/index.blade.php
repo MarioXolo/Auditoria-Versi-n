@@ -65,5 +65,63 @@
             </section>
         @endforeach
     </div>
+    @php $bag = $errors->getBag('secciones'); @endphp
+    <section class="card mt-6 overflow-hidden" id="secciones">
+        <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+            <div>
+                <h2 class="font-semibold">Secciones electorales</h2>
+                <p class="text-xs text-slate-500">Se eligen en los libros de Estrategia junto con la comunidad. Cada sección pertenece a una comunidad.</p>
+            </div>
+            <span class="text-sm text-slate-500">{{ $sections->where('active', true)->count() }} activas</span>
+        </div>
+        <form method="POST" action="{{ route('sections.store') }}" class="flex flex-wrap gap-2 border-b border-slate-200 bg-slate-50 px-5 py-4">
+            @csrf
+            <input name="clave" required maxlength="10" placeholder="Sección, ej. 0512" class="input w-40" value="{{ $bag->any() ? old('clave') : '' }}" aria-label="Nueva sección">
+            <select name="community_id" class="input w-56" aria-label="Comunidad">
+                <option value="">— Comunidad —</option>
+                @foreach ($activeCommunities as $c)
+                    <option value="{{ $c->id }}" @selected($bag->any() && old('community_id') == $c->id)>{{ $c->name }}</option>
+                @endforeach
+            </select>
+            <button class="btn btn-primary shrink-0">Agregar</button>
+        </form>
+        @if ($bag->any())
+            <p class="border-b border-rose-200 bg-rose-50 px-5 py-2 text-sm text-rose-700">{{ $bag->first() }}</p>
+        @endif
+        <ul class="grid divide-y divide-slate-100 md:grid-cols-2 md:divide-y-0">
+            @forelse ($sections as $section)
+                <li @class(['flex flex-wrap items-center gap-2 border-slate-100 px-5 py-2.5 md:border-b', 'bg-slate-50/70' => ! $section->active])>
+                    <form method="POST" action="{{ route('sections.update', $section) }}" class="flex min-w-0 flex-1 items-center gap-2">
+                        @csrf
+                        @method('PATCH')
+                        <input name="clave" value="{{ $section->clave }}" required maxlength="10" aria-label="Sección" @class(['input w-24 py-1.5 font-mono', 'text-slate-400 line-through' => ! $section->active])>
+                        <select name="community_id" class="input min-w-0 flex-1 py-1.5" aria-label="Comunidad de la sección {{ $section->clave }}">
+                            <option value="">— Sin comunidad —</option>
+                            @foreach ($activeCommunities as $c)
+                                <option value="{{ $c->id }}" @selected($section->community_id === $c->id)>{{ $c->name }}</option>
+                            @endforeach
+                        </select>
+                        <button class="btn btn-secondary shrink-0 px-3 py-1.5 text-xs">Guardar</button>
+                    </form>
+                    <form method="POST" action="{{ route('sections.update', $section) }}">
+                        @csrf
+                        @method('PATCH')
+                        <input type="hidden" name="active" value="{{ $section->active ? 0 : 1 }}">
+                        <button @class(['badge cursor-pointer', 'bg-emerald-100 text-emerald-800' => $section->active, 'bg-slate-200 text-slate-600' => ! $section->active])>{{ $section->active ? 'Activa' : 'Inactiva' }}</button>
+                    </form>
+                    @if ($section->strategy_records_count === 0)
+                        <form method="POST" action="{{ route('sections.destroy', $section) }}" onsubmit="return confirm('¿Eliminar la sección {{ $section->clave }}?')">
+                            @csrf
+                            @method('DELETE')
+                            <button class="text-xs font-medium text-rose-600 hover:underline">Eliminar</button>
+                        </form>
+                    @endif
+                </li>
+            @empty
+                <li class="px-5 py-8 text-center text-sm text-slate-500 md:col-span-2">Aún no hay secciones. Agrega las del municipio con su comunidad.</li>
+            @endforelse
+        </ul>
+    </section>
+
     <p class="mt-4 text-sm text-slate-500">Un elemento que ya tiene actividades no se puede borrar; desactívalo para que deje de aparecer al cargar actividades sin perder el historial.</p>
 @endsection

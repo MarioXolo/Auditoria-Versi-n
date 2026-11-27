@@ -118,3 +118,39 @@ document.querySelectorAll('[data-geo-validate]').forEach((form) => {
         );
     });
 });
+
+// 4. Punto en el mapa de un registro de Estrategia (bardas, lonas): se toca el mapa o se usa el GPS
+document.querySelectorAll('[data-map-point]').forEach((box) => {
+    const lat = box.querySelector('[name="lat"]');
+    const lng = box.querySelector('[name="lng"]');
+    const hint = box.querySelector('[data-map-hint]');
+    const has = lat.value && lng.value;
+    const map = L.map(box.querySelector('[data-map]')).setView(has ? [+lat.value, +lng.value] : DEFAULT_CENTER, has ? 17 : 12);
+    tiles().addTo(map);
+    let marker = null;
+    const place = (latlng, zoom) => {
+        lat.value = latlng.lat.toFixed(7);
+        lng.value = latlng.lng.toFixed(7);
+        marker ? marker.setLatLng(latlng) : (marker = dot(latlng, BRAND, 'Ubicación').addTo(map));
+        if (zoom) map.setView(latlng, zoom);
+        hint.textContent = `Punto marcado: ${lat.value}, ${lng.value}`;
+    };
+    if (has) place(L.latLng(+lat.value, +lng.value));
+    setTimeout(() => map.invalidateSize(), 300);
+    map.on('click', (e) => place(e.latlng));
+    box.querySelector('[data-map-clear]')?.addEventListener('click', () => {
+        lat.value = '';
+        lng.value = '';
+        if (marker) { map.removeLayer(marker); marker = null; }
+        hint.textContent = 'Sin punto. Toca el mapa para marcar dónde está.';
+    });
+    box.querySelector('[data-map-here]')?.addEventListener('click', () => {
+        if (!navigator.geolocation) return (hint.textContent = 'Este navegador no da la ubicación.');
+        hint.textContent = 'Buscando tu ubicación…';
+        navigator.geolocation.getCurrentPosition(
+            (p) => place(L.latLng(p.coords.latitude, p.coords.longitude), 18),
+            () => (hint.textContent = 'No se pudo obtener tu ubicación. Toca el mapa para marcar el punto.'),
+            { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 },
+        );
+    });
+});

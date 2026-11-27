@@ -24,6 +24,14 @@
     $next = route('calendar.index', ['mes' => $month->addMonth()->format('Y-m')] + $query);
     $title = ucfirst($month->translatedFormat('F Y'));
     $visible = 4; // chips por día en pantalla; al imprimir se muestran todos
+    // Eventos de campaña según la Agenda IEEQ: verde reportado, ámbar por reportar, rojo vencido
+    $evChip = [
+        'reportado' => 'bg-emerald-600 text-white',
+        'en_tiempo' => 'bg-amber-400 text-amber-950',
+        'por_vencer' => 'bg-amber-500 text-white',
+        'vencido' => 'bg-rose-600 text-white',
+        'cancelado' => 'bg-slate-300 text-slate-600 line-through',
+    ];
     $user = auth()->user();
 @endphp
 
@@ -120,6 +128,14 @@
                 {{ $row['status']->label() }} <strong class="tabular-nums">{{ $row['count'] }}</strong>
             </span>
         @endforeach
+        @if ($events->isNotEmpty())
+            <span class="inline-flex items-center gap-1.5 text-xs text-slate-600">
+                Eventos de campaña:
+                <span class="rounded bg-emerald-600 px-1.5 text-white">reportado</span>
+                <span class="rounded bg-amber-400 px-1.5 text-amber-950">por reportar</span>
+                <span class="rounded bg-rose-600 px-1.5 text-white">vencido</span>
+            </span>
+        @endif
         <span class="ml-auto inline-flex gap-4">
             <span>Cumplimiento <strong class="tabular-nums">{{ $cumplimiento !== null ? $cumplimiento.'%' : '—' }}</strong></span>
             <span @class(['font-semibold text-rose-600' => $overdue > 0])>Vencidas <strong class="tabular-nums">{{ $overdue }}</strong></span>
@@ -138,6 +154,7 @@
                 @foreach ($week as $day)
                     @php
                         $list = $days[$day->toDateString()] ?? collect();
+                        $dayEvents = $events[$day->toDateString()] ?? collect();
                         $inMonth = $day->month === $month->month;
                     @endphp
                     <div @class([
@@ -155,6 +172,18 @@
                                 <span class="text-[10px] text-slate-400 tabular-nums">{{ $list->count() }}</span>
                             @endif
                         </div>
+                        @if ($dayEvents->isNotEmpty())
+                            <ul class="mb-1 space-y-1">
+                                @foreach ($dayEvents as $ev)
+                                    <li>
+                                        <a href="{{ route('campaigns.strategy.edit', [$ev->campaign_id, $ev->libro, $ev]) }}" title="{{ $ev->book()['name'] }} · {{ $ev->title() }} · IEEQ: {{ $ev->ieeq_estatus }}"
+                                           class="block rounded px-1.5 py-0.5 text-[11px] leading-tight font-medium hover:brightness-95 print:text-[8px] {{ $evChip[$ev->agendaSemaforo()] ?? $evChip['en_tiempo'] }}">
+                                            {{ $ev->book()['icon'] }} @if ($ev->horaCorta()){{ $ev->horaCorta() }} @endif<span class="block truncate">{{ $ev->title() }}</span>
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        @endif
                         <ul class="space-y-1 print:space-y-0.5">
                             @foreach ($list as $i => $activity)
                                 <li @class(['hidden print:block' => $i >= $visible])>
@@ -184,14 +213,25 @@
 
     {{-- Agenda en celular --}}
     <div class="space-y-3 md:hidden print:hidden">
-        @forelse (collect($days)->sortKeys() as $date => $list)
-            @php $d = \Carbon\Carbon::parse($date); @endphp
+        @forelse (collect(array_fill_keys(array_unique([...array_keys($days), ...$events->keys()->all()]), null))->sortKeys() as $date => $_)
+            @php $d = \Carbon\Carbon::parse($date); $list = $days[$date] ?? collect(); $dayEvents = $events[$date] ?? collect(); @endphp
             @continue($d->month !== $month->month)
             <section class="card overflow-hidden">
                 <h2 @class(['px-4 py-2 text-sm font-semibold', 'bg-brand-600 text-white' => $d->isToday(), 'bg-slate-50' => ! $d->isToday()])>
                     {{ ucfirst($d->translatedFormat('l j \d\e F')) }}
                 </h2>
                 <ul class="divide-y divide-slate-100">
+                    @foreach ($dayEvents as $ev)
+                        <li>
+                            <a href="{{ route('campaigns.strategy.edit', [$ev->campaign_id, $ev->libro, $ev]) }}" class="flex items-center justify-between gap-3 px-4 py-2.5">
+                                <span class="min-w-0">
+                                    <span class="text-xs font-semibold text-slate-500">{{ $ev->book()['icon'] }} {{ $ev->book()['name'] }}@if ($ev->horaCorta()) · {{ $ev->horaCorta() }}@endif</span>
+                                    <span class="block truncate text-sm font-medium">{{ $ev->title() }} · {{ $ev->community?->name }}</span>
+                                </span>
+                                <span class="badge shrink-0 {{ $evChip[$ev->agendaSemaforo()] ?? $evChip['en_tiempo'] }}">{{ $ev->ieeq_estatus }}</span>
+                            </a>
+                        </li>
+                    @endforeach
                     @foreach ($list as $activity)
                         <li>
                             <a href="{{ route('activities.show', $activity) }}" class="flex items-center justify-between gap-3 px-4 py-2.5">

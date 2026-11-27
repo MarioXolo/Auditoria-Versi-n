@@ -48,4 +48,9 @@ return [
         'retardos_periodo' => 3,       // retardos en el periodo
         'cumplimiento_encargado' => 50, // % mínimo de lo que asignó un encargado
     ],
+
+    // Agenda reportada al IEEQ: con cuántos días de anticipación se reporta cada evento
+    // (verificar el plazo vigente con el jurídico) y desde cuántos días antes se avisa.
+    'ieeq_dias_anticipacion' => (int) env('IEEQ_DIAS_ANTICIPACION', 7),
+    'ieeq_dias_aviso' => (int) env('IEEQ_DIAS_AVISO', 3),
 ];

@@ -191,7 +191,7 @@ class SheetController extends Controller
         foreach ($def['fields'] as $name => $f) {
             $data[$name] = match ($f['type']) {
                 'bool' => $request->boolean($name),
-                'int' => (int) ($data[$name] ?? 0),
+                'int' => ($data[$name] ?? null) === null && ($f['nullable'] ?? false) ? null : (int) ($data[$name] ?? 0),
                 'percent' => ((float) ($data[$name] ?? 0)) / 100,
                 'money' => ($data[$name] ?? null) === null ? (($f['nullable'] ?? false) ? null : 0) : (float) $data[$name],
                 'community' => CatalogResolver::community($data[$name] ?? null, $data['community_new'] ?? null),
@@ -200,6 +200,10 @@ class SheetController extends Controller
             };
         }
         unset($data['community_new']);
+
+        if ($def['key'] === 'defensa-del-voto' && ($data['tipo'] ?? null) === 'Nueva' && blank($data['motivo_nueva'] ?? null)) {
+            throw \Illuminate\Validation\ValidationException::withMessages(['motivo_nueva' => 'Escribe el motivo de la casilla nueva.']);
+        }
 
         // Sin duplicados (p. ej. la misma sección y casilla dos veces)
         if ($unique = $def['unique'] ?? null) {

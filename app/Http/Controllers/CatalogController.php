@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ActivityType;
 use App\Models\Community;
+use App\Models\Section;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -27,7 +28,51 @@ class CatalogController extends Controller
         return view('catalogs.index', [
             'types' => ActivityType::withCount('activities')->orderByDesc('active')->orderBy('name')->get(),
             'communities' => Community::withCount('activities')->orderByDesc('active')->orderBy('name')->get(),
+            'sections' => Section::with('community:id,name')->withCount('strategyRecords')->orderByDesc('active')->orderBy('clave')->get(),
+            'activeCommunities' => Community::active()->orderBy('name')->get(['id', 'name']),
         ]);
+    }
+
+    /** Secciones electorales: clave + comunidad a la que pertenece. */
+    public function storeSection(Request $request): RedirectResponse
+    {
+        $data = $this->sectionData($request);
+        $section = Section::create($data + ['active' => true]);
+
+        return back()->with('status', "Sección {$section->clave} agregada.");
+    }
+
+    public function updateSection(Request $request, Section $section): RedirectResponse
+    {
+        if ($request->has('active')) {
+            $section->update(['active' => $request->boolean('active')]);
+
+            return back()->with('status', "Sección {$section->clave} ".($section->active ? 'activada.' : 'desactivada.'));
+        }
+
+        $section->update($this->sectionData($request, $section));
+
+        return back()->with('status', "Sección {$section->clave} actualizada.");
+    }
+
+    public function destroySection(Section $section): RedirectResponse
+    {
+        if ($section->inUse()) {
+            return back()->withErrors(['clave' => "La sección {$section->clave} ya se usa; desactívala en lugar de borrarla."], 'secciones');
+        }
+        $section->delete();
+
+        return back()->with('status', "Sección {$section->clave} eliminada.");
+    }
+
+    private function sectionData(Request $request, ?Section $section = null): array
+    {
+        $data = $request->validateWithBag('secciones', [
+            'clave' => ['required', 'string', 'max:10', 'regex:/^[0-9]{1,6}$/', Rule::unique('sections', 'clave')->ignore($section?->id)],
+            'community_id' => ['nullable', 'integer', 'exists:communities,id'],
+        ], ['clave.regex' => 'La sección solo lleva números (ej. 0512).', 'clave.unique' => 'Esa sección ya está en el catálogo.'], ['clave' => 'sección', 'community_id' => 'comunidad']);
+
+        return ['clave' => trim($data['clave']), 'community_id' => $data['community_id'] ?? null];
     }
 
     public function store(Request $request, string $catalog): RedirectResponse

@@ -33,6 +33,15 @@ Desde la versión 3 ya no existe el rol Empleado: esas cuentas se desactivaron y
 
 Las fotos y evidencias se guardan en `storage/app/private` y solo se muestran a quien tiene permiso; no quedan públicas en internet.
 
+
+### Puntos nuevos (11–20) · fase 1
+
+- **Catálogo de secciones electorales** (Catálogos): cada sección ligada a su comunidad. Al instalar se precargan las secciones que ya estaban capturadas en votantes y casillas.
+- **11. Estrategia de campaña** (burbuja 11 del Cuaderno): 10 libros —prioridades de comunidades, mítines, bardas, lonas, puerta por puerta, desayunos, kits, caravana, cabalgata y agenda metropolitana— con los campos comunes (comunidad y sección de catálogo, responsable, fecha, estatus Pendiente/En curso/Hecho, costo estimado y real, foto y archivo) más los propios de cada libro. Bardas y lonas llevan ubicación en mapa, formato de autorización para imprimir/firmar/subir y fotos antes/después. Todo se exporta a CSV.
+- **Casillas** (normales, especiales y nuevas): una sola tabla, la de Defensa del Voto, con tipo, domicilio, listado nominal, votos 2024 y motivo de la casilla nueva.
+- **20. Agenda IEEQ** (burbuja 20): cada evento (mitin, desayuno, caravana, cabalgata y reunión metropolitana que sea acto de campaña) aparece solo, con fecha límite de reporte (`IEEQ_DIAS_ANTICIPACION`, 7 días antes por defecto; ajustable por evento), estatus Por reportar / Reportado / Modificado / Cancelado, fecha de reporte y folio. Si un evento reportado cambia de fecha, hora o lugar pasa a «Modificado». Alerta de vencidos y por vencer (`IEEQ_DIAS_AVISO`).
+- **Calendario**: administradores y gerentes ven además los eventos de campaña, en verde (reportado), ámbar (por reportar) o rojo (vencido).
+
 ## Vista previa en GitHub Codespaces (sin servidor)
 
 1. En la página del repositorio, da clic en **Code → Codespaces → Create codespace on main**.

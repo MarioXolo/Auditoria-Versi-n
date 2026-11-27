@@ -8,6 +8,8 @@ use App\Http\Controllers\Campaigns\CampaignController;
 use App\Http\Controllers\Campaigns\KpiController;
 use App\Http\Controllers\Campaigns\PromoterController;
 use App\Http\Controllers\Campaigns\SheetController;
+use App\Http\Controllers\Campaigns\StrategyController;
+use App\Http\Controllers\Campaigns\AgendaController;
 use App\Http\Controllers\Campaigns\TerritoryController;
 use App\Http\Controllers\Campaigns\VoterController;
 use App\Http\Controllers\Auth\LoginController;
@@ -72,6 +74,9 @@ Route::middleware(['auth', 'active'])->group(function () {
 
         // Catálogos: tipos de actividad y comunidades
         Route::get('/catalogos', [CatalogController::class, 'index'])->name('catalogs.index');
+        Route::post('/catalogos/secciones', [CatalogController::class, 'storeSection'])->name('sections.store');
+        Route::patch('/catalogos/secciones/{section}', [CatalogController::class, 'updateSection'])->name('sections.update');
+        Route::delete('/catalogos/secciones/{section}', [CatalogController::class, 'destroySection'])->name('sections.destroy');
         Route::post('/catalogos/{catalog}', [CatalogController::class, 'store'])->whereIn('catalog', ['tipos', 'comunidades'])->name('catalogs.store');
         Route::patch('/catalogos/{catalog}/{id}', [CatalogController::class, 'update'])->whereIn('catalog', ['tipos', 'comunidades'])->whereNumber('id')->name('catalogs.update');
         Route::delete('/catalogos/{catalog}/{id}', [CatalogController::class, 'destroy'])->whereIn('catalog', ['tipos', 'comunidades'])->whereNumber('id')->name('catalogs.destroy');
@@ -97,6 +102,22 @@ Route::middleware(['auth', 'active'])->group(function () {
             Route::delete('/kpi/{kpi}', [KpiController::class, 'destroy'])->name('kpis.destroy');
 
             // Etapa 2: pestañas 5, 6, 7, 8 y 10 (mismo controlador; columnas en App\Services\CampaignSheets)
+            // 11. Estrategia de campaña y 20. Agenda reportada al IEEQ
+            Route::get('/estrategia', [StrategyController::class, 'hub'])->name('strategy.hub');
+            Route::get('/agenda-ieeq', [AgendaController::class, 'index'])->name('agenda.index');
+            Route::put('/agenda-ieeq/{record}', [AgendaController::class, 'update'])->withoutScopedBindings()->name('agenda.update');
+            Route::prefix('/estrategia/{libro}')->whereIn('libro', \App\Services\StrategyBooks::keys())->withoutScopedBindings()->group(function () {
+                Route::get('/', [StrategyController::class, 'index'])->name('strategy.index');
+                Route::get('/nuevo', [StrategyController::class, 'create'])->name('strategy.create');
+                Route::post('/', [StrategyController::class, 'store'])->name('strategy.store');
+                Route::get('/exportar', [StrategyController::class, 'export'])->name('strategy.export');
+                Route::get('/formato/{record?}', [StrategyController::class, 'formato'])->name('strategy.formato');
+                Route::get('/{record}/editar', [StrategyController::class, 'edit'])->name('strategy.edit');
+                Route::put('/{record}', [StrategyController::class, 'update'])->name('strategy.update');
+                Route::delete('/{record}', [StrategyController::class, 'destroy'])->name('strategy.destroy');
+                Route::get('/{record}/archivo/{campo}', [StrategyController::class, 'file'])->where('campo', '[a-z_]+')->name('strategy.file');
+            });
+
             Route::put('/presupuesto/tope', [SheetController::class, 'tope'])->name('sheets.tope');
             Route::post('/cronograma/plantilla', [SheetController::class, 'template'])->name('sheets.template');
             Route::pattern('sheet', implode('|', \App\Services\CampaignSheets::keys()));

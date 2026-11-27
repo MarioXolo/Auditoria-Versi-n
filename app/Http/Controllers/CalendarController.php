@@ -48,6 +48,17 @@ class CalendarController extends Controller
 
         $days = $this->days($activities, $from, $to, $mode);
 
+        // Eventos de campaña (Estrategia → Agenda IEEQ): solo administradores y gerentes
+        $events = $user->seesEverything()
+            ? \App\Models\StrategyRecord::query()
+                ->where('es_evento', true)
+                ->whereBetween('fecha', [$from->toDateString(), $to->toDateString()])
+                ->with('community:id,name')
+                ->orderBy('hora')
+                ->get()
+                ->groupBy(fn ($e) => $e->fecha->toDateString())
+            : collect();
+
         // Semanas de lunes a domingo que cubren el mes
         $weeks = collect();
         for ($d = $from->startOfWeek(CarbonInterface::MONDAY); $d->lte($to->endOfWeek(CarbonInterface::SUNDAY)); $d = $d->addWeek()) {
@@ -67,6 +78,7 @@ class CalendarController extends Controller
             'mode' => $mode,
             'weeks' => $weeks,
             'days' => $days,
+            'events' => $events,
             'activities' => $activities,
             'summary' => $summary,
             'total' => $total,
