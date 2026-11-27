@@ -214,12 +214,14 @@ class ActivityFormTest extends TestCase
         $this->assertSame('Brigada de limpieza', $a->type->name);
         $this->assertSame('Colonia Nueva Esperanza', $a->community->name);
 
-        // Lo escrito queda en el catálogo y no se duplica aunque cambien mayúsculas
+        // Lo escrito no se duplica aunque cambien mayúsculas (reutiliza el de la lista común)
         $this->actingAs($this->empleado)->post('/activities', $this->payload([
             'activity_type_id' => 'otro', 'activity_type_new' => 'visita DOMICILIARIA',
         ]))->assertRedirect();
         $this->assertSame(1, ActivityType::whereRaw('LOWER(name) = ?', ['visita domiciliaria'])->count());
-        $this->actingAs($this->encargado)->get('/activities/create')->assertSee('Brigada de limpieza')->assertSee('Colonia Nueva Esperanza');
+        // La comunidad nueva queda para todos; el tipo escrito queda privado de quien lo escribió
+        $this->actingAs($this->empleado)->get('/activities/create')->assertSee('Brigada de limpieza');
+        $this->actingAs($this->encargado)->get('/activities/create')->assertDontSee('Brigada de limpieza')->assertSee('Colonia Nueva Esperanza');
 
         // Si elige «otro» tiene que escribirlo
         $this->actingAs($this->empleado)->post('/activities', $this->payload(['community_id' => 'otro']))

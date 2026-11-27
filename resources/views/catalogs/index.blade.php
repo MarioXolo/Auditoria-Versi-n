@@ -65,6 +65,27 @@
             </section>
         @endforeach
     </div>
+    @if ($privateTypes->isNotEmpty())
+        <section class="card mt-6 overflow-hidden">
+            <div class="border-b border-slate-200 px-5 py-4">
+                <h2 class="font-semibold">Tipos de actividad privados</h2>
+                <p class="text-xs text-slate-500">Los escribió cada persona con «Otro…». Solo le aparecen a quien lo escribió; los demás no los ven. Solo el administrador ve esta lista.</p>
+            </div>
+            <ul class="divide-y divide-slate-100 text-sm">
+                @foreach ($privateTypes as $pt)
+                    <li class="flex flex-wrap items-center justify-between gap-2 px-5 py-2.5">
+                        <span><b>{{ $pt->name }}</b> <span class="text-slate-500">· de {{ $pt->owner?->name }} · {{ $pt->activities_count }} {{ $pt->activities_count === 1 ? 'actividad' : 'actividades' }}</span></span>
+                        <form method="POST" action="{{ route('catalogs.share-type', $pt->id) }}" onsubmit="return confirm('¿Pasar «{{ $pt->name }}» a la lista común? Todos lo podrán elegir.')">
+                            @csrf
+                            @method('PATCH')
+                            <button class="text-xs font-medium text-brand-700 hover:underline">Pasar a la lista común</button>
+                        </form>
+                    </li>
+                @endforeach
+            </ul>
+        </section>
+    @endif
+
     @php $bag = $errors->getBag('secciones'); @endphp
     <section class="card mt-6 overflow-hidden" id="secciones">
         <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">

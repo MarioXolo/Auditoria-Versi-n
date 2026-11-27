@@ -72,7 +72,7 @@ class ActivityController extends Controller
             'people' => $user->canManageActivities() ? $this->visiblePeople($user) : collect(),
             'teams' => $this->teamsFor($user),
             'statuses' => ActivityStatus::options(),
-            'types' => ActivityType::orderBy('name')->get(['id', 'name']),
+            'types' => ActivityType::filterableBy($user)->orderBy('name')->get(['id', 'name']),
             'communities' => Community::orderBy('name')->get(['id', 'name']),
             'canMarkAny' => true,
         ]);
@@ -262,7 +262,7 @@ class ActivityController extends Controller
             $assignableIds[] = $activity->assigned_to;
         }
 
-        $typeIds = ActivityType::active()->pluck('id')->push($activity?->activity_type_id)->filter()->all();
+        $typeIds = ActivityType::active()->availableTo($user)->pluck('id')->push($activity?->activity_type_id)->filter()->all();
         $communityIds = Community::active()->pluck('id')->push($activity?->community_id)->filter()->all();
 
         // «otro» = escribirlo a mano; se agrega al catálogo al guardar
@@ -296,7 +296,7 @@ class ActivityController extends Controller
             'end_date' => 'fecha de fin',
         ]);
 
-        $data['activity_type_id'] = $this->catalogId(ActivityType::class, $data['activity_type_id'], $data['activity_type_new'] ?? null);
+        $data['activity_type_id'] = $this->typeId($user, $data['activity_type_id'], $data['activity_type_new'] ?? null);
         $data['community_id'] = $this->catalogId(Community::class, $data['community_id'], $data['community_new'] ?? null);
 
         unset($data['evidence'], $data['activity_type_new'], $data['community_new']);
@@ -439,6 +439,25 @@ class ActivityController extends Controller
      *
      * @param  class-string<ActivityType|Community>  $model
      */
+    /**
+     * Tipo de actividad: si se escribe uno nuevo con «Otro…» queda privado de quien lo escribió
+     * (no se agrega a la lista de los demás). Si ya existe en la lista común o en los suyos, se reutiliza.
+     */
+    private function typeId(User $user, int|string $selected, ?string $typed): int
+    {
+        if ($selected !== 'otro') {
+            return (int) $selected;
+        }
+        $name = preg_replace('/\s+/', ' ', trim((string) $typed));
+        $item = ActivityType::availableTo($user)->whereRaw('LOWER(name) = ?', [mb_strtolower($name)])->orderByRaw('owner_id is not null')->first()
+            ?? ActivityType::create(['name' => $name, 'owner_id' => $user->id, 'active' => true]);
+        if (! $item->active) {
+            $item->update(['active' => true]);
+        }
+
+        return $item->id;
+    }
+
     private function catalogId(string $model, int|string $selected, ?string $typed): int
     {
         if ($selected !== 'otro') {
@@ -484,7 +503,7 @@ class ActivityController extends Controller
             'folioPreviews' => $activity->exists ? collect() : $previews,
             'teams' => $this->teamsFor($user),
             'statuses' => ActivityStatus::editableOptions(),
-            'types' => ActivityType::active()->orWhere('id', $activity->activity_type_id)->orderBy('name')->get(['id', 'name']),
+            'types' => ActivityType::where(fn ($q) => $q->where('active', true)->availableTo($user))->orWhere('id', $activity->activity_type_id)->orderBy('name')->get(['id', 'name']),
             'communities' => Community::active()->orWhere('id', $activity->community_id)->orderBy('name')->get(['id', 'name']),
             'code' => $code,
         ];

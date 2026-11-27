@@ -109,6 +109,7 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::post('/catalogos/secciones', [CatalogController::class, 'storeSection'])->name('sections.store');
         Route::patch('/catalogos/secciones/{section}', [CatalogController::class, 'updateSection'])->name('sections.update');
         Route::delete('/catalogos/secciones/{section}', [CatalogController::class, 'destroySection'])->name('sections.destroy');
+        Route::patch('/catalogos/tipos/{id}/compartir', [CatalogController::class, 'shareType'])->whereNumber('id')->name('catalogs.share-type');
         Route::post('/catalogos/{catalog}', [CatalogController::class, 'store'])->whereIn('catalog', ['tipos', 'comunidades'])->name('catalogs.store');
         Route::patch('/catalogos/{catalog}/{id}', [CatalogController::class, 'update'])->whereIn('catalog', ['tipos', 'comunidades'])->whereNumber('id')->name('catalogs.update');
         Route::delete('/catalogos/{catalog}/{id}', [CatalogController::class, 'destroy'])->whereIn('catalog', ['tipos', 'comunidades'])->whereNumber('id')->name('catalogs.destroy');

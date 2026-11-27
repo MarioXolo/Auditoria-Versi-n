@@ -26,7 +26,8 @@ class CatalogController extends Controller
     public function index(): View
     {
         return view('catalogs.index', [
-            'types' => ActivityType::withCount('activities')->orderByDesc('active')->orderBy('name')->get(),
+            'types' => ActivityType::shared()->withCount('activities')->orderByDesc('active')->orderBy('name')->get(),
+            'privateTypes' => auth()->user()->isAdmin() ? ActivityType::whereNotNull('owner_id')->with('owner:id,name')->withCount('activities')->orderBy('name')->get() : collect(),
             'communities' => Community::withCount('activities')->orderByDesc('active')->orderBy('name')->get(),
             'sections' => Section::with('community:id,name')->withCount('strategyRecords')->orderByDesc('active')->orderBy('clave')->get(),
             'activeCommunities' => Community::active()->orderBy('name')->get(['id', 'name']),
@@ -80,7 +81,7 @@ class CatalogController extends Controller
         $config = $this->config($catalog);
 
         $data = $request->validateWithBag($catalog, [
-            'name' => ['required', 'string', 'max:120', Rule::unique($config['table'], 'name')],
+            'name' => ['required', 'string', 'max:120', $catalog === 'tipos' ? Rule::unique('activity_types', 'name')->whereNull('owner_id') : Rule::unique($config['table'], 'name')],
         ], [], ['name' => 'nombre']);
 
         $config['model']::create(['name' => trim($data['name']), 'active' => true]);
@@ -100,12 +101,32 @@ class CatalogController extends Controller
         }
 
         $data = $request->validateWithBag($catalog, [
-            'name' => ['required', 'string', 'max:120', Rule::unique($config['table'], 'name')->ignore($item->id)],
+            'name' => ['required', 'string', 'max:120', ($catalog === 'tipos' ? Rule::unique('activity_types', 'name')->where('owner_id', $item->owner_id) : Rule::unique($config['table'], 'name'))->ignore($item->id)],
         ], [], ['name' => 'nombre']);
 
         $item->update(['name' => trim($data['name'])]);
 
         return back()->with('status', "Nombre actualizado a «{$item->name}».");
+    }
+
+    /**
+     * Admin: pasa un tipo privado a la lista común. Si ya hay uno común con el mismo nombre,
+     * sus actividades se juntan con ese y el privado se elimina.
+     */
+    public function shareType(int $id): RedirectResponse
+    {
+        abort_unless(auth()->user()->isAdmin(), 403);
+        $type = ActivityType::whereNotNull('owner_id')->findOrFail($id);
+        $shared = ActivityType::shared()->whereRaw('LOWER(name) = ?', [mb_strtolower($type->name)])->first();
+
+        if ($shared) {
+            \App\Models\Activity::where('activity_type_id', $type->id)->update(['activity_type_id' => $shared->id]);
+            $type->delete();
+        } else {
+            $type->update(['owner_id' => null]);
+        }
+
+        return back()->with('status', "«{$type->name}» ahora está en la lista común: todos lo pueden elegir.");
     }
 
     public function destroy(string $catalog, int $id): RedirectResponse
