@@ -39,6 +39,7 @@ class PromoterController extends Controller
             'campaign' => $campaign,
             'promoter' => new CampaignPromoter(['meta_votos' => $campaign->votantes_por_promotor]),
             'communities' => Community::active()->orderBy('name')->get(['id', 'name']),
+            'users' => \App\Models\User::where('active', true)->orderBy('name')->get(['id', 'name']),
         ]);
     }
 
@@ -55,6 +56,7 @@ class PromoterController extends Controller
             'campaign' => $campaign,
             'promoter' => $promoter,
             'communities' => Community::active()->orWhere('id', $promoter->community_id)->orderBy('name')->get(['id', 'name']),
+            'users' => \App\Models\User::where('active', true)->orWhere('id', $promoter->user_id)->orderBy('name')->get(['id', 'name']),
         ]);
     }
 
@@ -118,6 +120,7 @@ class PromoterController extends Controller
             'community_new' => ['nullable', 'required_if:community_id,otro', 'string', 'max:120'],
             'secciones' => ['nullable', 'string', 'max:120'],
             'coordinador' => ['nullable', 'string', 'max:150'],
+            'user_id' => ['nullable', 'integer', 'exists:users,id'],
             'meta_votos' => ['required', 'integer', 'min:0', 'max:100000'],
             'verificado' => ['nullable', 'boolean'],
         ], ['community_new.required_if' => 'Escribe el nombre de la comunidad.'], [
@@ -126,6 +129,7 @@ class PromoterController extends Controller
 
         $data['community_id'] = CatalogResolver::community($data['community_id'] ?? null, $data['community_new'] ?? null);
         $data['verificado'] = $request->boolean('verificado');
+        $data['user_id'] ??= null;
         unset($data['community_new']);
 
         return $data;

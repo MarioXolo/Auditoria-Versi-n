@@ -9,11 +9,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 /** Fila del «Padrón de Promotores». Los identificados se cuentan de la base de votantes. */
 class CampaignPromoter extends Model
 {
-    protected $fillable = ['campaign_id', 'name', 'phone', 'community_id', 'secciones', 'coordinador', 'meta_votos', 'verificado'];
+    protected $fillable = ['campaign_id', 'name', 'phone', 'community_id', 'secciones', 'coordinador', 'user_id', 'meta_votos', 'verificado'];
 
     protected function casts(): array
     {
-        return ['meta_votos' => 'integer', 'verificado' => 'boolean'];
+        return ['meta_votos' => 'integer', 'verificado' => 'boolean', 'user_id' => 'integer'];
+    }
+
+    /** Cuenta del sistema del promotor: con perfil «solo sus votantes» ve únicamente a los suyos. */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function campaign(): BelongsTo

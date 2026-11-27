@@ -8,7 +8,10 @@
         <p class="text-sm text-slate-500">{{ $users->total() }} registrados</p>
     </div>
     @if (auth()->user()->isAdmin())
-        <a href="{{ route('users.create') }}" class="btn btn-primary">Nuevo usuario</a>
+        <div class="flex gap-2">
+            <a href="{{ route('profiles.index') }}" class="btn btn-secondary">Perfiles de acceso</a>
+            <a href="{{ route('users.create') }}" class="btn btn-primary">Nuevo usuario</a>
+        </div>
     @else
         <p class="text-sm text-slate-500">Solo el administrador puede crear o editar usuarios.</p>
     @endif
@@ -49,7 +52,7 @@
                             <span class="font-medium text-slate-900">{{ $user->name }}</span>
                             <span class="block text-xs text-slate-500">{{ $user->email }}</span>
                         </td>
-                        <td class="table-cell">{{ $user->role->label() }}</td>
+                        <td class="table-cell">{{ $user->role->label() }}@if ($user->accessProfile)<span class="block text-xs text-slate-500">{{ $user->accessProfile->name }}</span>@endif</td>
                         <td class="table-cell">{{ $user->team?->name ?? '—' }}</td>
                         <td class="table-cell">
                             <span @class(['badge', 'bg-emerald-100 text-emerald-800' => $user->active, 'bg-slate-200 text-slate-600' => ! $user->active])>

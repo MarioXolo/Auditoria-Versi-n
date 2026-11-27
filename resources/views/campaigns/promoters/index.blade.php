@@ -25,8 +25,12 @@
             <option value="si" @selected(request('verificado') === 'si')>Solo verificados</option>
             <option value="no" @selected(request('verificado') === 'no')>Sin verificar</option>
         </select>
+        @if (auth()->user()->puede('promotores', 'exportar'))
         <a href="{{ route('campaigns.promoters.export', [$campaign] + request()->query()) }}" class="btn btn-secondary">Exportar CSV</a>
+        @endif
+        @if (auth()->user()->puede('promotores', 'capturar'))
         <a href="{{ route('campaigns.promoters.create', $campaign) }}" class="btn btn-primary">Registrar promotor</a>
+        @endif
     </form>
 
     {{-- Mismas columnas que la pestaña «Padrón de Promotores» del Excel --}}

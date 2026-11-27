@@ -24,8 +24,18 @@
     if ($me->seesEverything()) {
         $nav[] = ['route' => 'users.index', 'match' => 'users.*', 'label' => 'Usuarios', 'icon' => 'M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m22 0v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75M13 7a4 4 0 11-8 0 4 4 0 018 0z'];
         $nav[] = ['route' => 'teams.index', 'match' => 'teams.*', 'label' => 'Equipos', 'icon' => 'M3 7h18M3 12h18M3 17h18'];
+    }
+    // Módulos con permisos por perfil (punto 19)
+    if ($me->puede('minutas')) {
         $nav[] = ['route' => 'minutes.index', 'match' => 'minutes.*', 'label' => 'Minutas', 'icon' => 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'];
+    }
+    if ($me->puedeVerCuaderno()) {
         $nav[] = ['route' => 'campaigns.index', 'match' => 'campaigns.*', 'label' => 'Cuaderno Maestro', 'icon' => 'M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6V3Zm0 0v18M3 7h3m-3 5h3m-3 5h3m4-9h5'];
+    }
+    if ($me->puede('organigrama')) {
+        $nav[] = ['route' => 'org.index', 'match' => 'org.*', 'label' => 'Organigrama', 'icon' => 'M12 3v4m0 0H7a2 2 0 00-2 2v3m7-5h5a2 2 0 012 2v3M9 3h6v4H9zM2 12h6v4H2zm14 0h6v4h-6zm-7 5h6v4H9zm3-1v1'];
+    }
+    if ($me->puede('catalogos')) {
         $nav[] = ['route' => 'catalogs.index', 'match' => 'catalogs.*', 'label' => 'Catálogos', 'icon' => 'M4 6a2 2 0 012-2h3l2 2h7a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm4 6h8m-8 4h5'];
     }
 @endphp

@@ -18,7 +18,7 @@ class UserController extends Controller
     public function index(Request $request): View
     {
         $users = User::query()
-            ->with('team:id,name')
+            ->with(['team:id,name', 'accessProfile:id,name'])
             ->when($request->filled('q'), function ($q) use ($request) {
                 $term = '%'.$request->string('q').'%';
                 $q->where(fn ($w) => $w->where('name', 'like', $term)->orWhere('email', 'like', $term));
@@ -34,6 +34,7 @@ class UserController extends Controller
             'users' => $users,
             'roles' => Role::options(),
             'teams' => Team::orderBy('name')->get(['id', 'name']),
+            'profiles' => \App\Models\AccessProfile::orderBy('name')->get(['id', 'name', 'description']),
         ]);
     }
 
@@ -43,6 +44,7 @@ class UserController extends Controller
             'user' => new User(['role' => Role::Encargado, 'active' => true]),
             'roles' => Role::options(),
             'teams' => Team::orderBy('name')->get(['id', 'name']),
+            'profiles' => \App\Models\AccessProfile::orderBy('name')->get(['id', 'name', 'description']),
         ]);
     }
 
@@ -62,6 +64,7 @@ class UserController extends Controller
             'user' => $user,
             'roles' => Role::options(),
             'teams' => Team::orderBy('name')->get(['id', 'name']),
+            'profiles' => \App\Models\AccessProfile::orderBy('name')->get(['id', 'name', 'description']),
         ]);
     }
 
@@ -103,6 +106,7 @@ class UserController extends Controller
             'phone' => ['nullable', 'string', 'max:30'],
             'role' => ['required', Rule::in(array_keys(Role::options()))],
             'team_id' => ['nullable', 'integer', 'exists:teams,id'],
+            'access_profile_id' => ['nullable', 'integer', 'exists:access_profiles,id'],
             'password' => [$user ? 'nullable' : 'required', 'confirmed', Password::min(8)],
         ], [], [
             'name' => 'nombre',
@@ -110,10 +114,12 @@ class UserController extends Controller
             'phone' => 'teléfono',
             'role' => 'rol',
             'team_id' => 'equipo',
+            'access_profile_id' => 'perfil',
             'password' => 'contraseña',
         ]);
 
         $data['active'] = $request->boolean('active');
+        $data['access_profile_id'] ??= null;
 
         return $data;
     }

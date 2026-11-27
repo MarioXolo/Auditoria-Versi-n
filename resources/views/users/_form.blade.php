@@ -35,6 +35,16 @@
             @endforeach
         </select>
     </div>
+    <div>
+        <label for="access_profile_id" class="label">Perfil de acceso <span class="font-normal text-slate-500">(Cuaderno, Estrategia, Minutas…)</span></label>
+        <select id="access_profile_id" name="access_profile_id" class="input">
+            <option value="">Sin perfil (gerente: acceso completo · encargado: sin acceso)</option>
+            @foreach ($profiles as $profile)
+                <option value="{{ $profile->id }}" @selected((int) old('access_profile_id', $user->access_profile_id) === $profile->id)>{{ $profile->name }}</option>
+            @endforeach
+        </select>
+        <p class="mt-1 text-xs text-slate-500">El administrador puede todo, tenga o no perfil. <a href="{{ route('profiles.index') }}" class="text-brand-700 hover:underline">Ver qué permite cada perfil</a>.</p>
+    </div>
     <div class="flex items-end">
         <label class="flex items-center gap-2 text-sm">
             <input type="hidden" name="active" value="0">

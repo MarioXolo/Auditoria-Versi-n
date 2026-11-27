@@ -7,7 +7,9 @@
         <h1 class="text-2xl font-semibold">Minutas</h1>
         <p class="text-sm text-slate-500">Acuerdos y compromisos de cada reunión, ordenados por fecha.</p>
     </div>
-    <a href="{{ route('minutes.create') }}" class="btn btn-primary">+ Crea tu minuta</a>
+    @if (auth()->user()->puede('minutas', 'capturar'))
+        <a href="{{ route('minutes.create') }}" class="btn btn-primary">+ Crea tu minuta</a>
+    @endif
 @endsection
 
 @section('content')

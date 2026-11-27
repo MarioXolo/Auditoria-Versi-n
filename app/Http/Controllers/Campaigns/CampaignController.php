@@ -19,10 +19,15 @@ class CampaignController extends Controller
 {
     private const PERCENT_FIELDS = ['participacion', 'objetivo', 'colchon'];
 
+    /** Módulo de permisos de cada burbuja (las que no aparecen son «cuaderno»). */
+    public const MODULE_OF = [3 => 'votantes', 4 => 'promotores', 11 => 'estrategia', 20 => 'agenda'];
+
     /** Entrada del menú: abre el cuaderno, o su configuración inicial si aún no existe. */
-    public function index(): RedirectResponse
+    public function index(Request $request): RedirectResponse
     {
+        abort_unless($request->user()->puedeVerCuaderno(), 403, 'Tu perfil no tiene acceso al Cuaderno Maestro.');
         $campaign = Campaign::current();
+        abort_if(! $campaign && ! $request->user()->puede('cuaderno', 'capturar'), 404, 'El Cuaderno Maestro aún no se ha configurado.');
 
         return $campaign ? redirect()->route('campaigns.show', $campaign) : redirect()->route('campaigns.create');
     }
@@ -52,6 +57,8 @@ class CampaignController extends Controller
 
     public function show(Campaign $campaign): View
     {
+        abort_unless(auth()->user()->puedeVerCuaderno(), 403, 'Tu perfil no tiene acceso al Cuaderno Maestro.');
+
         $metrics = new CampaignMetrics($campaign);
 
         $summary = $metrics->summary();
@@ -98,7 +105,7 @@ class CampaignController extends Controller
         $eventos = $campaign->strategyRecords()->where('es_evento', true)->count();
         $porReportar = $campaign->strategyRecords()->pendientesIeeq()->count();
 
-        return [
+        $all = [
             [1, 'Meta de Votos', 'Calculadora: define tu número objetivo y cuántos promotores necesitas. Empieza aquí.', route('campaigns.edit', $campaign), $campaign->listado_nominal > 0, 'Meta: '.$n(round($campaign->metaConColchon())).' votos'],
             [2, 'Estructura Territorial', 'Metas y avance por delegación.', route('campaigns.territories.index', $campaign), $summary->comunidades > 0, $count($summary->comunidades, 'comunidad', 'comunidades')],
             [3, 'Base de Votantes', 'El padrón nominal propio: votante por votante identificado.', route('campaigns.voters.index', $campaign), $summary->votantes > 0, $count($summary->votantes, 'votante', 'votantes')],
@@ -112,6 +119,11 @@ class CampaignController extends Controller
             [11, 'Estrategia de Campaña', 'Los libros: prioridades, mítines, bardas, lonas, puerta por puerta, casillas…', route('campaigns.strategy.hub', $campaign), $registros > 0, $count($registros, 'registro', 'registros')],
             [20, 'Agenda IEEQ', 'Los eventos de los libros llegan solos; controla qué falta reportar.', route('campaigns.agenda.index', $campaign), $eventos > 0, $porReportar > 0 ? $count($porReportar, 'evento por reportar', 'eventos por reportar') : $count($eventos, 'evento', 'eventos')],
         ];
+
+        // Punto 19: cada quien ve solo las burbujas de los módulos que su perfil le deja ver
+        $user = auth()->user();
+
+        return array_values(array_filter($all, fn ($b) => ! $user || $user->puede(self::MODULE_OF[$b[0]] ?? 'cuaderno')));
     }
 
     private function validated(Request $request): array

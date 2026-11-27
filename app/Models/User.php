@@ -21,6 +21,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'access_profile_id',
         'team_id',
         'phone',
         'active',
@@ -108,6 +109,46 @@ class User extends Authenticatable
     public function seesEverything(): bool
     {
         return $this->hasRole(Role::Admin, Role::Gerente);
+    }
+
+    public function accessProfile(): BelongsTo
+    {
+        return $this->belongsTo(AccessProfile::class);
+    }
+
+    /**
+     * Punto 19 · ¿Puede hacer esta acción en este módulo? (ver App\Support\Access)
+     * Administrador: todo. Con perfil: lo que diga el perfil. Sin perfil: el gerente conserva
+     * el acceso completo que ya tenía y el encargado no entra.
+     */
+    public function puede(string $module, string $action = 'ver'): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+        if ($this->access_profile_id) {
+            return (bool) $this->accessProfile?->allows($module, $action);
+        }
+
+        return $this->isGerente();
+    }
+
+    /** Promotor: en la base de votantes solo ve y captura a los suyos. */
+    public function soloSusVotantes(): bool
+    {
+        return ! $this->isAdmin() && (bool) $this->accessProfile?->solo_sus_votantes;
+    }
+
+    /** ¿Ve al menos un módulo del Cuaderno Maestro? */
+    public function puedeVerCuaderno(): bool
+    {
+        foreach (['cuaderno', 'promotores', 'votantes', 'estrategia', 'agenda'] as $m) {
+            if ($this->puede($m)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /** Todos pueden cargar actividades; el encargado solo para sí mismo. */

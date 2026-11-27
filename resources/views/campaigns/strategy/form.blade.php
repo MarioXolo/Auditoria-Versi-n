@@ -183,13 +183,17 @@
 
         <div class="flex flex-wrap items-center justify-between gap-3">
             <div class="flex gap-2">
+                @if (auth()->user()->puede('estrategia', 'capturar'))
                 <button class="btn btn-primary">{{ $record->exists ? 'Guardar cambios' : 'Guardar' }}</button>
+                @else
+                <p class="text-sm text-slate-500">Tu perfil solo permite consultar.</p>
+                @endif
                 <a href="{{ route('campaigns.strategy.index', [$campaign, $key]) }}" class="btn btn-secondary">Cancelar</a>
             </div>
         </div>
     </form>
 
-    @if ($record->exists)
+    @if ($record->exists && auth()->user()->puede('estrategia', 'capturar'))
         <form method="POST" action="{{ route('campaigns.strategy.destroy', [$campaign, $key, $record]) }}" class="mt-6 border-t border-slate-200 pt-4" onsubmit="return confirm('¿Eliminar este registro y sus archivos? No se puede deshacer.')">
             @csrf
             @method('DELETE')

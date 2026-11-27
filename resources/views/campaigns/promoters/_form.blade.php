@@ -29,6 +29,14 @@
         <input id="coordinador" name="coordinador" value="{{ old('coordinador', $promoter->coordinador) }}" maxlength="150" class="input">
     </div>
     <div>
+        <label for="user_id" class="label">Cuenta en el sistema</label>
+        <select id="user_id" name="user_id" class="input">
+            <option value="">— Sin cuenta —</option>
+            @foreach ($users as $u)<option value="{{ $u->id }}" @selected((int) old('user_id', $promoter->user_id) === $u->id)>{{ $u->name }}</option>@endforeach
+        </select>
+        <p class="mt-1 text-xs text-slate-500">Si su usuario tiene el perfil «Promotor», en la base de votantes solo verá y capturará a los suyos.</p>
+    </div>
+    <div>
         <label for="meta_votos" class="label">Meta (votos) *</label>
         <input id="meta_votos" type="number" min="0" name="meta_votos" value="{{ old('meta_votos', $promoter->meta_votos) }}" required class="input tabular-nums">
         <p class="mt-1 text-xs text-slate-500">Por defecto, los votantes por promotor de la campaña ({{ $campaign->votantes_por_promotor }}).</p>

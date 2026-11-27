@@ -75,6 +75,7 @@
     @endif
 
     {{-- Agregar fila --}}
+    @if (auth()->user()->puede('cuaderno', 'capturar'))
     <details class="card mb-4" @if ($errors->any() || $all->isEmpty()) open @endif>
         <summary class="cursor-pointer px-4 py-3 text-sm font-semibold text-brand-700">+ Agregar {{ $sheet['singular'] }}</summary>
         <form method="POST" action="{{ route('campaigns.sheets.store', [$campaign, $key]) }}" class="grid gap-3 border-t border-slate-100 p-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -90,6 +91,7 @@
             </div>
         </form>
     </details>
+    @endif
 
     {{-- Búsqueda y filtros --}}
     @if ($sheet['search'] || $sheet['filters'] || $all->isNotEmpty())
@@ -123,7 +125,9 @@
             @if (request()->hasAny(['q', ...$sheet['filters']]))
                 <a href="{{ route('campaigns.sheets.index', [$campaign, $key]) }}" class="text-sm text-slate-500 hover:underline">Limpiar</a>
             @endif
-            <a href="{{ route('campaigns.sheets.export', [$campaign, $key] + request()->query()) }}" class="btn btn-secondary ml-auto">Exportar CSV</a>
+            @if (auth()->user()->puede('cuaderno', 'exportar'))
+                <a href="{{ route('campaigns.sheets.export', [$campaign, $key] + request()->query()) }}" class="btn btn-secondary ml-auto">Exportar CSV</a>
+            @endif
         </form>
     @endif
 
@@ -158,12 +162,14 @@
                             @endif
                         @endforeach
                         <td class="table-cell whitespace-nowrap text-right">
+                            @if (auth()->user()->puede('cuaderno', 'capturar'))
                             <form id="{{ $formId }}" method="POST" action="{{ route('campaigns.sheets.update', [$campaign, $key, $row->id]) }}" class="inline">@csrf @method('PUT')
                                 <button class="text-xs font-medium text-brand-600 hover:underline">Guardar</button>
                             </form>
                             <form method="POST" action="{{ route('campaigns.sheets.destroy', [$campaign, $key, $row->id]) }}" class="ml-2 inline" onsubmit="return confirm('¿Eliminar esta fila?')">@csrf @method('DELETE')
                                 <button class="text-xs font-medium text-rose-600 hover:underline">Eliminar</button>
                             </form>
+                            @endif
                         </td>
                     </tr>
                 @empty

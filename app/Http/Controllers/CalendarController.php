@@ -49,7 +49,7 @@ class CalendarController extends Controller
         $days = $this->days($activities, $from, $to, $mode);
 
         // Eventos de campaña (Estrategia → Agenda IEEQ): solo administradores y gerentes
-        $events = $user->seesEverything()
+        $events = $user->puede('agenda')
             ? \App\Models\StrategyRecord::query()
                 ->where('es_evento', true)
                 ->whereBetween('fecha', [$from->toDateString(), $to->toDateString()])

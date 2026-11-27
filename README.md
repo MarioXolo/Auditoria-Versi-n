@@ -42,6 +42,13 @@ Las fotos y evidencias se guardan en `storage/app/private` y solo se muestran a 
 - **20. Agenda IEEQ** (burbuja 20): cada evento (mitin, desayuno, caravana, cabalgata y reunión metropolitana que sea acto de campaña) aparece solo, con fecha límite de reporte (`IEEQ_DIAS_ANTICIPACION`, 7 días antes por defecto; ajustable por evento), estatus Por reportar / Reportado / Modificado / Cancelado, fecha de reporte y folio. Si un evento reportado cambia de fecha, hora o lugar pasa a «Modificado». Alerta de vencidos y por vencer (`IEEQ_DIAS_AVISO`).
 - **Calendario**: administradores y gerentes ven además los eventos de campaña, en verde (reportado), ámbar (por reportar) o rojo (vencido).
 
+
+### Punto 19 · Organigrama y roles
+
+- **Organigrama** (menú): por persona puesto, nombre, a quién reporta, equipo, delegación o sección, teléfono, cuenta en el sistema (de ahí sale su rol y perfil) y «¿es servidor público?». Se dibuja solo con «a quién reporta» (no permite ciclos); quien es servidor público sale resaltado y con alerta arriba. Al quitar a alguien, quienes le reportaban suben a su jefe.
+- **Perfiles de acceso** (Usuarios → Perfiles de acceso, solo administrador): permisos de ver, capturar, revisar y exportar por módulo (Cuaderno, Promotores, Base de votantes, Estrategia, Agenda IEEQ, Minutas, Organigrama, Catálogos). Vienen 5: Coordinación general, Coordinación territorial, Análisis, Equipo de campaña de apoyo y Promotor. El perfil se asigna en cada usuario. El administrador puede todo; un gerente sin perfil conserva el acceso completo de antes y un encargado sin perfil no entra a estos módulos. El menú, las burbujas del Cuaderno y los botones se ajustan a lo que permite el perfil.
+- **Promotor**: en el Padrón de Promotores se liga cada promotor con su cuenta. Con un perfil «solo sus votantes» ve, captura, edita y exporta únicamente a sus votantes; el aviso de duplicado no le muestra datos de votantes de otros.
+
 ## Vista previa en GitHub Codespaces (sin servidor)
 
 1. En la página del repositorio, da clic en **Code → Codespaces → Create codespace on main**.

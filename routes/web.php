@@ -3,7 +3,9 @@
 use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\CalendarController;
+use App\Http\Controllers\AccessProfileController;
 use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\OrgChartController;
 use App\Http\Controllers\Campaigns\CampaignController;
 use App\Http\Controllers\Campaigns\KpiController;
 use App\Http\Controllers\Campaigns\PromoterController;
@@ -37,7 +39,10 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::middleware('role:admin,gerente')->group(function () {
         Route::get('/dashboard/exportar', [DashboardController::class, 'export'])->name('dashboard.export');
 
-        // Minutas de reunión (formato de Excel de 5 secciones)
+    });
+
+    // Minutas de reunión (formato de Excel de 5 secciones) · permisos por perfil (punto 19)
+    Route::middleware('puede:minutas')->group(function () {
         Route::post('/minutas/importar', [MinuteController::class, 'import'])->name('minutes.import');
         Route::resource('minutas', MinuteController::class)->parameters(['minutas' => 'minute'])->names('minutes');
     });
@@ -72,7 +77,18 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
         Route::resource('teams', TeamController::class)->except(['show']);
 
-        // Catálogos: tipos de actividad y comunidades
+    });
+
+    // Organigrama y perfiles de acceso (punto 19)
+    Route::middleware('puede:organigrama')->group(function () {
+        Route::get('/organigrama', [OrgChartController::class, 'index'])->name('org.index');
+        Route::post('/organigrama', [OrgChartController::class, 'store'])->name('org.store');
+        Route::put('/organigrama/{member}', [OrgChartController::class, 'update'])->name('org.update');
+        Route::delete('/organigrama/{member}', [OrgChartController::class, 'destroy'])->name('org.destroy');
+    });
+
+    // Catálogos: tipos de actividad, comunidades y secciones electorales
+    Route::middleware('puede:catalogos')->group(function () {
         Route::get('/catalogos', [CatalogController::class, 'index'])->name('catalogs.index');
         Route::post('/catalogos/secciones', [CatalogController::class, 'storeSection'])->name('sections.store');
         Route::patch('/catalogos/secciones/{section}', [CatalogController::class, 'updateSection'])->name('sections.update');
@@ -80,44 +96,59 @@ Route::middleware(['auth', 'active'])->group(function () {
         Route::post('/catalogos/{catalog}', [CatalogController::class, 'store'])->whereIn('catalog', ['tipos', 'comunidades'])->name('catalogs.store');
         Route::patch('/catalogos/{catalog}/{id}', [CatalogController::class, 'update'])->whereIn('catalog', ['tipos', 'comunidades'])->whereNumber('id')->name('catalogs.update');
         Route::delete('/catalogos/{catalog}/{id}', [CatalogController::class, 'destroy'])->whereIn('catalog', ['tipos', 'comunidades'])->whereNumber('id')->name('catalogs.destroy');
+    });
 
-        // V2 · Cuaderno Maestro de Campaña (cada registro pertenece a su campaña: scopeBindings)
-        // Cuaderno Maestro de Campaña: uno solo; /campanas abre el que existe (o su configuración inicial)
-        Route::resource('campanas', CampaignController::class)->parameters(['campanas' => 'campaign'])->names('campaigns')->except('destroy');
-        Route::prefix('/campanas/{campaign}')->name('campaigns.')->scopeBindings()->group(function () {
+    // Cuaderno Maestro de Campaña: uno solo; /campanas abre el que existe (o su configuración inicial).
+    // Cada módulo exige su permiso del perfil (punto 19); cada registro pertenece a su campaña (scopeBindings).
+    Route::get('/campanas', [CampaignController::class, 'index'])->name('campaigns.index');
+    Route::get('/campanas/{campaign}', [CampaignController::class, 'show'])->whereNumber('campaign')->name('campaigns.show');
+    Route::middleware('puede:cuaderno,capturar')->group(function () {
+        Route::get('/campanas/create', [CampaignController::class, 'create'])->name('campaigns.create');
+        Route::post('/campanas', [CampaignController::class, 'store'])->name('campaigns.store');
+        Route::get('/campanas/{campaign}/edit', [CampaignController::class, 'edit'])->name('campaigns.edit');
+        Route::match(['put', 'patch'], '/campanas/{campaign}', [CampaignController::class, 'update'])->name('campaigns.update');
+    });
+    Route::prefix('/campanas/{campaign}')->name('campaigns.')->scopeBindings()->group(function () {
+        Route::middleware('puede:cuaderno')->group(function () {
             Route::get('/estructura', [TerritoryController::class, 'index'])->name('territories.index');
             Route::post('/estructura', [TerritoryController::class, 'store'])->name('territories.store');
             Route::put('/estructura/{territory}', [TerritoryController::class, 'update'])->name('territories.update');
             Route::delete('/estructura/{territory}', [TerritoryController::class, 'destroy'])->name('territories.destroy');
 
-            Route::get('/promotores/exportar', [PromoterController::class, 'export'])->name('promoters.export');
-            Route::resource('promotores', PromoterController::class)->parameters(['promotores' => 'promoter'])->names('promoters')->except(['show']);
-
-            Route::get('/votantes/exportar', [VoterController::class, 'export'])->name('voters.export');
-            Route::resource('votantes', VoterController::class)->parameters(['votantes' => 'voter'])->names('voters')->except(['show']);
-
             Route::get('/kpi', [KpiController::class, 'index'])->name('kpis.index');
             Route::post('/kpi', [KpiController::class, 'store'])->name('kpis.store');
             Route::put('/kpi/{kpi}', [KpiController::class, 'update'])->name('kpis.update');
             Route::delete('/kpi/{kpi}', [KpiController::class, 'destroy'])->name('kpis.destroy');
+        });
 
-            // Etapa 2: pestañas 5, 6, 7, 8 y 10 (mismo controlador; columnas en App\Services\CampaignSheets)
-            // 11. Estrategia de campaña y 20. Agenda reportada al IEEQ
-            Route::get('/estrategia', [StrategyController::class, 'hub'])->name('strategy.hub');
-            Route::get('/agenda-ieeq', [AgendaController::class, 'index'])->name('agenda.index');
-            Route::put('/agenda-ieeq/{record}', [AgendaController::class, 'update'])->withoutScopedBindings()->name('agenda.update');
-            Route::prefix('/estrategia/{libro}')->whereIn('libro', \App\Services\StrategyBooks::keys())->withoutScopedBindings()->group(function () {
-                Route::get('/', [StrategyController::class, 'index'])->name('strategy.index');
-                Route::get('/nuevo', [StrategyController::class, 'create'])->name('strategy.create');
-                Route::post('/', [StrategyController::class, 'store'])->name('strategy.store');
-                Route::get('/exportar', [StrategyController::class, 'export'])->name('strategy.export');
-                Route::get('/formato/{record?}', [StrategyController::class, 'formato'])->name('strategy.formato');
-                Route::get('/{record}/editar', [StrategyController::class, 'edit'])->name('strategy.edit');
-                Route::put('/{record}', [StrategyController::class, 'update'])->name('strategy.update');
-                Route::delete('/{record}', [StrategyController::class, 'destroy'])->name('strategy.destroy');
-                Route::get('/{record}/archivo/{campo}', [StrategyController::class, 'file'])->where('campo', '[a-z_]+')->name('strategy.file');
-            });
+        Route::middleware('puede:promotores')->group(function () {
+            Route::get('/promotores/exportar', [PromoterController::class, 'export'])->name('promoters.export');
+            Route::resource('promotores', PromoterController::class)->parameters(['promotores' => 'promoter'])->names('promoters')->except(['show']);
+        });
 
+        Route::middleware('puede:votantes')->group(function () {
+            Route::get('/votantes/exportar', [VoterController::class, 'export'])->name('voters.export');
+            Route::resource('votantes', VoterController::class)->parameters(['votantes' => 'voter'])->names('voters')->except(['show']);
+        });
+
+        // 11. Estrategia de campaña y 20. Agenda reportada al IEEQ
+        Route::get('/estrategia', [StrategyController::class, 'hub'])->middleware('puede:estrategia')->name('strategy.hub');
+        Route::get('/agenda-ieeq', [AgendaController::class, 'index'])->middleware('puede:agenda')->name('agenda.index');
+        Route::put('/agenda-ieeq/{record}', [AgendaController::class, 'update'])->middleware('puede:agenda,revisar')->withoutScopedBindings()->name('agenda.update');
+        Route::prefix('/estrategia/{libro}')->whereIn('libro', \App\Services\StrategyBooks::keys())->middleware('puede:estrategia')->withoutScopedBindings()->group(function () {
+            Route::get('/', [StrategyController::class, 'index'])->name('strategy.index');
+            Route::get('/nuevo', [StrategyController::class, 'create'])->middleware('puede:estrategia,capturar')->name('strategy.create');
+            Route::post('/', [StrategyController::class, 'store'])->name('strategy.store');
+            Route::get('/exportar', [StrategyController::class, 'export'])->name('strategy.export');
+            Route::get('/formato/{record?}', [StrategyController::class, 'formato'])->name('strategy.formato');
+            Route::get('/{record}/editar', [StrategyController::class, 'edit'])->name('strategy.edit');
+            Route::put('/{record}', [StrategyController::class, 'update'])->name('strategy.update');
+            Route::delete('/{record}', [StrategyController::class, 'destroy'])->name('strategy.destroy');
+            Route::get('/{record}/archivo/{campo}', [StrategyController::class, 'file'])->where('campo', '[a-z_]+')->name('strategy.file');
+        });
+
+        // Pestañas 1-2, 5-10 genéricas (mismo controlador; columnas en App\Services\CampaignSheets)
+        Route::middleware('puede:cuaderno')->group(function () {
             Route::put('/presupuesto/tope', [SheetController::class, 'tope'])->name('sheets.tope');
             Route::post('/cronograma/plantilla', [SheetController::class, 'template'])->name('sheets.template');
             Route::pattern('sheet', implode('|', \App\Services\CampaignSheets::keys()));
@@ -133,5 +164,9 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::middleware('role:admin')->group(function () {
         Route::resource('users', UserController::class)->except(['index', 'show', 'destroy']);
         Route::patch('/users/{user}/toggle', [UserController::class, 'toggle'])->name('users.toggle');
+        Route::get('/perfiles', [AccessProfileController::class, 'index'])->name('profiles.index');
+        Route::post('/perfiles', [AccessProfileController::class, 'store'])->name('profiles.store');
+        Route::put('/perfiles/{profile}', [AccessProfileController::class, 'update'])->name('profiles.update');
+        Route::delete('/perfiles/{profile}', [AccessProfileController::class, 'destroy'])->name('profiles.destroy');
     });
 });

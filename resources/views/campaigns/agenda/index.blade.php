@@ -59,6 +59,7 @@
                         <p class="mt-1 text-xs text-slate-500">Límite: <b>{{ $e->ieeq_fecha_limite?->format('d/m/Y') ?? '—' }}</b></p>
                     </div>
                 </div>
+                @if (auth()->user()->puede('agenda', 'revisar'))
                 <form method="POST" action="{{ route('campaigns.agenda.update', [$campaign, $e]) }}" class="grid gap-2 border-t border-slate-200 bg-white/70 p-3 sm:grid-cols-[10rem_10rem_1fr_10rem_auto] sm:items-end">
                     @csrf
                     @method('PUT')
@@ -82,6 +83,7 @@
                     </div>
                     <button class="btn btn-secondary py-1.5">Guardar</button>
                 </form>
+                @endif
             </article>
         @empty
             <div class="card p-10 text-center text-sm text-slate-500">

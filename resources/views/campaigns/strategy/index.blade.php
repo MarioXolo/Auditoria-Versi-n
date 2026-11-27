@@ -25,8 +25,12 @@
             @isset($book['formato'])
                 <a href="{{ route('campaigns.strategy.formato', [$campaign, $key]) }}" target="_blank" class="btn btn-secondary">Formato de autorización</a>
             @endisset
-            <a href="{{ route('campaigns.strategy.export', [$campaign, $key] + request()->query()) }}" class="btn btn-secondary">Exportar CSV</a>
-            <a href="{{ route('campaigns.strategy.create', [$campaign, $key]) }}" class="btn btn-primary">+ Agregar</a>
+            @if (auth()->user()->puede('estrategia', 'exportar'))
+                <a href="{{ route('campaigns.strategy.export', [$campaign, $key] + request()->query()) }}" class="btn btn-secondary">Exportar CSV</a>
+            @endif
+            @if (auth()->user()->puede('estrategia', 'capturar'))
+                <a href="{{ route('campaigns.strategy.create', [$campaign, $key]) }}" class="btn btn-primary">+ Agregar</a>
+            @endif
         </div>
     </div>
 
@@ -122,7 +126,7 @@
                                 @endif
                             </td>
                         @endif
-                        <td class="table-cell text-right"><a href="{{ route('campaigns.strategy.edit', [$campaign, $key, $r]) }}" class="text-sm font-medium text-brand-700 hover:underline">Editar</a></td>
+                        <td class="table-cell text-right"><a href="{{ route('campaigns.strategy.edit', [$campaign, $key, $r]) }}" class="text-sm font-medium text-brand-700 hover:underline">{{ auth()->user()->puede('estrategia', 'capturar') ? 'Editar' : 'Ver' }}</a></td>
                     </tr>
                 @empty
                     <tr><td colspan="20" class="px-4 py-10 text-center text-slate-500">Aún no hay registros. <a href="{{ route('campaigns.strategy.create', [$campaign, $key]) }}" class="font-medium text-brand-700 hover:underline">Agrega el primero</a>.</td></tr>

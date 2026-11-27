@@ -12,7 +12,7 @@
 @section('content')
     @include('campaigns._nav')
 
-    {{-- Las 10 hojas del cuaderno como burbujas: se entra a cada una para llenarla --}}
+    {{-- Las hojas del cuaderno como burbujas (solo las que el perfil deja ver): se entra a cada una para llenarla --}}
     <section class="mb-8" aria-labelledby="hojas">
         <h2 id="hojas" class="font-semibold">Hojas del cuaderno</h2>
         <p class="text-sm text-slate-500">Entra a cada burbuja para llenarla. Es tu documento vivo: los cálculos se hacen solos conforme llega la información.</p>
@@ -39,6 +39,7 @@
         </ul>
     </section>
 
+    @if (auth()->user()->puede('cuaderno'))
     <h2 class="mb-3 font-semibold">Resumen</h2>
     <div class="grid gap-6 lg:grid-cols-3">
         {{-- Meta y avance --}}
@@ -126,5 +127,6 @@
         <div class="mt-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
             La suma de metas por comunidad ({{ $n($summary->metaTerritorial) }}) es menor que la meta municipal con colchón ({{ $n($summary->meta) }}). Reparte la diferencia en <a class="font-medium underline" href="{{ route('campaigns.territories.index', $campaign) }}">Estructura territorial</a>.
         </div>
+    @endif
     @endif
 @endsection

@@ -10,12 +10,22 @@
     @include('campaigns._nav')
 
     <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <p class="text-sm text-slate-500"><b class="text-slate-900">{{ number_format($total) }}</b> votantes identificados · meta {{ number_format(round($campaign->metaConColchon())) }}. Información personal: solo la ven administradores y gerentes.</p>
+        <p class="text-sm text-slate-500"><b class="text-slate-900">{{ number_format($total) }}</b> {{ $soloLosSuyos ? 'votantes tuyos' : 'votantes identificados · meta '.number_format(round($campaign->metaConColchon())) }}. Información personal: solo la ve quien tiene permiso.</p>
         <div class="flex gap-2">
+            @if (auth()->user()->puede('votantes', 'exportar'))
             <a href="{{ route('campaigns.voters.export', [$campaign] + request()->query()) }}" class="btn btn-secondary">Exportar CSV</a>
+            @endif
+            @if (auth()->user()->puede('votantes', 'capturar'))
             <a href="{{ route('campaigns.voters.create', $campaign) }}" class="btn btn-primary">Registrar votante</a>
+            @endif
         </div>
     </div>
+
+    @if ($sinPromotor)
+        <p class="mb-4 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">Tu cuenta todavía no está ligada a ningún promotor, por eso no ves votantes. Pide a tu coordinador que te asigne en «Padrón de Promotores».</p>
+    @elseif ($soloLosSuyos)
+        <p class="mb-4 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-brand-900">Ves y capturas solo a tus votantes.</p>
+    @endif
 
     <form method="GET" class="card mb-5 grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-6">
         <input type="search" name="q" value="{{ request('q') }}" placeholder="Nombre, teléfono o domicilio" class="input lg:col-span-2">

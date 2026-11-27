@@ -13,17 +13,25 @@ use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-/** «Base de Votantes» identificados. Datos personales: solo administradores y gerentes. */
+/**
+ * «Base de Votantes» identificados. Datos personales: entra quien tenga permiso del módulo «votantes».
+ * Un perfil de promotor («solo sus votantes») solo ve, captura, edita y exporta a los de su(s) promotor(es).
+ */
 class VoterController extends Controller
 {
     public function index(Request $request, Campaign $campaign): View
     {
+        $own = $this->ownPromoterIds($request, $campaign);
+        $base = $campaign->voters()->when($own !== null, fn ($q) => $q->whereIn('promoter_id', $own));
+
         return view('campaigns.voters.index', [
             'campaign' => $campaign,
             'voters' => $this->query($request, $campaign)->paginate(50)->withQueryString(),
-            'communities' => Community::whereIn('id', $campaign->voters()->whereNotNull('community_id')->distinct()->pluck('community_id'))->orderBy('name')->get(['id', 'name']),
-            'promoters' => $campaign->promoters()->orderBy('name')->get(['id', 'name']),
-            'total' => $campaign->voters()->count(),
+            'communities' => Community::whereIn('id', (clone $base)->whereNotNull('community_id')->distinct()->pluck('community_id'))->orderBy('name')->get(['id', 'name']),
+            'promoters' => $this->promotersFor($request, $campaign),
+            'total' => $base->count(),
+            'soloLosSuyos' => $own !== null,
+            'sinPromotor' => $own === [],
         ]);
     }
 
@@ -41,7 +49,12 @@ class VoterController extends Controller
     {
         $data = $this->validated($request, $campaign);
 
-        // Aviso de posible duplicado (mismo teléfono, o mismo nombre en la misma sección)
+        // Aviso de posible duplicado (mismo teléfono, o mismo nombre en la misma sección).
+        // A un promotor no se le muestran datos de votantes que no son suyos.
+        if (! $request->boolean('confirmar_duplicado') && ($dup = $this->possibleDuplicate($campaign, $data))
+            && $this->ownPromoterIds($request, $campaign) !== null && ! in_array($dup->promoter_id, $this->ownPromoterIds($request, $campaign), true)) {
+            return back()->withInput()->withErrors(['duplicado' => 'Ya hay en la base una persona con ese teléfono, o con ese nombre en la misma sección. Confírmalo con tu coordinador; si es otra persona, marca «Es otra persona» y guarda de nuevo.']);
+        }
         if (! $request->boolean('confirmar_duplicado') && ($dup = $this->possibleDuplicate($campaign, $data))) {
             return back()->withInput()->withErrors(['duplicado' => "Posible duplicado: «{$dup->nombre}»"
                 .($dup->seccion ? " (sección {$dup->seccion})" : '').($dup->telefono ? ", tel. {$dup->telefono}" : '')
@@ -59,20 +72,24 @@ class VoterController extends Controller
         return redirect()->route('campaigns.voters.index', $campaign)->with('status', "«{$voter->nombre}» registrado en la base de votantes.");
     }
 
-    public function edit(Campaign $campaign, CampaignVoter $voter): View
+    public function edit(Request $request, Campaign $campaign, CampaignVoter $voter): View
     {
+        $this->ensureOwn($request, $campaign, $voter);
+
         return view('campaigns.voters.edit', $this->formData($campaign, $voter));
     }
 
     public function update(Request $request, Campaign $campaign, CampaignVoter $voter): RedirectResponse
     {
+        $this->ensureOwn($request, $campaign, $voter);
         $voter->update($this->validated($request, $campaign, $voter));
 
         return redirect()->route('campaigns.voters.index', $campaign)->with('status', "«{$voter->nombre}» actualizado.");
     }
 
-    public function destroy(Campaign $campaign, CampaignVoter $voter): RedirectResponse
+    public function destroy(Request $request, Campaign $campaign, CampaignVoter $voter): RedirectResponse
     {
+        $this->ensureOwn($request, $campaign, $voter);
         $voter->delete();
 
         return redirect()->route('campaigns.voters.index', $campaign)->with('status', 'Registro eliminado de la base de votantes.');
@@ -94,9 +111,37 @@ class VoterController extends Controller
         }, 'base-votantes-'.str($campaign->name)->slug().'.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
 
+    /**
+     * Promotores cuyos votantes puede ver el usuario: null = todos; [] = ninguno (perfil de promotor sin promotor ligado).
+     */
+    private function ownPromoterIds(Request $request, Campaign $campaign): ?array
+    {
+        if (! $request->user()->soloSusVotantes()) {
+            return null;
+        }
+
+        return $campaign->promoters()->where('user_id', $request->user()->id)->pluck('id')->all();
+    }
+
+    private function promotersFor(Request $request, Campaign $campaign)
+    {
+        $own = $this->ownPromoterIds($request, $campaign);
+
+        return $campaign->promoters()->when($own !== null, fn ($q) => $q->whereIn('id', $own))->orderBy('name')->get(['id', 'name']);
+    }
+
+    private function ensureOwn(Request $request, Campaign $campaign, CampaignVoter $voter): void
+    {
+        $own = $this->ownPromoterIds($request, $campaign);
+        abort_if($own !== null && ! in_array($voter->promoter_id, $own, true), 404);
+    }
+
     private function query(Request $request, Campaign $campaign)
     {
+        $own = $this->ownPromoterIds($request, $campaign);
+
         return $campaign->voters()
+            ->when($own !== null, fn ($q) => $q->whereIn('promoter_id', $own))
             ->with(['community:id,name', 'promoter:id,name'])
             ->when($request->filled('q'), fn ($q) => $q->where(fn ($w) => $w
                 ->where('nombre', 'like', '%'.$request->string('q').'%')
@@ -132,7 +177,7 @@ class VoterController extends Controller
             'campaign' => $campaign,
             'voter' => $voter,
             'communities' => Community::active()->orWhere('id', $voter->community_id)->orderBy('name')->get(['id', 'name']),
-            'promoters' => $campaign->promoters()->orderBy('name')->get(['id', 'name']),
+            'promoters' => $this->promotersFor(request(), $campaign),
         ];
     }
 
@@ -148,7 +193,9 @@ class VoterController extends Controller
             'telefono' => ['nullable', 'string', 'max:30'],
             'community_id' => ['nullable', Rule::in([...$communityIds, 'otro'])],
             'community_new' => ['nullable', 'required_if:community_id,otro', 'string', 'max:120'],
-            'promoter_id' => ['nullable', Rule::exists('campaign_promoters', 'id')->where('campaign_id', $campaign->id)],
+            'promoter_id' => ($own = $this->ownPromoterIds($request, $campaign)) !== null
+                ? ['required', Rule::in($own)]
+                : ['nullable', Rule::exists('campaign_promoters', 'id')->where('campaign_id', $campaign->id)],
             'afinidad' => ['nullable', Rule::in(CampaignVoter::AFINIDADES)],
             'recibe_apoyo' => ['nullable', 'in:0,1'],
             'notas' => ['nullable', 'string', 'max:2000'],
