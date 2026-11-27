@@ -46,6 +46,12 @@
                         <span class="mt-1 text-[11px] font-medium text-brand-700">Pasa a la Agenda IEEQ</span>
                     @endif
                     <span @class(['mt-auto pt-3 text-xs font-medium tabular-nums', 'text-brand-700' => $n > 0, 'text-slate-400' => $n === 0])>{{ $n > 0 ? number_format($n).' '.($n === 1 ? 'registro' : 'registros') : 'Por llenar' }}</span>
+                    @php $sl = $libros[$key] ?? null; @endphp
+                    @if ($sl && $sl->vencidos)
+                        <span class="mt-1 rounded-full bg-rose-100 px-2 py-0.5 text-[11px] font-semibold text-rose-800">{{ $sl->vencidos }} {{ $sl->vencidos === 1 ? 'vencido' : 'vencidos' }}</span>
+                    @elseif ($sl && $sl->por_vencer)
+                        <span class="mt-1 rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-semibold text-amber-800">{{ $sl->por_vencer }} {{ $sl->por_vencer === 1 ? 'vence pronto' : 'vencen pronto' }}</span>
+                    @endif
                 </a>
             </li>
         @endforeach

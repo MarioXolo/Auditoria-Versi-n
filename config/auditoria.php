@@ -53,4 +53,14 @@ return [
     // (verificar el plazo vigente con el jurídico) y desde cuántos días antes se avisa.
     'ieeq_dias_anticipacion' => (int) env('IEEQ_DIAS_ANTICIPACION', 7),
     'ieeq_dias_aviso' => (int) env('IEEQ_DIAS_AVISO', 3),
+
+    /*
+    | Semáforo del Cuaderno Maestro (automático, nadie lo captura).
+    | Rojo: algo vencido (fecha pasada sin «Hecho», tarea vencida, evento sin reportar a tiempo, tope rebasado, KPI en rojo).
+    | Amarillo: algo vence dentro de «dias_aviso» o la hoja lleva «dias_sin_movimiento» sin capturas.
+    */
+    'semaforo' => [
+        'dias_aviso' => (int) env('SEMAFORO_DIAS_AVISO', 7),
+        'dias_sin_movimiento' => (int) env('SEMAFORO_DIAS_SIN_MOVIMIENTO', 15),
+    ],
 ];

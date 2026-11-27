@@ -57,6 +57,8 @@
         <select name="estatus" class="input" aria-label="Estatus">
             <option value="">Todos los estatus</option>
             @foreach (\App\Services\StrategyBooks::ESTATUS as $e)<option @selected(request('estatus') === $e)>{{ $e }}</option>@endforeach
+            <option value="vencidos" @selected(request('estatus') === 'vencidos')>🔴 Vencidos</option>
+            <option value="por_vencer" @selected(request('estatus') === 'por_vencer')>🟡 Vencen pronto</option>
         </select>
         <div class="flex gap-2">
             <button class="btn btn-secondary flex-1">Filtrar</button>
@@ -85,7 +87,11 @@
             <tbody class="divide-y divide-slate-100">
                 @forelse ($records as $r)
                     <tr class="hover:bg-slate-50">
+                        @php $rs = $r->semaforo(); @endphp
                         <td class="table-cell whitespace-nowrap tabular-nums">
+                            @if (in_array($rs, ['vencido', 'por_vencer', 'en_tiempo'], true))
+                                <span @class(['mr-1 inline-block size-2.5 rounded-full align-middle', 'bg-rose-500' => $rs === 'vencido', 'bg-amber-400' => $rs === 'por_vencer', 'bg-emerald-500' => $rs === 'en_tiempo']) title="{{ ['vencido' => 'Vencido: la fecha ya pasó y no está en «Hecho»', 'por_vencer' => 'Vence pronto', 'en_tiempo' => 'En tiempo'][$rs] }}"></span><span class="sr-only">{{ ['vencido' => 'Vencido', 'por_vencer' => 'Vence pronto', 'en_tiempo' => 'En tiempo'][$rs] }}</span>
+                            @endif
                             {{ $r->fecha?->format('d/m/Y') ?? '—' }}
                             @if ($r->horaCorta())<span class="block text-xs text-slate-500">{{ $r->horaCorta() }}</span>@endif
                         </td>

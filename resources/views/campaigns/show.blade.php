@@ -16,14 +16,30 @@
     <section class="mb-8" aria-labelledby="hojas">
         <h2 id="hojas" class="font-semibold">Hojas del cuaderno</h2>
         <p class="text-sm text-slate-500">Entra a cada burbuja para llenarla. Es tu documento vivo: los cálculos se hacen solos conforme llega la información.</p>
+
+        {{-- Semáforo automático: sale de fechas, estatus y capturas; nadie lo marca a mano --}}
+        @php $semColor = ['rojo' => 'bg-rose-500', 'amarillo' => 'bg-amber-400', 'verde' => 'bg-emerald-500', 'gris' => 'bg-slate-300']; @endphp
+        <div class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm" role="status">
+            <span class="font-semibold">Semáforo</span>
+            @foreach (['rojo' => 'en rojo', 'amarillo' => 'en amarillo', 'verde' => 'al día', 'gris' => 'sin información'] as $c => $label)
+                <span class="inline-flex items-center gap-1.5"><span class="size-3 rounded-full {{ $semColor[$c] }}" aria-hidden="true"></span><b class="tabular-nums">{{ $semaforoResumen[$c] }}</b> {{ $label }}</span>
+            @endforeach
+            <details class="w-full text-xs text-slate-500">
+                <summary class="cursor-pointer select-none">¿Cómo se calcula?</summary>
+                <p class="mt-1">Se calcula solo. <b class="text-rose-700">Rojo</b>: algo con fecha pasada que no está en «Hecho», tareas vencidas, eventos sin reportar al IEEQ a tiempo, tope de gastos rebasado o indicadores en rojo. <b class="text-amber-700">Amarillo</b>: algo vence en los próximos {{ \App\Services\CuadernoSemaforo::diasAviso() }} días, la hoja lleva {{ \App\Services\CuadernoSemaforo::diasSinMovimiento() }} días o más sin capturas, el gasto pasa del 90 % del tope o hay indicadores en ámbar. <b class="text-emerald-700">Verde</b>: tiene información y nada de lo anterior. Para apagar un rojo, marca el registro como «Hecho» o corrige su fecha.</p>
+            </details>
+        </div>
         @foreach ([['Hojas 1 a 10', fn ($n) => $n <= 10], ['Puntos nuevos 11 a 20', fn ($n) => $n > 10]] as [$groupLabel, $inGroup])
         @php $group = collect($steps)->filter(fn ($st) => $inGroup($st[0])); @endphp
         @continue($group->isEmpty())
         <h3 class="mt-5 text-xs font-semibold tracking-wide text-slate-500 uppercase">{{ $groupLabel }}</h3>
         <ul class="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
             @foreach ($group as [$num, $label, $desc, $url, $done, $stat])
+                @php $sem = $semaforo[$num] ?? ['color' => 'gris', 'motivo' => null]; @endphp
                 <li>
-                    <a href="{{ $url }}" class="group flex h-full flex-col items-center rounded-3xl border border-slate-200 bg-white px-3 py-5 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-brand-500 hover:shadow-md focus-visible:ring-2 focus-visible:ring-brand-500">
+                    <a href="{{ $url }}" data-semaforo="{{ $sem['color'] }}" class="group relative flex h-full flex-col items-center rounded-3xl border border-slate-200 bg-white px-3 py-5 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-brand-500 hover:shadow-md focus-visible:ring-2 focus-visible:ring-brand-500">
+                        <span class="absolute top-3 left-3 size-3.5 rounded-full ring-2 ring-white {{ $semColor[$sem['color']] }}" title="Semáforo: {{ $sem['color'] }}{{ $sem['motivo'] ? ' — '.$sem['motivo'] : '' }}"></span>
+                        <span class="sr-only">Semáforo {{ $sem['color'] }}{{ $sem['motivo'] ? ': '.$sem['motivo'] : '' }}.</span>
                         <span @class([
                             'relative grid size-16 place-items-center rounded-full text-2xl font-semibold transition',
                             'bg-brand-600 text-white' => $done,
@@ -37,6 +53,9 @@
                         <span class="mt-3 text-sm leading-tight font-semibold text-slate-900">{{ $num }}. {{ $label }}</span>
                         <span class="mt-1 text-xs leading-snug text-slate-500">{{ $desc }}</span>
                         <span @class(['mt-auto pt-3 text-xs font-medium tabular-nums', 'text-brand-700' => $done, 'text-slate-400' => ! $done])>{{ $done ? $stat : 'Por llenar' }}</span>
+                        @if (in_array($sem['color'], ['rojo', 'amarillo'], true))
+                            <span @class(['mt-1 rounded-full px-2 py-0.5 text-[11px] font-semibold leading-tight', 'bg-rose-100 text-rose-800' => $sem['color'] === 'rojo', 'bg-amber-100 text-amber-800' => $sem['color'] === 'amarillo'])>{{ $sem['motivo'] }}</span>
+                        @endif
                     </a>
                 </li>
             @endforeach

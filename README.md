@@ -174,3 +174,13 @@ routes/web.php                Rutas y qué rol entra a cada una
 
 - **V2**: validación y rechazo de evidencias, ubicación en el registro de entrada, bitácora de cambios, exportación a Excel y PDF.
 - **V3**: metas por periodo, alertas de patrones raros, más gráficas y comparativos entre equipos, acceso instalable en el celular.
+
+## Semáforo automático del Cuaderno Maestro
+
+Nadie lo captura: sale de las fechas, estatus y capturas que ya existen (`App\Services\CuadernoSemaforo`).
+
+- **Rojo**: registros con fecha pasada que no están en «Hecho», tareas del cronograma vencidas, eventos sin reportar al IEEQ a tiempo, tope de gastos rebasado o indicadores en rojo.
+- **Amarillo**: algo vence dentro de `SEMAFORO_DIAS_AVISO` (7 días), la hoja lleva `SEMAFORO_DIAS_SIN_MOVIMIENTO` (15 días) sin capturas, gasto arriba del 90 % del tope o indicadores en ámbar.
+- **Verde**: tiene información y nada de lo anterior. **Gris**: sin información.
+
+Se ve en cada burbuja (con el motivo), en un resumen arriba de las burbujas, en cada libro de los puntos 11–18 («N vencidos») y en cada fila (punto de color junto a la fecha). Los listados se pueden filtrar por «Vencidos» y «Vencen pronto».

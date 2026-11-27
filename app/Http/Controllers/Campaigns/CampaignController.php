@@ -65,8 +65,12 @@ class CampaignController extends Controller
         $summary = $metrics->summary();
 
         $steps = self::bubbles($campaign, $summary);
+        $semaforo = (new \App\Services\CuadernoSemaforo($campaign))
+            ->burbujas(collect($steps)->mapWithKeys(fn ($b) => [$b[0] => $b[4]])->all());
 
         return view('campaigns.show', [
+            'semaforo' => $semaforo,
+            'semaforoResumen' => \App\Services\CuadernoSemaforo::resumen($semaforo),
             'campaign' => $campaign,
             'summary' => $summary,
             'kpis' => $metrics->kpis()->take(3),

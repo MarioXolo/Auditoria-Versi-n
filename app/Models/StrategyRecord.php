@@ -157,6 +157,37 @@ class StrategyRecord extends Model
         };
     }
 
+    /** Semáforo del registro: «hecho», «vencido» (fecha pasada sin «Hecho»), «por_vencer», «en_tiempo»; null sin fecha. */
+    public function semaforo(): ?string
+    {
+        if ($this->estatus === 'Hecho') {
+            return 'hecho';
+        }
+        if (! $this->fecha) {
+            return null;
+        }
+
+        return match (true) {
+            $this->fecha->lt(today()) => 'vencido',
+            $this->fecha->lte(today()->addDays((int) config('auditoria.semaforo.dias_aviso', 7))) => 'por_vencer',
+            default => 'en_tiempo',
+        };
+    }
+
+    /** Registros con fecha pasada que nadie marcó como «Hecho». */
+    public function scopeVencidos(Builder $q): Builder
+    {
+        return $q->where('estatus', '!=', 'Hecho')->whereNotNull('fecha')->whereDate('fecha', '<', today());
+    }
+
+    /** Registros sin «Hecho» cuya fecha cae dentro de los días de aviso. */
+    public function scopePorVencer(Builder $q): Builder
+    {
+        return $q->where('estatus', '!=', 'Hecho')->whereNotNull('fecha')
+            ->whereDate('fecha', '>=', today())
+            ->whereDate('fecha', '<=', today()->addDays((int) config('auditoria.semaforo.dias_aviso', 7)));
+    }
+
     /** Eventos que necesitan reportarse (o reportar su cambio) y no se han reportado. */
     public function scopePendientesIeeq(Builder $q): Builder
     {

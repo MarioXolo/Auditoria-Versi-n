@@ -47,6 +47,7 @@ class StrategyController extends Controller
             'punto' => $p,
             'books' => StrategyBooks::ofPunto($punto),
             'counts' => $counts,
+            'libros' => (new \App\Services\CuadernoSemaforo($campaign))->porLibro(),
             'casillas' => $punto === 11 ? $campaign->pollingStations()->selectRaw('tipo, count(*) as n')->groupBy('tipo')->pluck('n', 'tipo') : collect(),
             'pendientesIeeq' => $campaign->strategyRecords()->pendientesIeeq()
                 ->whereIn('libro', array_keys(StrategyBooks::ofPunto($punto)))->count(),
@@ -322,6 +323,8 @@ class StrategyController extends Controller
             ->when($request->filled('section_id'), fn ($q) => $q->where('section_id', $request->integer('section_id')))
             ->when($request->filled('responsable_id'), fn ($q) => $q->where('responsable_id', $request->integer('responsable_id')))
             ->when(in_array($request->input('estatus'), StrategyBooks::ESTATUS, true), fn ($q) => $q->where('estatus', $request->input('estatus')))
+            ->when($request->input('estatus') === 'vencidos', fn ($q) => $q->vencidos())
+            ->when($request->input('estatus') === 'por_vencer', fn ($q) => $q->porVencer())
             ->when($request->filled('q'), function ($q) use ($request, $book) {
                 $term = '%'.$request->string('q').'%';
                 $text = collect($book['fields'])->filter(fn ($f) => in_array($f['type'], ['text', 'longtext', 'catalog', 'select'], true))->keys();
