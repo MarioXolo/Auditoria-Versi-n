@@ -29,7 +29,8 @@ class Community extends Model
             || CampaignPromoter::where('community_id', $this->id)->exists()
             || CampaignVoter::where('community_id', $this->id)->exists()
             || CampaignActor::where('community_id', $this->id)->exists()
-            || StrategyRecord::where('community_id', $this->id)->exists();
+            || StrategyRecord::where('community_id', $this->id)->exists()
+            || PresidentActivity::where('community_id', $this->id)->exists();
     }
 
     public function sections(): HasMany

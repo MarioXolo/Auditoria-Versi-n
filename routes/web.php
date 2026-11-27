@@ -6,6 +6,7 @@ use App\Http\Controllers\CalendarController;
 use App\Http\Controllers\AccessProfileController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\OrgChartController;
+use App\Http\Controllers\PresidentAgendaController;
 use App\Http\Controllers\Campaigns\CampaignController;
 use App\Http\Controllers\Campaigns\KpiController;
 use App\Http\Controllers\Campaigns\PromoterController;
@@ -39,6 +40,20 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::middleware('role:admin,gerente')->group(function () {
         Route::get('/dashboard/exportar', [DashboardController::class, 'export'])->name('dashboard.export');
 
+    });
+
+    // Agenda del Presidente: administradores y gerentes; aparte de las actividades de los demás
+    Route::middleware('role:admin,gerente')->prefix('/agenda-presidente')->name('president.')->group(function () {
+        Route::get('/', [PresidentAgendaController::class, 'index'])->name('index');
+        Route::get('/nueva', [PresidentAgendaController::class, 'create'])->name('create');
+        Route::post('/', [PresidentAgendaController::class, 'store'])->name('store');
+        Route::get('/{activity}', [PresidentAgendaController::class, 'show'])->name('show');
+        Route::get('/{activity}/editar', [PresidentAgendaController::class, 'edit'])->name('edit');
+        Route::put('/{activity}', [PresidentAgendaController::class, 'update'])->name('update');
+        Route::delete('/{activity}', [PresidentAgendaController::class, 'destroy'])->name('destroy');
+        Route::post('/{activity}/marcar', [PresidentAgendaController::class, 'mark'])->name('mark');
+        Route::patch('/{activity}/estado', [PresidentAgendaController::class, 'updateStatus'])->name('status');
+        Route::get('/{activity}/evidencia', [PresidentAgendaController::class, 'evidence'])->name('evidence');
     });
 
     // Minutas de reunión (formato de Excel de 5 secciones) · permisos por perfil (punto 19)

@@ -24,6 +24,7 @@
     if ($me->seesEverything()) {
         $nav[] = ['route' => 'users.index', 'match' => 'users.*', 'label' => 'Usuarios', 'icon' => 'M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2m22 0v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75M13 7a4 4 0 11-8 0 4 4 0 018 0z'];
         $nav[] = ['route' => 'teams.index', 'match' => 'teams.*', 'label' => 'Equipos', 'icon' => 'M3 7h18M3 12h18M3 17h18'];
+        $nav[] = ['route' => 'president.index', 'match' => 'president.*', 'label' => 'Agenda del Presidente', 'icon' => 'M8 3v3m8-3v3M4 9h16M5 5h14a1 1 0 011 1v13a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1zm7 7l1.2 2.4 2.6.4-1.9 1.8.5 2.6L12 18l-2.4 1.2.5-2.6-1.9-1.8 2.6-.4z'];
     }
     // Módulos con permisos por perfil (punto 19)
     if ($me->puede('minutas')) {

@@ -43,6 +43,10 @@ Las fotos y evidencias se guardan en `storage/app/private` y solo se muestran a 
 - **Calendario**: administradores y gerentes ven además los eventos de campaña, en verde (reportado), ámbar (por reportar) o rojo (vencido).
 
 
+### Agenda del Presidente
+
+Sección propia del menú, solo para administradores y gerentes. Sus actividades tienen los mismos campos que «Actividades» (tipo, comunidad, asignada a, inicio–fin, estado, evidencia en foto o texto, marca ✓ Concluido / ✗ No completada; Concluido es definitivo y pide confirmación), con folio propio `AP-0001`. Viven en su propia tabla: no aparecen en Actividades, dashboards, calendario ni métricas de los demás usuarios. Se asignan solo a administradores o gerentes; una concluida solo la puede borrar el administrador.
+
 ### Puntos 12 a 18 · cada uno es una burbuja del Cuaderno
 
 El Cuaderno Maestro muestra las hojas 1 a 10 y los puntos nuevos 11 a 20 como burbujas. Del 11 al 18 cada punto tiene sus libros (tablas), todos con los campos comunes más los propios (definidos en `App\Services\StrategyBooks`):
