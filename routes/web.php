@@ -132,12 +132,15 @@ Route::middleware(['auth', 'active'])->group(function () {
         });
 
         // 11. Estrategia de campaña y 20. Agenda reportada al IEEQ
-        Route::get('/estrategia', [StrategyController::class, 'hub'])->middleware('puede:estrategia')->name('strategy.hub');
+        // Puntos 11 a 18 (el permiso de cada libro lo revisa el controlador según su punto)
+        Route::get('/estrategia', [StrategyController::class, 'hub'])->name('strategy.hub');
+        Route::get('/punto/{punto}', [StrategyController::class, 'hub'])->whereIn('punto', ['12', '13', '14', '15', '16', '17', '18'])->name('strategy.punto');
         Route::get('/agenda-ieeq', [AgendaController::class, 'index'])->middleware('puede:agenda')->name('agenda.index');
         Route::put('/agenda-ieeq/{record}', [AgendaController::class, 'update'])->middleware('puede:agenda,revisar')->withoutScopedBindings()->name('agenda.update');
-        Route::prefix('/estrategia/{libro}')->whereIn('libro', \App\Services\StrategyBooks::keys())->middleware('puede:estrategia')->withoutScopedBindings()->group(function () {
+        Route::prefix('/estrategia/{libro}')->whereIn('libro', \App\Services\StrategyBooks::keys())->withoutScopedBindings()->group(function () {
             Route::get('/', [StrategyController::class, 'index'])->name('strategy.index');
-            Route::get('/nuevo', [StrategyController::class, 'create'])->middleware('puede:estrategia,capturar')->name('strategy.create');
+            Route::get('/nuevo', [StrategyController::class, 'create'])->name('strategy.create');
+            Route::post('/{record}/subir', [StrategyController::class, 'escalate'])->name('strategy.escalate');
             Route::post('/', [StrategyController::class, 'store'])->name('strategy.store');
             Route::get('/exportar', [StrategyController::class, 'export'])->name('strategy.export');
             Route::get('/formato/{record?}', [StrategyController::class, 'formato'])->name('strategy.formato');

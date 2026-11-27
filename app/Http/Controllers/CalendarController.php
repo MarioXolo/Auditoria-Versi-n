@@ -48,7 +48,22 @@ class CalendarController extends Controller
 
         $days = $this->days($activities, $from, $to, $mode);
 
-        // Eventos de campaña (Estrategia → Agenda IEEQ): solo administradores y gerentes
+        // Fiestas patronales de mayordomos (punto 18): se repiten cada año en su mismo día
+        $fiestas = collect();
+        if ($user->puede('sectores')) {
+            $fiestas = \App\Models\StrategyRecord::where('libro', 'sectores')->with('community:id,name')->get()
+                ->filter(fn ($s) => $s->dato('fecha_fiesta'))
+                ->map(function ($s) use ($from) {
+                    $d = \Carbon\Carbon::parse($s->dato('fecha_fiesta'));
+                    $s->setAttribute('fiesta_dia', $d->setYear($from->year)->toDateString());
+
+                    return $s;
+                })
+                ->filter(fn ($s) => $s->fiesta_dia >= $from->toDateString() && $s->fiesta_dia <= $to->toDateString())
+                ->groupBy('fiesta_dia');
+        }
+
+        // Eventos de campaña (puntos 11, 13, 17 y 18 → Agenda IEEQ): quien tenga permiso de la agenda
         $events = $user->puede('agenda')
             ? \App\Models\StrategyRecord::query()
                 ->where('es_evento', true)
@@ -79,6 +94,7 @@ class CalendarController extends Controller
             'weeks' => $weeks,
             'days' => $days,
             'events' => $events,
+            'fiestas' => $fiestas,
             'activities' => $activities,
             'summary' => $summary,
             'total' => $total,

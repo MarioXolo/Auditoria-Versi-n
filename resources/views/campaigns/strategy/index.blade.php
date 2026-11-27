@@ -17,7 +17,7 @@
 
     <div class="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
-            <a href="{{ route('campaigns.strategy.hub', $campaign) }}" class="text-sm text-slate-500 hover:text-slate-800">← Libros de estrategia</a>
+            <a href="{{ $punto['n'] === 11 ? route('campaigns.strategy.hub', $campaign) : route('campaigns.strategy.punto', [$campaign, $punto['n']]) }}" class="text-sm text-slate-500 hover:text-slate-800">← {{ $punto['n'] }}. {{ $punto['name'] }}</a>
             <h2 class="mt-1 text-xl font-semibold"><span aria-hidden="true">{{ $book['icon'] }}</span> {{ $book['title_text'] ?? $book['name'] }}</h2>
             <p class="text-sm text-slate-500">{{ $book['intro'] }}</p>
         </div>
@@ -25,10 +25,10 @@
             @isset($book['formato'])
                 <a href="{{ route('campaigns.strategy.formato', [$campaign, $key]) }}" target="_blank" class="btn btn-secondary">Formato de autorización</a>
             @endisset
-            @if (auth()->user()->puede('estrategia', 'exportar'))
+            @if (auth()->user()->puede(\App\Services\StrategyBooks::module($key), 'exportar'))
                 <a href="{{ route('campaigns.strategy.export', [$campaign, $key] + request()->query()) }}" class="btn btn-secondary">Exportar CSV</a>
             @endif
-            @if (auth()->user()->puede('estrategia', 'capturar'))
+            @if (auth()->user()->puede(\App\Services\StrategyBooks::module($key), 'capturar'))
                 <a href="{{ route('campaigns.strategy.create', [$campaign, $key]) }}" class="btn btn-primary">+ Agregar</a>
             @endif
         </div>
@@ -90,7 +90,22 @@
                             @if ($r->horaCorta())<span class="block text-xs text-slate-500">{{ $r->horaCorta() }}</span>@endif
                         </td>
                         @foreach ($listFields as $k => $f)
-                            @if ($f['type'] === 'file' || $f['type'] === 'photo')
+                            @if ($f['type'] === 'minuta')
+                                <td class="table-cell whitespace-nowrap">
+                                    @if ($r->dato($k))<a href="{{ route('minutes.show', $r->dato($k)) }}" class="text-brand-700 hover:underline">Ver minuta</a>@endif
+                                </td>
+                            @elseif ($f['type'] === 'bool' && ($book['escalate'] ?? false) && $k === 'escalado')
+                                <td class="table-cell whitespace-nowrap">
+                                    @if ($r->dato('escalado'))
+                                        <span class="badge bg-brand-100 text-brand-800" title="{{ $r->dato('escalado_por') }} · {{ $r->dato('escalado_el') }}">⬆ En el central{{ $r->dato('cuarto_origen') ? ' (de '.$r->dato('cuarto_origen').')' : '' }}</span>
+                                    @elseif (auth()->user()->puede(\App\Services\StrategyBooks::module($key), 'capturar'))
+                                        <form method="POST" action="{{ route('campaigns.strategy.escalate', [$campaign, $key, $r]) }}" onsubmit="return confirm('¿Subir este tema al cuarto central?')">
+                                            @csrf
+                                            <button class="btn btn-secondary px-2.5 py-1 text-xs">⬆ Subir al central</button>
+                                        </form>
+                                    @endif
+                                </td>
+                            @elseif ($f['type'] === 'file' || $f['type'] === 'photo')
                                 <td class="table-cell whitespace-nowrap">
                                     @if ($r->archivo($k))
                                         <a href="{{ route('campaigns.strategy.file', [$campaign, $key, $r, $k]) }}" target="_blank" class="text-brand-700 hover:underline">✓ Ver</a>
@@ -103,9 +118,9 @@
                             @else
                                 <td @class(['table-cell', 'text-right tabular-nums' => in_array($f['type'], ['int', 'money']), 'min-w-48 font-medium text-slate-900' => $k === $book['title']])>
                                     @if ($k === $book['title'])
-                                        <a href="{{ route('campaigns.strategy.edit', [$campaign, $key, $r]) }}" class="hover:text-brand-700 hover:underline">{{ StrategyController::display($f, $r->dato($k)) ?: '—' }}</a>
+                                        <a href="{{ route('campaigns.strategy.edit', [$campaign, $key, $r]) }}" class="hover:text-brand-700 hover:underline">{{ StrategyController::display($f, $r->dato($k), $lookups) ?: '—' }}</a>
                                     @else
-                                        {{ StrategyController::display($f, $r->dato($k)) }}
+                                        {{ StrategyController::display($f, $r->dato($k), $lookups) }}
                                     @endif
                                 </td>
                             @endif
@@ -126,7 +141,7 @@
                                 @endif
                             </td>
                         @endif
-                        <td class="table-cell text-right"><a href="{{ route('campaigns.strategy.edit', [$campaign, $key, $r]) }}" class="text-sm font-medium text-brand-700 hover:underline">{{ auth()->user()->puede('estrategia', 'capturar') ? 'Editar' : 'Ver' }}</a></td>
+                        <td class="table-cell text-right"><a href="{{ route('campaigns.strategy.edit', [$campaign, $key, $r]) }}" class="text-sm font-medium text-brand-700 hover:underline">{{ auth()->user()->puede(\App\Services\StrategyBooks::module($key), 'capturar') ? 'Editar' : 'Ver' }}</a></td>
                     </tr>
                 @empty
                     <tr><td colspan="20" class="px-4 py-10 text-center text-slate-500">Aún no hay registros. <a href="{{ route('campaigns.strategy.create', [$campaign, $key]) }}" class="font-medium text-brand-700 hover:underline">Agrega el primero</a>.</td></tr>

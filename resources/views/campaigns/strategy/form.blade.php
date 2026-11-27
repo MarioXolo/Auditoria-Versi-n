@@ -24,7 +24,7 @@
     @include('campaigns._nav')
 
     <div class="mb-4">
-        <a href="{{ route('campaigns.strategy.index', [$campaign, $key]) }}" class="text-sm text-slate-500 hover:text-slate-800">← {{ $book['name'] }}</a>
+        <a href="{{ route('campaigns.strategy.index', [$campaign, $key]) }}" class="text-sm text-slate-500 hover:text-slate-800">← {{ $punto['n'] }}. {{ $punto['name'] }} · {{ $book['name'] }}</a>
         <h2 class="mt-1 text-xl font-semibold"><span aria-hidden="true">{{ $book['icon'] }}</span> {{ $record->exists ? $record->title() : 'Nuevo registro · '.$book['name'] }}</h2>
         @if ($record->es_evento)
             <p class="mt-1 text-sm text-slate-600">Agenda IEEQ: <b>{{ $record->ieeq_estatus }}</b>@if ($record->ieeq_fecha_limite) · fecha límite {{ $record->ieeq_fecha_limite->format('d/m/Y') }}@endif · <a href="{{ route('campaigns.agenda.index', $campaign) }}" class="text-brand-700 hover:underline">ver agenda</a></p>
@@ -43,7 +43,8 @@
             <div class="grid gap-4 sm:grid-cols-2">
                 @foreach ($book['fields'] as $k => $f)
                     @continue(in_array($f['type'], ['photo', 'file'], true))
-                    <div @class(['sm:col-span-2' => in_array($f['type'], ['longtext', 'multiselect']) || $k === $book['title']])>
+                    @continue(in_array($f['type'], ['readonly', 'minuta'], true) && ! $record->dato($k))
+                    <div @class(['sm:col-span-2' => in_array($f['type'], ['longtext', 'multiselect', 'communities']) || $k === $book['title']])>
                         <label for="d_{{ $k }}" class="label">{{ $f['label'] }}{{ ($f['required'] ?? false) ? ' *' : '' }}</label>
                         @switch($f['type'])
                             @case('longtext')
@@ -67,8 +68,65 @@
                                     @endforeach
                                 </div>
                                 @break
+                            @case('casilla')
+                            @case('promotor')
+                            @case('propuesta')
+                            @case('mensaje')
+                                @php $opts = $lookups[$f['type'] === 'mensaje' ? 'mensaje_ok' : $f['type']] ?? []; @endphp
+                                <select id="d_{{ $k }}" name="d[{{ $k }}]" class="input" @required($f['required'] ?? false)>
+                                    <option value="">— Elige —</option>
+                                    @foreach ($opts as $ov => $ol)<option value="{{ $ov }}" @selected((string) $val($k) === (string) $ov)>{{ $ol }}</option>@endforeach
+                                </select>
+                                @if (empty($opts))
+                                    <p class="mt-1 text-xs text-amber-700">
+                                        @switch($f['type'])
+                                            @case('casilla') Aún no hay casillas: captúralas en <a href="{{ route('campaigns.sheets.index', [$campaign, 'defensa-del-voto']) }}" class="underline">Defensa del Voto</a>. @break
+                                            @case('promotor') Aún no hay promotores en el <a href="{{ route('campaigns.promoters.index', $campaign) }}" class="underline">Padrón de Promotores</a>. @break
+                                            @case('propuesta') Aún no hay propuestas en el punto 15. @break
+                                            @case('mensaje') Aún no hay mensajes aprobados en el punto 15. @break
+                                        @endswitch
+                                    </p>
+                                @endif
+                                @break
+                            @case('catalog')
+                                @php $cur = (string) ($val($k) ?? ''); $opts = $lookups['catalog'][$k] ?? []; @endphp
+                                <div class="flex gap-2" data-catalog>
+                                    <select id="d_{{ $k }}" name="d[{{ $k }}]" class="input" @required($f['required'] ?? false)>
+                                        <option value="">— Elige —</option>
+                                        @foreach ($opts as $o)<option @selected($cur === $o)>{{ $o }}</option>@endforeach
+                                        <option value="__otro" @selected(old("d.$k") === '__otro')>Otro… (agregar)</option>
+                                    </select>
+                                    <input name="nuevo[{{ $k }}]" value="{{ old("nuevo.$k") }}" maxlength="120" placeholder="Nombre nuevo" aria-label="Nuevo {{ mb_strtolower($f['label']) }}" @class(['input', 'hidden' => old("d.$k") !== '__otro'])>
+                                </div>
+                                @break
+                            @case('communities')
+                                @php $sel = array_map('intval', (array) ($val($k) ?? [])); @endphp
+                                <div class="flex max-h-48 flex-wrap gap-2 overflow-y-auto">
+                                    @foreach ($lookups['communities'] ?? [] as $cid => $cname)
+                                        <label class="inline-flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-1 text-sm has-[:checked]:border-brand-500 has-[:checked]:bg-brand-50">
+                                            <input type="checkbox" name="d[{{ $k }}][]" value="{{ $cid }}" class="rounded border-slate-300" @checked(in_array($cid, $sel, true))> {{ $cname }}
+                                        </label>
+                                    @endforeach
+                                </div>
+                                @break
+                            @case('bool')
+                                <label class="mt-1 inline-flex items-center gap-2 text-sm">
+                                    <input type="hidden" name="d[{{ $k }}]" value="0">
+                                    <input id="d_{{ $k }}" type="checkbox" name="d[{{ $k }}]" value="1" class="size-4 rounded border-slate-300" @checked($val($k))> Sí
+                                </label>
+                                @break
+                            @case('url')
+                                <input id="d_{{ $k }}" type="url" name="d[{{ $k }}]" value="{{ $val($k) }}" maxlength="500" class="input" placeholder="https://…" @required($f['required'] ?? false)>
+                                @break
+                            @case('readonly')
+                                <p class="py-2 text-sm text-slate-700">{{ $record->dato($k) }}@if ($record->dato('aprobado_el')) · {{ $record->dato('aprobado_el') }}@endif</p>
+                                @break
+                            @case('minuta')
+                                <p class="py-2 text-sm"><a href="{{ route('minutes.show', $record->dato($k)) }}" class="font-medium text-brand-700 hover:underline">Abrir la minuta en Minutas →</a></p>
+                                @break
                             @case('int')
                                 <input id="d_{{ $k }}" type="number" min="0" step="1" name="d[{{ $k }}]" value="{{ $val($k) }}" class="input tabular-nums" @required($f['required'] ?? false)>
+                                @isset($f['hint'])<p class="mt-1 text-xs text-slate-500">{{ $f['hint'] }}</p>@endisset
                                 @break
                             @case('money')
                                 <input id="d_{{ $k }}" type="number" min="0" step="any" name="d[{{ $k }}]" value="{{ $val($k) }}" class="input tabular-nums" placeholder="$">
@@ -104,8 +162,9 @@
             <h3 class="mb-4 text-sm font-semibold tracking-wide text-slate-500 uppercase">Datos generales</h3>
             <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div>
-                    <label for="community_id" class="label">Comunidad *</label>
-                    <select id="community_id" name="community_id" class="input" required data-community-select>
+                    @php $comOptional = ($book['community'] ?? null) === 'optional'; @endphp
+                    <label for="community_id" class="label">Comunidad{{ $comOptional ? '' : ' *' }}</label>
+                    <select id="community_id" name="community_id" class="input" @required(! $comOptional) data-community-select>
                         <option value="">— Elige —</option>
                         @foreach ($communities as $c)<option value="{{ $c->id }}" @selected(old('community_id', $record->community_id) == $c->id)>{{ $c->name }}</option>@endforeach
                     </select>
@@ -130,13 +189,15 @@
                     </select>
                 </div>
                 <div>
-                    <label for="fecha" class="label">{{ $book['fecha_label'] ?? 'Fecha' }}{{ ($book['evento'] ?? false) ? ' *' : '' }}</label>
-                    <input id="fecha" type="date" name="fecha" value="{{ old('fecha', $record->fecha?->format('Y-m-d')) }}" class="input" @required($book['evento'] ?? false)>
+                    @php $fechaReq = ($book['evento'] ?? false) || isset($book['fecha_max']); @endphp
+                    <label for="fecha" class="label">{{ $book['fecha_label'] ?? 'Fecha' }}{{ $fechaReq ? ' *' : '' }}</label>
+                    <input id="fecha" type="date" name="fecha" value="{{ old('fecha', $record->fecha?->format('Y-m-d')) }}" class="input" @required($fechaReq) @isset($book['fecha_max']) max="{{ $book['fecha_max'] }}" @endisset>
+                    @isset($book['fecha_max'])<p class="mt-1 text-xs text-amber-700">No puede pasar del {{ \Carbon\Carbon::parse($book['fecha_max'])->format('d/m/Y') }}.</p>@endisset
                 </div>
                 @if ($book['hora'] ?? false)
                     <div>
-                        <label for="hora" class="label">Hora</label>
-                        <input id="hora" type="time" name="hora" value="{{ old('hora', $record->horaCorta()) }}" class="input">
+                        <label for="hora" class="label">Hora{{ ($book['hora'] ?? false) === 'required' ? ' *' : '' }}</label>
+                        <input id="hora" type="time" name="hora" value="{{ old('hora', $record->horaCorta()) }}" class="input" @required(($book['hora'] ?? false) === 'required')>
                     </div>
                 @endif
                 <div>
@@ -183,7 +244,7 @@
 
         <div class="flex flex-wrap items-center justify-between gap-3">
             <div class="flex gap-2">
-                @if (auth()->user()->puede('estrategia', 'capturar'))
+                @if (auth()->user()->puede(\App\Services\StrategyBooks::module($key), 'capturar'))
                 <button class="btn btn-primary">{{ $record->exists ? 'Guardar cambios' : 'Guardar' }}</button>
                 @else
                 <p class="text-sm text-slate-500">Tu perfil solo permite consultar.</p>
@@ -193,7 +254,7 @@
         </div>
     </form>
 
-    @if ($record->exists && auth()->user()->puede('estrategia', 'capturar'))
+    @if ($record->exists && auth()->user()->puede(\App\Services\StrategyBooks::module($key), 'capturar'))
         <form method="POST" action="{{ route('campaigns.strategy.destroy', [$campaign, $key, $record]) }}" class="mt-6 border-t border-slate-200 pt-4" onsubmit="return confirm('¿Eliminar este registro y sus archivos? No se puede deshacer.')">
             @csrf
             @method('DELETE')
@@ -204,6 +265,13 @@
 
 @push('scripts')
 <script>
+    // Catálogo ampliable: al elegir «Otro…» aparece el campo para escribir el nombre nuevo
+    document.querySelectorAll('[data-catalog]').forEach((box) => {
+        const sel = box.querySelector('select');
+        const input = box.querySelector('input');
+        sel.addEventListener('change', () => { input.classList.toggle('hidden', sel.value !== '__otro'); if (sel.value === '__otro') input.focus(); });
+    });
+
     // La lista de secciones se acota a la comunidad elegida
     (() => {
         const com = document.querySelector('[data-community-select]');

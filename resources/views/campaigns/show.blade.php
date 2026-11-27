@@ -16,8 +16,12 @@
     <section class="mb-8" aria-labelledby="hojas">
         <h2 id="hojas" class="font-semibold">Hojas del cuaderno</h2>
         <p class="text-sm text-slate-500">Entra a cada burbuja para llenarla. Es tu documento vivo: los cálculos se hacen solos conforme llega la información.</p>
-        <ul class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
-            @foreach ($steps as [$num, $label, $desc, $url, $done, $stat])
+        @foreach ([['Hojas 1 a 10', fn ($n) => $n <= 10], ['Puntos nuevos 11 a 20', fn ($n) => $n > 10]] as [$groupLabel, $inGroup])
+        @php $group = collect($steps)->filter(fn ($st) => $inGroup($st[0])); @endphp
+        @continue($group->isEmpty())
+        <h3 class="mt-5 text-xs font-semibold tracking-wide text-slate-500 uppercase">{{ $groupLabel }}</h3>
+        <ul class="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+            @foreach ($group as [$num, $label, $desc, $url, $done, $stat])
                 <li>
                     <a href="{{ $url }}" class="group flex h-full flex-col items-center rounded-3xl border border-slate-200 bg-white px-3 py-5 text-center shadow-sm transition hover:-translate-y-0.5 hover:border-brand-500 hover:shadow-md focus-visible:ring-2 focus-visible:ring-brand-500">
                         <span @class([
@@ -37,6 +41,7 @@
                 </li>
             @endforeach
         </ul>
+        @endforeach
     </section>
 
     @if (auth()->user()->puede('cuaderno'))

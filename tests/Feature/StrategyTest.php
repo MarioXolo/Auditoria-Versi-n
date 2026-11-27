@@ -53,7 +53,7 @@ class StrategyTest extends TestCase
     public function test_hub_shows_every_book_and_casillas_only_for_managers(): void
     {
         $page = $this->actingAs($this->gerente)->get($this->url('/estrategia'))->assertOk();
-        foreach (StrategyBooks::all() as $key => $book) {
+        foreach (StrategyBooks::ofPunto(11) as $key => $book) {
             $page->assertSee($book['name']);
             $this->actingAs($this->gerente)->get($this->url("/estrategia/{$key}"))->assertOk();
             $this->actingAs($this->gerente)->get($this->url("/estrategia/{$key}/nuevo"))->assertOk();

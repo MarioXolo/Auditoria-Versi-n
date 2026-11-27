@@ -18,7 +18,7 @@
 @section('content')
     @include('campaigns._nav')
 
-    <p class="mb-4 text-sm text-slate-500">Los eventos de los libros (mítines, desayunos, caravanas, cabalgatas y agenda metropolitana de campaña) aparecen aquí solos. La fecha límite es {{ StrategyRecord::diasAnticipacion() }} días antes del evento; se puede ajustar en cada uno. Si un evento ya reportado cambia de fecha, hora o lugar, pasa a «Modificado» para reportar el cambio.</p>
+    <p class="mb-4 text-sm text-slate-500">Los eventos de los puntos 11 (mítines, desayunos, caravanas, cabalgatas, agenda metropolitana de campaña), 13 (campaña de apoyo), 17 (cierres) y 18 (eventos con sectores) aparecen aquí solos. La fecha límite es {{ StrategyRecord::diasAnticipacion() }} días antes del evento; se puede ajustar en cada uno. Si un evento ya reportado cambia de fecha, hora o lugar, pasa a «Modificado» para reportar el cambio.</p>
 
     <div class="mb-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div class="card p-4"><p class="text-xs text-slate-500">Eventos</p><p class="text-2xl font-semibold tabular-nums">{{ number_format($cards['total']) }}</p><p class="text-xs text-slate-500">Gasto estimado {{ CampaignSheets::money($cards['gasto']) }}</p></div>

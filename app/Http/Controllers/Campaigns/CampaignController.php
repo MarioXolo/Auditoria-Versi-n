@@ -20,7 +20,8 @@ class CampaignController extends Controller
     private const PERCENT_FIELDS = ['participacion', 'objetivo', 'colchon'];
 
     /** Módulo de permisos de cada burbuja (las que no aparecen son «cuaderno»). */
-    public const MODULE_OF = [3 => 'votantes', 4 => 'promotores', 11 => 'estrategia', 20 => 'agenda'];
+    public const MODULE_OF = [3 => 'votantes', 4 => 'promotores', 11 => 'estrategia', 12 => 'diad', 13 => 'apoyo', 14 => 'cuartos',
+        15 => 'mensajes', 16 => 'estadisticas', 17 => 'cierre', 18 => 'sectores', 19 => 'organigrama', 20 => 'agenda'];
 
     /** Entrada del menú: abre el cuaderno, o su configuración inicial si aún no existe. */
     public function index(Request $request): RedirectResponse
@@ -101,7 +102,14 @@ class CampaignController extends Controller
         $hechas = $campaign->tasks()->where('estatus', 'Hecho')->count();
         $logros = $campaign->achievements()->count();
         $kpis = $campaign->kpis()->where('valor', '>', 0)->count();
-        $registros = $campaign->strategyRecords()->count();
+        $porLibro = $campaign->strategyRecords()->selectRaw('libro, count(*) as n')->groupBy('libro')->pluck('n', 'libro');
+        $personas = \App\Models\OrgMember::count();
+        $puntos = [];
+        foreach (\App\Services\StrategyBooks::PUNTOS as $num => [$name, $desc]) {
+            $total = collect(\App\Services\StrategyBooks::ofPunto($num))->keys()->sum(fn ($k) => $porLibro[$k] ?? 0)
+                + ($num === 11 ? $casillas : 0);
+            $puntos[] = [$num, $name, $desc, $num === 11 ? route('campaigns.strategy.hub', $campaign) : route('campaigns.strategy.punto', [$campaign, $num]), $total > 0, $count($total, 'registro', 'registros')];
+        }
         $eventos = $campaign->strategyRecords()->where('es_evento', true)->count();
         $porReportar = $campaign->strategyRecords()->pendientesIeeq()->count();
 
@@ -116,8 +124,9 @@ class CampaignController extends Controller
             [8, 'Cronograma', 'Fases y tareas rumbo a la jornada.', $sheet('cronograma'), $tareas > 0, $tareas > 0 ? $n($hechas).' de '.$count($tareas, 'tarea hecha', 'tareas hechas') : '0 tareas'],
             [9, 'Tablero KPI', 'Seguimiento semanal de los indicadores clave.', route('campaigns.kpis.index', $campaign), $kpis > 0, 'Semáforo de indicadores'],
             [10, 'Logros Comunicables', 'Inventario de obra del gobierno, munición para el mensaje.', $sheet('logros'), $logros > 0, $count($logros, 'logro', 'logros')],
-            [11, 'Estrategia de Campaña', 'Los libros: prioridades, mítines, bardas, lonas, puerta por puerta, casillas…', route('campaigns.strategy.hub', $campaign), $registros > 0, $count($registros, 'registro', 'registros')],
-            [20, 'Agenda IEEQ', 'Los eventos de los libros llegan solos; controla qué falta reportar.', route('campaigns.agenda.index', $campaign), $eventos > 0, $porReportar > 0 ? $count($porReportar, 'evento por reportar', 'eventos por reportar') : $count($eventos, 'evento', 'eventos')],
+            ...$puntos,
+            [19, 'Organigrama', 'Quién es quién, a quién reporta y alertas de servidores públicos.', route('org.index'), $personas > 0, $count($personas, 'persona', 'personas')],
+            [20, 'Agenda IEEQ', 'Los eventos de los puntos 11, 13, 17 y 18 llegan solos; controla qué falta reportar.', route('campaigns.agenda.index', $campaign), $eventos > 0, $porReportar > 0 ? $count($porReportar, 'evento por reportar', 'eventos por reportar') : $count($eventos, 'evento', 'eventos')],
         ];
 
         // Punto 19: cada quien ve solo las burbujas de los módulos que su perfil le deja ver

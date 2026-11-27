@@ -130,7 +130,8 @@ class User extends Authenticatable
             return (bool) $this->accessProfile?->allows($module, $action);
         }
 
-        return $this->isGerente();
+        // Gerente sin perfil: todo lo de antes, menos los módulos restringidos (campaña de apoyo y estadísticas)
+        return $this->isGerente() && ! in_array($module, \App\Support\Access::RESTRICTED, true);
     }
 
     /** Promotor: en la base de votantes solo ve y captura a los suyos. */
@@ -142,7 +143,7 @@ class User extends Authenticatable
     /** ¿Ve al menos un módulo del Cuaderno Maestro? */
     public function puedeVerCuaderno(): bool
     {
-        foreach (['cuaderno', 'promotores', 'votantes', 'estrategia', 'agenda'] as $m) {
+        foreach (['cuaderno', 'promotores', 'votantes', 'estrategia', 'diad', 'apoyo', 'cuartos', 'mensajes', 'estadisticas', 'cierre', 'sectores', 'agenda', 'organigrama'] as $m) {
             if ($this->puede($m)) {
                 return true;
             }

@@ -43,6 +43,20 @@ Las fotos y evidencias se guardan en `storage/app/private` y solo se muestran a 
 - **Calendario**: administradores y gerentes ven además los eventos de campaña, en verde (reportado), ámbar (por reportar) o rojo (vencido).
 
 
+### Puntos 12 a 18 · cada uno es una burbuja del Cuaderno
+
+El Cuaderno Maestro muestra las hojas 1 a 10 y los puntos nuevos 11 a 20 como burbujas. Del 11 al 18 cada punto tiene sus libros (tablas), todos con los campos comunes más los propios (definidos en `App\Services\StrategyBooks`):
+
+- **12. Día D**: plan por casilla (meta, votantes asignados, promotor), sala de situación (apertura, llegada de representantes, incidencias con hora y foto), estampida (cortes por hora; el tablero toma el último corte de cada casilla y promotor), encuesta de salida (resultado estimado automático) y conteo propio (contra la meta; si el acta no la trae se toma la del plan). Las casillas son las de Defensa del Voto.
+- **13. Campaña de apoyo**: agenda de eventos y visitas (pasan a la Agenda IEEQ y su costo cuenta como gasto) y comunidades/públicos, liderazgos y peticiones. Restringido: solo perfiles que lo incluyan.
+- **14. Cuartos de guerra**: cuartos (catálogo ampliable: central, digital, jurídico, territorial por zona, Día D), bitácora con «Subir al central», monitoreo de menciones y reuniones que crean su minuta en Minutas.
+- **15. Propuestas y mensajes**: propuestas por pilar con comunidades beneficiadas, costo, fuente y orden de gobierno; mensajes con estatus borrador/aprobado/en uso/retirado y quién lo aprobó (solo quien puede «revisar»); bardas, lonas y la bitácora solo ofrecen mensajes aprobados o en uso; registro de qué propuesta se dijo en qué comunidad.
+- **16. Estadísticas**: encuestas y resultados históricos por sección (2018, 2021, 2024); bases Nica y Anahí bloqueadas para carga; acceso restringido y registro de cada consulta, archivo abierto o exportación.
+- **17. Cierre de campaña**: cierres por comunidad y principal con sede, aforo, oradores, templete y sonido, seguridad, protección civil y plan B; ninguna fecha después del 2 de junio de 2027; pasan a la Agenda IEEQ.
+- **18. Sectores**: catálogo ampliable (taxistas, iglesias, mayordomos), organización, líder, teléfono, integrantes, votos que influye, postura, peticiones y compromiso; la fiesta patronal de mayordomos sale cada año en el Calendario; los eventos con sectores pasan a la Agenda IEEQ.
+
+Cada punto tiene su permiso en los perfiles de acceso. «13. Campaña de apoyo» y «16. Estadísticas» son restringidos: el gerente sin perfil no entra.
+
 ### Punto 19 · Organigrama y roles
 
 - **Organigrama** (menú): por persona puesto, nombre, a quién reporta, equipo, delegación o sección, teléfono, cuenta en el sistema (de ahí sale su rol y perfil) y «¿es servidor público?». Se dibuja solo con «a quién reporta» (no permite ciclos); quien es servidor público sale resaltado y con alerta arriba. Al quitar a alguien, quienes le reportaban suben a su jefe.

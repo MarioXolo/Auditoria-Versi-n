@@ -27,12 +27,25 @@ final class Access
         'cuaderno' => ['Cuaderno Maestro', 'Hojas 1, 2 y 5 a 10: datos, estructura territorial, actores, defensa del voto, presupuesto, cronograma, KPIs y logros.'],
         'promotores' => ['Promotores', 'Hoja 4 del Cuaderno: padrón de promotores.'],
         'votantes' => ['Base de votantes', 'Hoja 3 del Cuaderno. Datos personales.'],
-        'estrategia' => ['Estrategia de campaña', 'Punto 11: los libros (mítines, bardas, lonas…).'],
-        'agenda' => ['Agenda IEEQ', 'Punto 20. «Revisar» = registrar si ya se reportó, folio y estatus.'],
+        'estrategia' => ['11. Estrategia de campaña', 'Los libros: mítines, bardas, lonas, puerta por puerta…'],
+        'diad' => ['12. Día D', 'Plan por casilla, sala de situación, estampida, encuesta de salida y conteo.'],
+        'apoyo' => ['13. Campaña de apoyo', 'Restringido: solo los perfiles que lo tengan (el gerente sin perfil no entra).'],
+        'cuartos' => ['14. Cuartos de guerra', 'Cuartos, bitácora, monitoreo y reuniones.'],
+        'mensajes' => ['15. Propuestas y mensajes', '«Revisar» = aprobar mensajes.'],
+        'estadisticas' => ['16. Estadísticas y análisis', 'Restringido y con registro de quién consulta o exporta.'],
+        'cierre' => ['17. Cierre de campaña', 'Cierres por comunidad y cierre principal.'],
+        'sectores' => ['18. Sectores', 'Organizaciones, líderes, postura y fiestas patronales.'],
+        'agenda' => ['20. Agenda IEEQ', '«Revisar» = registrar si ya se reportó, folio y estatus.'],
         'minutas' => ['Minutas', 'Minutas de reunión.'],
-        'organigrama' => ['Organigrama', 'Punto 19: personas, a quién reportan y servidores públicos.'],
+        'organigrama' => ['19. Organigrama', 'Personas, a quién reportan y servidores públicos.'],
         'catalogos' => ['Catálogos', 'Tipos de actividad, comunidades y secciones electorales.'],
     ];
+
+    /** Módulos que solo ve quien tenga un perfil que los incluya (el gerente sin perfil no entra). */
+    public const RESTRICTED = ['apoyo', 'estadisticas'];
+
+    /** Módulos agregados con los puntos 12 a 18 (para actualizar los perfiles de fábrica). */
+    public const NEW_IN_V5 = ['diad', 'apoyo', 'cuartos', 'mensajes', 'estadisticas', 'cierre', 'sectores'];
 
     /** Perfiles con los que arranca el sistema (se pueden editar o borrar). */
     public static function defaults(): array
@@ -46,6 +59,11 @@ final class Access
                 'promotores' => ['ver', 'capturar', 'revisar', 'exportar'],
                 'votantes' => ['ver', 'capturar', 'exportar'],
                 'estrategia' => ['ver', 'capturar', 'revisar'],
+                'diad' => ['ver', 'capturar'],
+                'cuartos' => ['ver', 'capturar'],
+                'mensajes' => ['ver'],
+                'cierre' => ['ver', 'capturar'],
+                'sectores' => ['ver', 'capturar'],
                 'agenda' => ['ver'],
                 'organigrama' => ['ver'],
                 'catalogos' => ['ver'],
@@ -55,11 +73,19 @@ final class Access
                 'promotores' => ['ver', 'exportar'],
                 'votantes' => ['ver', 'exportar'],
                 'estrategia' => ['ver', 'exportar'],
+                'diad' => ['ver', 'exportar'],
+                'cuartos' => ['ver', 'exportar'],
+                'mensajes' => ['ver', 'exportar'],
+                'estadisticas' => ['ver', 'capturar', 'exportar'],
+                'cierre' => ['ver', 'exportar'],
+                'sectores' => ['ver', 'exportar'],
                 'agenda' => ['ver', 'exportar'],
                 'organigrama' => ['ver'],
             ], false],
-            ['Equipo de campaña de apoyo', 'Estrategia y agenda de eventos.', [
+            ['Equipo de campaña de apoyo', 'Su punto 13, estrategia, mensajes y agenda de eventos.', [
+                'apoyo' => ['ver', 'capturar', 'revisar', 'exportar'],
                 'estrategia' => ['ver', 'capturar'],
+                'mensajes' => ['ver', 'capturar'],
                 'agenda' => ['ver', 'revisar'],
                 'organigrama' => ['ver'],
             ], false],

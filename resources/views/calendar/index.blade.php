@@ -155,6 +155,7 @@
                     @php
                         $list = $days[$day->toDateString()] ?? collect();
                         $dayEvents = $events[$day->toDateString()] ?? collect();
+                        $dayFiestas = $fiestas[$day->toDateString()] ?? collect();
                         $inMonth = $day->month === $month->month;
                     @endphp
                     <div @class([
@@ -172,6 +173,9 @@
                                 <span class="text-[10px] text-slate-400 tabular-nums">{{ $list->count() }}</span>
                             @endif
                         </div>
+                        @foreach ($dayFiestas as $fi)
+                            <a href="{{ route('campaigns.strategy.edit', [$fi->campaign_id, 'sectores', $fi]) }}" title="Fiesta patronal · {{ $fi->dato('organizacion') }}" class="mb-1 block truncate rounded bg-violet-100 px-1.5 py-0.5 text-[11px] font-medium text-violet-800 hover:brightness-95">⛪ {{ $fi->dato('fiesta') ?: 'Fiesta patronal' }}{{ $fi->community ? ' · '.$fi->community->name : '' }}</a>
+                        @endforeach
                         @if ($dayEvents->isNotEmpty())
                             <ul class="mb-1 space-y-1">
                                 @foreach ($dayEvents as $ev)
@@ -213,14 +217,17 @@
 
     {{-- Agenda en celular --}}
     <div class="space-y-3 md:hidden print:hidden">
-        @forelse (collect(array_fill_keys(array_unique([...array_keys($days), ...$events->keys()->all()]), null))->sortKeys() as $date => $_)
-            @php $d = \Carbon\Carbon::parse($date); $list = $days[$date] ?? collect(); $dayEvents = $events[$date] ?? collect(); @endphp
+        @forelse (collect(array_fill_keys(array_unique([...array_keys($days), ...$events->keys()->all(), ...$fiestas->keys()->all()]), null))->sortKeys() as $date => $_)
+            @php $d = \Carbon\Carbon::parse($date); $list = $days[$date] ?? collect(); $dayEvents = $events[$date] ?? collect(); $dayFiestas = $fiestas[$date] ?? collect(); @endphp
             @continue($d->month !== $month->month)
             <section class="card overflow-hidden">
                 <h2 @class(['px-4 py-2 text-sm font-semibold', 'bg-brand-600 text-white' => $d->isToday(), 'bg-slate-50' => ! $d->isToday()])>
                     {{ ucfirst($d->translatedFormat('l j \d\e F')) }}
                 </h2>
                 <ul class="divide-y divide-slate-100">
+                    @foreach ($dayFiestas as $fi)
+                        <li><a href="{{ route('campaigns.strategy.edit', [$fi->campaign_id, 'sectores', $fi]) }}" class="block px-4 py-2.5 text-sm"><span class="badge bg-violet-100 text-violet-800">⛪ Fiesta patronal</span> {{ $fi->dato('fiesta') }} · {{ $fi->dato('organizacion') }}{{ $fi->community ? ' · '.$fi->community->name : '' }}</a></li>
+                    @endforeach
                     @foreach ($dayEvents as $ev)
                         <li>
                             <a href="{{ route('campaigns.strategy.edit', [$ev->campaign_id, $ev->libro, $ev]) }}" class="flex items-center justify-between gap-3 px-4 py-2.5">
