@@ -91,15 +91,16 @@
         <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
             <div>
                 <h2 class="font-semibold">Secciones electorales</h2>
-                <p class="text-xs text-slate-500">Se eligen en los libros de Estrategia junto con la comunidad. Cada sección pertenece a una comunidad.</p>
+                <p class="text-xs text-slate-500">Se eligen en los libros de Estrategia. Su lista nominal reparte la meta de votos en el semáforo por sección (Meta de votos).</p>
             </div>
             <span class="text-sm text-slate-500">{{ $sections->where('active', true)->count() }} activas</span>
         </div>
         <form method="POST" action="{{ route('sections.store') }}" class="flex flex-wrap gap-2 border-b border-slate-200 bg-slate-50 px-5 py-4">
             @csrf
             <input name="clave" required maxlength="10" placeholder="Sección, ej. 0512" class="input w-40" value="{{ $bag->any() ? old('clave') : '' }}" aria-label="Nueva sección">
+            <input name="listado_nominal" type="number" min="0" placeholder="Lista nominal" class="input w-36" value="{{ $bag->any() ? old('listado_nominal') : '' }}" aria-label="Lista nominal">
             <select name="community_id" class="input w-56" aria-label="Comunidad">
-                <option value="">— Comunidad —</option>
+                <option value="">— Comunidad principal —</option>
                 @foreach ($activeCommunities as $c)
                     <option value="{{ $c->id }}" @selected($bag->any() && old('community_id') == $c->id)>{{ $c->name }}</option>
                 @endforeach
@@ -109,19 +110,25 @@
         @if ($bag->any())
             <p class="border-b border-rose-200 bg-rose-50 px-5 py-2 text-sm text-rose-700">{{ $bag->first() }}</p>
         @endif
-        <ul class="grid divide-y divide-slate-100 md:grid-cols-2 md:divide-y-0">
+        <ul class="divide-y divide-slate-100">
             @forelse ($sections as $section)
-                <li @class(['flex flex-wrap items-center gap-2 border-slate-100 px-5 py-2.5 md:border-b', 'bg-slate-50/70' => ! $section->active])>
-                    <form method="POST" action="{{ route('sections.update', $section) }}" class="flex min-w-0 flex-1 items-center gap-2">
+                <li @class(['flex flex-wrap items-center gap-2 px-5 py-2.5', 'bg-slate-50/70' => ! $section->active])>
+                    <form method="POST" action="{{ route('sections.update', $section) }}" class="flex min-w-0 flex-1 flex-wrap items-center gap-2">
                         @csrf
                         @method('PATCH')
-                        <input name="clave" value="{{ $section->clave }}" required maxlength="10" aria-label="Sección" @class(['input w-24 py-1.5 font-mono', 'text-slate-400 line-through' => ! $section->active])>
-                        <select name="community_id" class="input min-w-0 flex-1 py-1.5" aria-label="Comunidad de la sección {{ $section->clave }}">
-                            <option value="">— Sin comunidad —</option>
-                            @foreach ($activeCommunities as $c)
-                                <option value="{{ $c->id }}" @selected($section->community_id === $c->id)>{{ $c->name }}</option>
-                            @endforeach
-                        </select>
+                        <input name="clave" value="{{ $section->clave }}" required maxlength="10" aria-label="Sección" @class(['input w-20 py-1.5 font-mono', 'text-slate-400 line-through' => ! $section->active])>
+                        <input name="listado_nominal" type="number" min="0" value="{{ $section->listado_nominal }}" placeholder="Lista nominal" class="input w-32 py-1.5" aria-label="Lista nominal de la sección {{ $section->clave }}">
+                        <input name="representante" value="{{ $section->representante }}" maxlength="120" placeholder="Representante general" class="input min-w-0 flex-1 py-1.5" aria-label="Representante de la sección {{ $section->clave }}">
+                        <input type="hidden" name="community_id" value="{{ $section->community_id }}">
+                        @php $mias = $section->communities->pluck('id')->all(); @endphp
+                        <details class="w-full">
+                            <summary class="cursor-pointer text-xs text-brand-700">Comunidades ({{ count($mias) }})</summary>
+                            <div class="mt-2 grid max-h-64 grid-cols-1 gap-x-4 overflow-y-auto rounded-lg border border-slate-200 bg-white p-2 text-sm sm:grid-cols-2 lg:grid-cols-3">
+                                @foreach ($activeCommunities as $c)
+                                    <label class="flex items-center gap-2 py-0.5"><input type="checkbox" name="communities[]" value="{{ $c->id }}" @checked(in_array($c->id, $mias, true) || $section->community_id === $c->id)> {{ $c->name }}</label>
+                                @endforeach
+                            </div>
+                        </details>
                         <button class="btn btn-secondary shrink-0 px-3 py-1.5 text-xs">Guardar</button>
                     </form>
                     <form method="POST" action="{{ route('sections.update', $section) }}">
@@ -139,7 +146,7 @@
                     @endif
                 </li>
             @empty
-                <li class="px-5 py-8 text-center text-sm text-slate-500 md:col-span-2">Aún no hay secciones. Agrega las del municipio con su comunidad.</li>
+                <li class="px-5 py-8 text-center text-sm text-slate-500">Aún no hay secciones. Agrega las del municipio con su lista nominal y sus comunidades.</li>
             @endforelse
         </ul>
     </section>

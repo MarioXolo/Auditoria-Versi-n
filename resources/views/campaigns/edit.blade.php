@@ -12,4 +12,6 @@
             <button class="btn btn-primary">Guardar cambios</button>
         </div>
     </form>
+
+    @include('campaigns._semaforo_secciones')
 @endsection

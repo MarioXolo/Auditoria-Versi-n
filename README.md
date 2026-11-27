@@ -196,3 +196,7 @@ Paneles nuevos (todo automático, `App\Services\DashboardPulse` y `DashboardMetr
 - **Control de ubicación**: % comprobadas (GPS + a mano), fuera del radio y sin validar.
 - **Encargados sin movimiento** (`ALERTA_DIAS_SIN_MOVIMIENTO`, 5 días), **comunidades olvidadas** (`ALERTA_DIAS_COMUNIDAD_OLVIDADA`, 15 días) y **compromisos de minutas vencidos**.
 - En el dashboard del encargado, «Me las asignaron» muestra el área, no el nombre del gerente.
+
+## Semáforo del voto por sección (Meta de votos)
+
+Cada sección del catálogo guarda su **lista nominal**, su **representante general** y **todas sus comunidades** (tabla `community_section`; una comunidad puede caer en varias secciones). En «Meta de votos» cada sección recibe el mismo % de su lista nominal que la meta con colchón representa del listado del municipio, y se compara con los votantes identificados: verde ≥ 80 %, amarillo ≥ 50 %, rojo debajo y gris sin lista nominal. Un votante cuenta en la sección capturada; sin sección, en la de su comunidad si esa comunidad cae en una sola. Los datos reales (secciones, listas y representantes) se cargan directo en el servidor, no en el repositorio.

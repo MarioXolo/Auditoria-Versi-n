@@ -80,7 +80,10 @@ class CampaignController extends Controller
 
     public function edit(Campaign $campaign): View
     {
-        return view('campaigns.edit', compact('campaign'));
+        return view('campaigns.edit', [
+            'campaign' => $campaign,
+            'porSeccion' => (new CampaignMetrics($campaign))->sectionRows(),
+        ]);
     }
 
     public function update(Request $request, Campaign $campaign): RedirectResponse

@@ -80,6 +80,95 @@ class CampaignMetrics
             ->pluck('total', 'community_id')->map(fn ($v) => (int) $v)->all();
     }
 
+    /**
+     * Semáforo de votos por sección: la meta total (con colchón) se reparte entre las secciones
+     * en proporción a su lista nominal oficial, y se compara con los votantes identificados en cada una.
+     * Un votante cuenta en la sección que trae capturada; si no trae sección, cuenta en la de
+     * su comunidad cuando esa comunidad cae en una sola sección.
+     * Verde ≥ 80 % de su meta, amarillo ≥ 50 %, rojo debajo; gris si la sección no tiene lista nominal.
+     */
+    public function sectionRows(): array
+    {
+        $sections = \App\Models\Section::active()->with('communities:id,name')->get()
+            ->sortBy(fn ($s) => [(int) $s->clave, $s->clave])->values();
+        $listaTotal = (int) $sections->sum('listado_nominal');
+        $metaTotal = $this->campaign->metaConColchon();
+        $norm = fn ($c) => ltrim(trim((string) $c), '0');
+
+        // Comunidad → secciones donde aparece (para votantes sin sección capturada)
+        $secsDe = [];
+        foreach ($sections as $s) {
+            foreach ($s->communities as $c) {
+                $secsDe[$c->id][] = $s->id;
+            }
+        }
+        $porClave = $sections->keyBy(fn ($s) => $norm($s->clave));
+
+        $conteo = [];      // section_id => total
+        $porComunidad = []; // section_id => [community_id => total]
+        $sinSeccion = 0;
+        $this->campaign->voters()->selectRaw('seccion, community_id, COUNT(*) as total')->groupBy('seccion', 'community_id')->get()
+            ->each(function ($v) use (&$conteo, &$porComunidad, &$sinSeccion, $porClave, $secsDe, $norm) {
+                $sec = $porClave->get($norm($v->seccion));
+                $id = $sec?->id ?? (count($secsDe[$v->community_id] ?? []) === 1 ? $secsDe[$v->community_id][0] : null);
+                if (! $id) {
+                    $sinSeccion += (int) $v->total;
+
+                    return;
+                }
+                $conteo[$id] = ($conteo[$id] ?? 0) + (int) $v->total;
+                if ($v->community_id) {
+                    $porComunidad[$id][$v->community_id] = ($porComunidad[$id][$v->community_id] ?? 0) + (int) $v->total;
+                }
+            });
+
+        $color = fn (?float $avance) => match (true) {
+            $avance === null => 'gris',
+            $avance >= 0.8 => 'verde',
+            $avance >= 0.5 => 'amarillo',
+            default => 'rojo',
+        };
+
+        // Cada sección recibe el mismo % de su lista nominal que la meta representa del listado del
+        // municipio; así, si a una sección le falta su lista nominal, no se le carga su parte a las demás.
+        $base = $this->campaign->listado_nominal > 0 ? $this->campaign->listado_nominal : $listaTotal;
+        $tasa = $base > 0 ? $metaTotal / $base : 0;
+
+        $rows = $sections->map(function ($s) use ($tasa, $conteo, $porComunidad, $color) {
+            $meta = ($s->listado_nominal && $tasa > 0) ? (int) round($s->listado_nominal * $tasa) : null;
+            $identificados = $conteo[$s->id] ?? 0;
+            $avance = $meta ? $identificados / $meta : null;
+
+            return (object) [
+                'section' => $s,
+                'meta' => $meta,
+                'identificados' => $identificados,
+                'avance' => $avance,
+                'color' => $color($avance),
+                'comunidades' => $s->communities->sortBy('name')->map(fn ($c) => (object) [
+                    'name' => $c->name,
+                    'identificados' => $porComunidad[$s->id][$c->id] ?? 0,
+                ])->values(),
+            ];
+        });
+
+        $metaSecciones = (int) $rows->sum('meta');
+        $identificados = (int) $rows->sum('identificados');
+
+        return [
+            'rows' => $rows,
+            'totals' => (object) [
+                'listado' => $listaTotal,
+                'meta' => $metaSecciones,
+                'identificados' => $identificados,
+                'avance' => $metaSecciones > 0 ? $identificados / $metaSecciones : null,
+                'sin_seccion' => $sinSeccion,
+                'sin_lista' => $rows->whereNull('meta')->count(),
+                'colores' => $rows->countBy('color')->all(),
+            ],
+        ];
+    }
+
     /** Filas de «Estructura Territorial» con sus cálculos, más la fila de totales. */
     public function territoryRows(): array
     {

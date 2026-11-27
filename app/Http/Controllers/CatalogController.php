@@ -29,7 +29,7 @@ class CatalogController extends Controller
             'types' => ActivityType::shared()->withCount('activities')->orderByDesc('active')->orderBy('name')->get(),
             'privateTypes' => auth()->user()->isAdmin() ? ActivityType::whereNotNull('owner_id')->with('owner:id,name')->withCount('activities')->orderBy('name')->get() : collect(),
             'communities' => Community::withCount('activities')->orderByDesc('active')->orderBy('name')->get(),
-            'sections' => Section::with('community:id,name')->withCount('strategyRecords')->orderByDesc('active')->orderBy('clave')->get(),
+            'sections' => Section::with(['community:id,name', 'communities:id'])->withCount('strategyRecords')->orderByDesc('active')->orderBy('clave')->get(),
             'activeCommunities' => Community::active()->orderBy('name')->get(['id', 'name']),
         ]);
     }
@@ -38,7 +38,8 @@ class CatalogController extends Controller
     public function storeSection(Request $request): RedirectResponse
     {
         $data = $this->sectionData($request);
-        $section = Section::create($data + ['active' => true]);
+        $section = Section::create(\Illuminate\Support\Arr::except($data, 'communities') + ['active' => true]);
+        $section->communities()->sync($data['communities']);
 
         return back()->with('status', "Sección {$section->clave} agregada.");
     }
@@ -51,7 +52,9 @@ class CatalogController extends Controller
             return back()->with('status', "Sección {$section->clave} ".($section->active ? 'activada.' : 'desactivada.'));
         }
 
-        $section->update($this->sectionData($request, $section));
+        $data = $this->sectionData($request, $section);
+        $section->update(\Illuminate\Support\Arr::except($data, 'communities'));
+        $section->communities()->sync($data['communities']);
 
         return back()->with('status', "Sección {$section->clave} actualizada.");
     }
@@ -71,9 +74,26 @@ class CatalogController extends Controller
         $data = $request->validateWithBag('secciones', [
             'clave' => ['required', 'string', 'max:10', 'regex:/^[0-9]{1,6}$/', Rule::unique('sections', 'clave')->ignore($section?->id)],
             'community_id' => ['nullable', 'integer', 'exists:communities,id'],
-        ], ['clave.regex' => 'La sección solo lleva números (ej. 0512).', 'clave.unique' => 'Esa sección ya está en el catálogo.'], ['clave' => 'sección', 'community_id' => 'comunidad']);
+            'communities' => ['nullable', 'array'],
+            'communities.*' => ['integer', 'exists:communities,id'],
+            'listado_nominal' => ['nullable', 'integer', 'min:0', 'max:999999'],
+            'representante' => ['nullable', 'string', 'max:120'],
+        ], ['clave.regex' => 'La sección solo lleva números (ej. 0512).', 'clave.unique' => 'Esa sección ya está en el catálogo.'], ['clave' => 'sección', 'community_id' => 'comunidad', 'listado_nominal' => 'lista nominal']);
 
-        return ['clave' => trim($data['clave']), 'community_id' => $data['community_id'] ?? null];
+        // Todas sus comunidades; la «principal» (la que ya usaban los libros) es la elegida o la primera de la lista
+        $communities = collect($data['communities'] ?? [])->map(fn ($id) => (int) $id);
+        if (! empty($data['community_id'])) {
+            $communities->prepend((int) $data['community_id']);
+        }
+        $communities = $communities->unique()->values()->all();
+
+        return [
+            'clave' => trim($data['clave']),
+            'community_id' => $data['community_id'] ?? ($communities[0] ?? null),
+            'listado_nominal' => $data['listado_nominal'] ?? null,
+            'representante' => filled($data['representante'] ?? null) ? trim($data['representante']) : null,
+            'communities' => $communities,
+        ];
     }
 
     public function store(Request $request, string $catalog): RedirectResponse
