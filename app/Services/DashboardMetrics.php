@@ -393,6 +393,8 @@ class DashboardMetrics
                 'overdue' => $g->filter(fn ($a) => $this->isOverdue($a))->count(),
                 'cumplimiento' => self::pct($completed->count(), $effective),
                 'a_tiempo' => self::pct($completed->filter(fn ($a) => $this->isOnTime($a))->count(), $completed->count()),
+                // Los 5 estados con su color de siempre (concluido verde, no completada rojo…)
+                'estados' => collect(ActivityStatus::cases())->mapWithKeys(fn ($st) => [$st->value => $g->filter(fn ($a) => $a->status === $st)->count()])->all(),
             ];
         });
 

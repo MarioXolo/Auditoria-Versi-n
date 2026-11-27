@@ -9,6 +9,8 @@
     $goalCump = (int) config('auditoria.metas.cumplimiento');
     $goalTiempo = (int) config('auditoria.metas.a_tiempo');
     $num = fn ($v) => number_format((float) $v);
+    // Mismos colores de estado que en Actividades y en «Actividades por estado»
+    $stDot = ['no_iniciado' => 'bg-amber-400', 'en_proceso' => 'bg-sky-500', 'suspendida' => 'bg-slate-400', 'concluido' => 'bg-emerald-600', 'no_completada' => 'bg-rose-600'];
 @endphp
 
 {{-- 1. Cuaderno Maestro + próximos días --}}
@@ -79,7 +81,7 @@
                         <li class="flex items-start justify-between gap-3">
                             <a href="{{ route('activities.show', $a) }}" class="min-w-0 hover:underline">
                                 <span class="font-medium">{{ $a->code }}</span> {{ $a->type?->name }}
-                                <span class="block truncate text-xs text-slate-500">{{ $a->assignee?->folioLabel() ? $a->assignee->folioLabel().' · ' : '' }}{{ $a->assignee?->name }}</span>
+                                <span class="block truncate text-xs text-slate-500"><span class="badge {{ $a->status->badge() }} mr-1 px-1.5 py-0 text-[10px]">{{ $a->status->label() }}</span>{{ $a->assignee?->folioLabel() ? $a->assignee->folioLabel().' · ' : '' }}{{ $a->assignee?->name }}</span>
                             </a>
                             <span @class(['shrink-0 text-xs font-medium tabular-nums', 'text-rose-700' => $a->end_date->isToday(), 'text-amber-700' => ! $a->end_date->isToday()])>{{ $a->end_date->isToday() ? 'Hoy' : $a->end_date->translatedFormat('D j') }}</span>
                         </li>
@@ -121,7 +123,7 @@
                                 <li class="flex items-start justify-between gap-3">
                                     <a href="{{ route('president.show', $p) }}" class="min-w-0 hover:underline">
                                         <span class="font-medium">{{ $p->folio }}</span> {{ $p->type?->name }}
-                                        @if ($p->community)<span class="block truncate text-xs text-slate-500">{{ $p->community->name }}</span>@endif
+                                        <span class="block truncate text-xs text-slate-500"><span class="badge {{ $p->status->badge() }} mr-1 px-1.5 py-0 text-[10px]">{{ $p->status->label() }}</span>{{ $p->community?->name }}</span>
                                     </a>
                                     <span class="shrink-0 text-xs font-medium tabular-nums text-slate-600">{{ $p->start_date?->lte(today()) ? 'En curso' : $p->start_date?->translatedFormat('D j') }}</span>
                                 </li>
@@ -149,11 +151,10 @@
                     <tr>
                         <th class="table-head whitespace-nowrap">Encomendó</th>
                         <th class="table-head text-right">Total</th>
-                        <th class="table-head text-right" title="Concluidas">Concl.</th>
+                        <th class="table-head min-w-36">Estados</th>
                         <th class="table-head text-right" title="Cumplimiento">Cumpl.</th>
                         <th class="table-head whitespace-nowrap text-right">A tiempo</th>
                         <th class="table-head text-right">Vencidas</th>
-                        <th class="table-head text-right" title="No completadas">✗</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -167,18 +168,29 @@
                                 @endif
                             </td>
                             <td class="table-cell text-right tabular-nums">{{ $r->total }}</td>
-                            <td class="table-cell text-right tabular-nums">{{ $r->completed }}</td>
+                            <td class="table-cell">
+                                <div class="flex h-2.5 overflow-hidden rounded-full bg-slate-100" title="{{ collect(\App\Enums\ActivityStatus::cases())->map(fn ($st) => $st->label().': '.($r->estados[$st->value] ?? 0))->join(' · ') }}">
+                                    @foreach (\App\Enums\ActivityStatus::cases() as $st)
+                                        @if ($r->estados[$st->value] ?? 0)<div class="{{ $stDot[$st->value] }}" style="width: {{ round($r->estados[$st->value] / max($r->total, 1) * 100, 2) }}%"></div>@endif
+                                    @endforeach
+                                </div>
+                                <span class="mt-1 block text-[11px] whitespace-nowrap text-slate-500 tabular-nums"><span class="text-emerald-700">✓ {{ $r->estados['concluido'] ?? 0 }}</span> · <span class="text-rose-700">✗ {{ $r->estados['no_completada'] ?? 0 }}</span> · {{ ($r->estados['no_iniciado'] ?? 0) + ($r->estados['en_proceso'] ?? 0) }} abiertas</span>
+                            </td>
                             <td class="table-cell text-right font-semibold tabular-nums {{ $pctTone($r->cumplimiento, $goalCump) }}">{{ $fmt($r->cumplimiento) }}</td>
                             <td class="table-cell text-right tabular-nums {{ $pctTone($r->a_tiempo, $goalTiempo) }}">{{ $fmt($r->a_tiempo) }}</td>
                             <td @class(['table-cell text-right tabular-nums', 'font-semibold text-rose-700' => $r->overdue > 0])>{{ $r->overdue }}</td>
-                            <td @class(['table-cell text-right tabular-nums', 'text-rose-700' => $r->incompletas > 0])>{{ $r->incompletas }}</td>
                         </tr>
                     @empty
-                        <tr><td colspan="7" class="px-5 py-6 text-center text-slate-500">Sin actividades en el periodo.</td></tr>
+                        <tr><td colspan="6" class="px-5 py-6 text-center text-slate-500">Sin actividades en el periodo.</td></tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
+        <p class="flex flex-wrap gap-x-4 gap-y-1 border-t border-slate-100 px-5 py-2 text-[11px] text-slate-500">
+            @foreach (\App\Enums\ActivityStatus::cases() as $st)
+                <span class="inline-flex items-center gap-1.5"><span class="size-2 rounded-full {{ $stDot[$st->value] }}"></span>{{ $st->label() }}</span>
+            @endforeach
+        </p>
     </section>
 
     <section class="card p-5" aria-labelledby="pulso-ubicacion">
