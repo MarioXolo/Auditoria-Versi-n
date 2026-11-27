@@ -27,13 +27,15 @@
         @endif
     </div>
     <div>
-        <label for="team_id" class="label">Equipo</label>
-        <select id="team_id" name="team_id" class="input">
-            <option value="">Sin equipo</option>
-            @foreach ($teams as $team)
-                <option value="{{ $team->id }}" @selected((int) old('team_id', $user->team_id) === $team->id)>{{ $team->name }}</option>
-            @endforeach
-        </select>
+        <label for="area" class="label">Área <span class="font-normal text-slate-500">(gerentes)</span></label>
+        <input id="area" name="area" list="areas" value="{{ old('area', $user->area) }}" maxlength="60" class="input" placeholder="Coordinación, Territorial, Técnica, Agenda">
+        <datalist id="areas">
+            @foreach (['Coordinación', 'Territorial', 'Técnica', 'Agenda'] as $a)<option value="{{ $a }}">@endforeach
+        </datalist>
+        <p class="mt-1 text-xs text-slate-500">Es lo que ve el encargado: «Técnica te encomendó esta actividad», no el nombre.</p>
+        @if ($user->folio_number)
+            <p class="mt-2 text-sm">Número de encargado: <b class="font-mono">{{ $user->folioLabel() }}</b> <span class="text-xs text-slate-500">(sus actividades llevan folio {{ $user->folioLabel() }}.0001, .0002…)</span></p>
+        @endif
     </div>
     <div>
         <label for="access_profile_id" class="label">Perfil de acceso <span class="font-normal text-slate-500">(Cuaderno, Estrategia, Minutas…)</span></label>

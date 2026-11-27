@@ -18,18 +18,12 @@
 @endsection
 
 @section('content')
-    <form method="GET" class="card mb-5 grid gap-3 p-4 sm:grid-cols-4">
+    <form method="GET" class="card mb-5 grid gap-3 p-4 sm:grid-cols-3">
         <input type="search" name="q" value="{{ request('q') }}" placeholder="Nombre o correo" class="input sm:col-span-2">
         <select name="role" class="input" onchange="this.form.submit()">
             <option value="">Todos los roles</option>
             @foreach ($roles as $value => $label)
                 <option value="{{ $value }}" @selected(request('role') === $value)>{{ $label }}</option>
-            @endforeach
-        </select>
-        <select name="team_id" class="input" onchange="this.form.submit()">
-            <option value="">Todos los equipos</option>
-            @foreach ($teams as $team)
-                <option value="{{ $team->id }}" @selected((int) request('team_id') === $team->id)>{{ $team->name }}</option>
             @endforeach
         </select>
     </form>
@@ -40,7 +34,7 @@
                 <tr>
                     <th class="table-head">Nombre</th>
                     <th class="table-head">Rol</th>
-                    <th class="table-head">Equipo</th>
+                    <th class="table-head">Área · ID</th>
                     <th class="table-head">Estado</th>
                     <th class="table-head"></th>
                 </tr>
@@ -53,7 +47,7 @@
                             <span class="block text-xs text-slate-500">{{ $user->email }}</span>
                         </td>
                         <td class="table-cell">{{ $user->role->label() }}@if ($user->accessProfile)<span class="block text-xs text-slate-500">{{ $user->accessProfile->name }}</span>@endif</td>
-                        <td class="table-cell">{{ $user->team?->name ?? '—' }}</td>
+                        <td class="table-cell">{{ $user->area ?? '' }}@if ($user->folio_number)<span class="font-mono text-sm">{{ $user->folioLabel() }}</span>@endif @if (! $user->area && ! $user->folio_number)—@endif</td>
                         <td class="table-cell">
                             <span @class(['badge', 'bg-emerald-100 text-emerald-800' => $user->active, 'bg-slate-200 text-slate-600' => ! $user->active])>
                                 {{ $user->active ? 'Activo' : 'Inactivo' }}

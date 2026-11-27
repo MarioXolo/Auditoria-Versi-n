@@ -152,7 +152,7 @@ class AccessAndOrgChartTest extends TestCase
         $p = AccessProfile::firstWhere('name', 'Análisis');
         $this->actingAs($this->admin)->get("/users/{$u->id}/edit")->assertOk()->assertSee('Perfil de acceso');
         $this->actingAs($this->admin)->put("/users/{$u->id}", [
-            'name' => $u->name, 'email' => $u->email, 'role' => 'gerente', 'access_profile_id' => $p->id, 'active' => '1',
+            'name' => $u->name, 'email' => $u->email, 'role' => 'gerente', 'area' => 'Técnica', 'access_profile_id' => $p->id, 'active' => '1',
         ])->assertSessionHasNoErrors();
         $this->assertSame($p->id, $u->fresh()->access_profile_id);
         $this->assertFalse($u->fresh()->puede('votantes', 'capturar'));   // con perfil manda el perfil

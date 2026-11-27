@@ -143,7 +143,7 @@ class AppSmokeTest extends TestCase
     {
         $this->actingAs($this->encargado)->get('/activities/create')->assertOk()->assertDontSee('name="assigned_to"', false);
         $this->actingAs($this->encargado)->post('/activities', $this->payload(['assigned_to' => $this->otroEmpleado->id]))->assertRedirect();
-        $this->assertDatabaseHas('activities', ['assigned_to' => $this->encargado->id, 'created_by' => $this->encargado->id, 'team_id' => $this->team->id]);
+        $this->assertDatabaseHas('activities', ['assigned_to' => $this->encargado->id, 'created_by' => $this->encargado->id, 'folio_group' => $this->encargado->folio_number]);
         $this->assertDatabaseMissing('activities', ['assigned_to' => $this->otroEmpleado->id]);
     }
 

@@ -147,7 +147,7 @@ class CalendarController extends Controller
         };
 
         return [
-            'teams' => $user->seesEverything() ? Team::orderBy('number')->get(['id', 'name', 'number']) : collect(),
+            'teams' => collect(),   // los equipos ya no se usan
             'types' => ActivityType::filterableBy($user)->orderBy('name')->get(['id', 'name']),
             'communities' => Community::orderBy('name')->get(['id', 'name']),
             'people' => $people,

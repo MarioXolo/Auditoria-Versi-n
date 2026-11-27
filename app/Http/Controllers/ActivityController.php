@@ -23,7 +23,7 @@ class ActivityController extends Controller
 
         $query = Activity::query()
             ->visibleTo($user)
-            ->with(['assignee:id,name,role', 'team:id,name', 'type:id,name', 'community:id,name'])
+            ->with(['assignee:id,name,role,folio_number', 'creator:id,name,role,area', 'type:id,name', 'community:id,name'])
             ->when($request->filled('q'), function ($q) use ($request) {
                 $term = trim((string) $request->string('q'));
 
@@ -70,7 +70,7 @@ class ActivityController extends Controller
         return view('activities.index', [
             'activities' => $activities,
             'people' => $user->canManageActivities() ? $this->visiblePeople($user) : collect(),
-            'teams' => $this->teamsFor($user),
+            'teams' => collect(),   // los equipos ya no se usan
             'statuses' => ActivityStatus::options(),
             'types' => ActivityType::filterableBy($user)->orderBy('name')->get(['id', 'name']),
             'communities' => Community::orderBy('name')->get(['id', 'name']),
@@ -101,7 +101,7 @@ class ActivityController extends Controller
 
         $data = $this->validated($request, $user);
         $data['created_by'] = $user->id;
-        $data['team_id'] = User::find($data['assigned_to'])?->team_id;
+        $data['team_id'] = null;   // ya no hay equipos: el folio va por encargado
         // Al crear se elige No iniciado, En proceso o Suspendida; Concluido y No completada solo los pone un superior
         $data['status'] = $request->validate([
             'status' => ['nullable', Rule::in(array_keys(ActivityStatus::editableOptions()))],
@@ -141,7 +141,7 @@ class ActivityController extends Controller
 
         $data = $this->validated($request, $request->user(), $activity);
         if ((int) $data['assigned_to'] !== $activity->assigned_to) {
-            $data['team_id'] = User::find($data['assigned_to'])?->team_id;
+            $data['team_id'] = null;
         }
 
         // A mano solo se elige No iniciado, En proceso o Suspendida; los otros dos se ponen con el checkbox
@@ -477,20 +477,18 @@ class ActivityController extends Controller
 
     private function formData(User $user, Activity $activity): array
     {
-        $people = $user->assignableUsers()->get(['id', 'name', 'role', 'team_id']);
+        $people = $user->assignableUsers()->get(['id', 'name', 'role', 'folio_number']);
 
         if ($activity->assigned_to && ! $people->contains('id', $activity->assigned_to)) {
-            $people->push(User::find($activity->assigned_to, ['id', 'name', 'role', 'team_id']));
+            $people->push(User::find($activity->assigned_to, ['id', 'name', 'role', 'folio_number']));
         }
         $people = $people->filter();
 
-        // Vista previa del folio: depende del equipo de la persona asignada
-        $numbers = Team::pluck('number', 'id');
-        $groupOf = fn (?int $teamId) => $teamId ? (int) ($numbers[$teamId] ?? 0) : 0;
-        $previews = $people->mapWithKeys(fn ($p) => [$p->id => Activity::nextCode($groupOf($p->team_id))]);
+        // Vista previa del folio: depende del número de la persona asignada (ID7.0001…)
+        $previews = $people->mapWithKeys(fn ($p) => [$p->id => Activity::nextCode((int) $p->folio_number)]);
         $code = match (true) {
             $activity->exists => $activity->code,
-            $user->selfAssignOnly() => Activity::nextCode($groupOf($user->team_id)),
+            $user->selfAssignOnly() => Activity::nextCode((int) $user->folio_number),
             (bool) $activity->assigned_to => $previews[$activity->assigned_to] ?? Activity::nextCode(0),
             // Si todas las personas son del mismo equipo (caso del encargado), el folio ya se conoce
             $previews->unique()->count() === 1 => $previews->first(),
@@ -501,7 +499,6 @@ class ActivityController extends Controller
             'activity' => $activity,
             'people' => $people,
             'folioPreviews' => $activity->exists ? collect() : $previews,
-            'teams' => $this->teamsFor($user),
             'statuses' => ActivityStatus::editableOptions(),
             'types' => ActivityType::where(fn ($q) => $q->where('active', true)->availableTo($user))->orWhere('id', $activity->activity_type_id)->orderBy('name')->get(['id', 'name']),
             'communities' => Community::active()->orWhere('id', $activity->community_id)->orderBy('name')->get(['id', 'name']),

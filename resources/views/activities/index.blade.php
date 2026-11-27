@@ -90,7 +90,7 @@
                         </div>
                     </div>
                     <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
-                        <span>{{ $activity->assignee?->name }}</span>
+                        <span>{{ auth()->user()->selfAssignOnly() ? ($activity->assignedByText(auth()->user()) ?? 'Te la cargaste tú') : $activity->assignee?->name }}</span>
                         <span @class(['font-semibold text-rose-600' => $activity->isOverdue()])>
                             {{ $activity->start_date->format('d/m') }} – {{ $activity->end_date->format('d/m/Y') }}{{ $activity->isOverdue() ? ' · Vencida' : '' }}
                         </span>
@@ -139,8 +139,8 @@
                         </td>
                         <td class="table-cell">
                             <a href="{{ route('activities.show', $activity) }}" @class(['font-medium hover:text-brand-600', 'text-rose-900' => $failed, 'text-slate-900' => ! $failed])>{{ $activity->type?->name }}</a>
-                            @if ($activity->team)
-                                <span class="block text-xs text-slate-500">{{ $activity->team->name }}</span>
+                            @if (auth()->user()->selfAssignOnly() && ($by = $activity->assignedByText(auth()->user())))
+                                <span class="block text-xs font-medium text-brand-700">{{ $by }}</span>
                             @endif
                         </td>
                         <td class="table-cell">{{ $activity->community?->name }}</td>

@@ -43,6 +43,11 @@ Las fotos y evidencias se guardan en `storage/app/private` y solo se muestran a 
 - **Calendario**: administradores y gerentes ven además los eventos de campaña, en verde (reportado), ámbar (por reportar) o rojo (vencido).
 
 
+### Encargados con número propio y área de los gerentes (sin equipos)
+
+- Ya no se usan los equipos. Cada **encargado** recibe al crearse el siguiente número (ID1, ID2…) y sus actividades llevan folio `ID{número}.0001`, `.0002`… (las actividades anteriores conservan su folio). El encargado carga sus propias actividades y un gerente o el admin también se las puede cargar; un encargado nunca ve las de otros.
+- Cada **gerente** tiene un **área** (Coordinación, Territorial, Técnica, Agenda), obligatoria en su usuario. Cuando le asigna una actividad a un encargado, este ve «Técnica te encomendó esta actividad» y «marcada por Técnica», no el nombre. Gerentes y admin sí ven el nombre con su área.
+
 ### Tipos de actividad privados
 
 Lo que alguien escribe con «Otro…» en el tipo de actividad queda **privado de esa persona**: solo le aparece a ella para sus siguientes actividades y no se agrega a la lista de los demás. Gerentes y administradores lo ven en las actividades que supervisan, pero no en su lista para cargar. La lista común la administran admin y gerentes en Catálogos; el administrador ve aparte los tipos privados y puede «pasar a la lista común» el que convenga. Al instalar, los tipos que ya se habían escrito con «Otro…» (creados junto con su primera actividad y usados por una sola persona) se volvieron privados de quien los escribió. Las comunidades siguen siendo una lista común.

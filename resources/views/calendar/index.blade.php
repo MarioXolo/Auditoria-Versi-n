@@ -267,7 +267,7 @@
             <table class="min-w-full divide-y divide-slate-200 text-sm print:text-[9px]">
                 <thead class="bg-slate-50">
                     <tr>
-                        @foreach (['ID', 'Tipo de actividad', 'Comunidad', 'Asignada a', 'Equipo', 'Inicio', 'Fin', 'Estado'] as $h)
+                        @foreach (['ID', 'Tipo de actividad', 'Comunidad', 'Asignada a', 'Número', 'Inicio', 'Fin', 'Estado'] as $h)
                             <th class="table-head print:px-1.5 print:py-1">{{ $h }}</th>
                         @endforeach
                     </tr>
@@ -279,7 +279,7 @@
                             <td class="table-cell print:px-1.5 print:py-0.5">{{ $activity->type?->name }}</td>
                             <td class="table-cell print:px-1.5 print:py-0.5">{{ $activity->community?->name }}</td>
                             <td class="table-cell print:px-1.5 print:py-0.5">{{ $activity->assignee?->name }}</td>
-                            <td class="table-cell print:px-1.5 print:py-0.5">{{ $activity->team?->name ?? '—' }}</td>
+                            <td class="table-cell print:px-1.5 print:py-0.5">{{ $activity->assignee?->folioLabel() ?? '—' }}</td>
                             <td class="table-cell whitespace-nowrap print:px-1.5 print:py-0.5">{{ $activity->start_date->format('d/m/Y') }}</td>
                             <td @class(['table-cell whitespace-nowrap print:px-1.5 print:py-0.5', 'font-semibold text-rose-600' => $activity->isOverdue()])>{{ $activity->end_date->format('d/m/Y') }}</td>
                             <td class="table-cell print:px-1.5 print:py-0.5">

@@ -105,21 +105,22 @@ class UserController extends Controller
             'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user?->id)],
             'phone' => ['nullable', 'string', 'max:30'],
             'role' => ['required', Rule::in(array_keys(Role::options()))],
-            'team_id' => ['nullable', 'integer', 'exists:teams,id'],
+            'area' => ['nullable', 'required_if:role,gerente', 'string', 'max:60'],
             'access_profile_id' => ['nullable', 'integer', 'exists:access_profiles,id'],
             'password' => [$user ? 'nullable' : 'required', 'confirmed', Password::min(8)],
-        ], [], [
+        ], ['area.required_if' => 'Escribe el área del gerente (Coordinación, Territorial, Técnica o Agenda).'], [
             'name' => 'nombre',
             'email' => 'correo',
             'phone' => 'teléfono',
             'role' => 'rol',
-            'team_id' => 'equipo',
+            'area' => 'área',
             'access_profile_id' => 'perfil',
             'password' => 'contraseña',
         ]);
 
         $data['active'] = $request->boolean('active');
         $data['access_profile_id'] ??= null;
+        $data['area'] = filled($data['area'] ?? null) ? trim($data['area']) : null;
 
         return $data;
     }

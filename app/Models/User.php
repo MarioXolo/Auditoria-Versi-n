@@ -23,6 +23,8 @@ class User extends Authenticatable
         'role',
         'access_profile_id',
         'team_id',
+        'area',
+        'folio_number',
         'phone',
         'active',
     ];
@@ -38,6 +40,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'role' => Role::class,
+            'folio_number' => 'integer',
             'team_id' => 'integer',
             'active' => 'boolean',
         ];
@@ -88,6 +91,40 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->role === Role::Admin;
+    }
+
+    protected static function booted(): void
+    {
+        // Cada encargado tiene su número en secuencia (ID1, ID2…) para el folio de sus actividades
+        static::saving(function (User $u) {
+            if ($u->role === Role::Encargado && ! $u->folio_number) {
+                $u->folio_number = self::nextFolioNumber();
+            }
+        });
+    }
+
+    public static function nextFolioNumber(): int
+    {
+        return max((int) self::max('folio_number'), (int) Activity::max('folio_group'), (int) Team::max('number')) + 1;
+    }
+
+    /** «ID7» del encargado, o null. */
+    public function folioLabel(): ?string
+    {
+        return $this->folio_number ? 'ID'.$this->folio_number : null;
+    }
+
+    /**
+     * Cómo lo ve un encargado cuando le asignan algo: el área del gerente («Técnica»),
+     * no su nombre. Administración para el admin.
+     */
+    public function areaLabel(): string
+    {
+        return $this->area ?: match ($this->role) {
+            Role::Admin => 'Administración',
+            Role::Gerente => 'Gerencia',
+            default => $this->name,
+        };
     }
 
     public function isGerente(): bool

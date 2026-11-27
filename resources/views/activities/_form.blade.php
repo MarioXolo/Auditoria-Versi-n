@@ -65,7 +65,7 @@
                 <option value="">Selecciona una persona</option>
                 @foreach ($people as $person)
                     <option value="{{ $person->id }}" @selected((int) old('assigned_to', $activity->assigned_to) === $person->id)>
-                        {{ $person->name }} ({{ $person->role->label() }})
+                        {{ $person->name }} ({{ $person->role->label() }}{{ $person->folio_number ? ' · ID'.$person->folio_number : '' }})
                     </option>
                 @endforeach
             </select>

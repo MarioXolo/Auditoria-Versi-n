@@ -24,6 +24,9 @@
                 <span class="badge bg-brand-50 text-brand-700">Se la cargó él mismo</span>
             @endif
         </div>
+        @if (auth()->user()->selfAssignOnly() && ($by = $activity->assignedByText(auth()->user())))
+            <p class="mt-2 rounded-lg bg-brand-50 px-3 py-2 text-sm font-medium text-brand-900">{{ $by }}</p>
+        @endif
     </div>
     <div class="flex gap-2">
         @can('update', $activity)
@@ -158,7 +161,7 @@
 
                 @if ($activity->marked_at)
                     <p @class(['mt-2 text-sm font-medium', 'text-rose-900' => $failed, 'text-emerald-900' => $done])>
-                        {{ $done ? 'Concluido' : 'No completada' }} · marcada por {{ $activity->marker?->name }}
+                        {{ $done ? 'Concluido' : 'No completada' }} · marcada por {{ $activity->markedByText(auth()->user()) }}
                     </p>
                     <p class="text-xs text-slate-500">{{ $activity->marked_at->format('d/m/Y H:i') }}</p>
                     @if ($done)
@@ -213,9 +216,9 @@
                     'ID' => $activity->code,
                     'Tipo' => $activity->type?->name,
                     'Comunidad' => $activity->community?->name,
-                    'Asignada a' => $activity->assignee?->name,
-                    ($activity->isSelfAssigned() ? 'Cargada por' : 'Asignada por') => $activity->creator?->name,
-                    'Equipo' => $activity->team?->name ?? '—',
+                    'Asignada a' => $activity->assignee?->name.($activity->assignee?->folio_number ? ' · '.$activity->assignee->folioLabel() : ''),
+                    ($activity->isSelfAssigned() ? 'Cargada por' : 'Asignada por') => $activity->isSelfAssigned() ? $activity->creator?->name
+                        : (auth()->user()->selfAssignOnly() ? $activity->creator?->areaLabel() : $activity->creator?->name.($activity->creator?->area ? ' ('.$activity->creator->area.')' : '')),
                     'Fecha de inicio' => $activity->start_date->format('d/m/Y'),
                     'Fecha de fin' => $activity->end_date->format('d/m/Y'),
                     'Creada' => $activity->created_at->format('d/m/Y H:i'),

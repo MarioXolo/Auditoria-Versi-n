@@ -80,7 +80,7 @@ class ActivityFormTest extends TestCase
         $this->assertSame('Se visitaron 18 domicilios.', $a->evidence_text);
         $this->actingAs($this->gerente)->get("/activities/{$a->id}")
             ->assertSee('Se visitaron 18 domicilios.')
-            ->assertSee('ID1.0001')
+            ->assertSee('ID2.0001')
             ->assertSee('Visita domiciliaria')
             ->assertSee('San Isidro');
     }
@@ -112,14 +112,14 @@ class ActivityFormTest extends TestCase
         $team = $this->empleado->team_id;
         $uno = $this->makeActivity(['assigned_to' => $this->empleado->id, 'created_by' => $this->encargado->id, 'team_id' => $team], 'El Mirador');
         $dos = $this->makeActivity(['assigned_to' => $this->empleado->id, 'created_by' => $this->encargado->id, 'team_id' => $team], 'Los Pinos');
-        $this->assertSame(['ID1.0001', 'ID1.0002'], [$uno->code, $dos->code]);
+        $this->assertSame(['ID2.0001', 'ID2.0002'], [$uno->code, $dos->code]);
 
         // Los filtros listan todas las comunidades, así que se compara por folio
-        $this->actingAs($this->gerente)->get('/activities?q=ID1.0002')->assertSee('ID1.0002')->assertDontSee('ID1.0001');
-        $this->actingAs($this->gerente)->get('/activities?q=1.2')->assertSee('ID1.0002')->assertDontSee('ID1.0001');
-        $this->actingAs($this->gerente)->get('/activities?q=ID1')->assertSee('ID1.0001')->assertSee('ID1.0002');
-        $this->actingAs($this->gerente)->get('/activities?q=mirador')->assertSee('ID1.0001')->assertDontSee('ID1.0002');
-        $this->actingAs($this->gerente)->get('/activities?community_id='.$uno->community_id)->assertSee('ID1.0001')->assertDontSee('ID1.0002');
+        $this->actingAs($this->gerente)->get('/activities?q=ID2.0002')->assertSee('ID2.0002')->assertDontSee('ID2.0001');
+        $this->actingAs($this->gerente)->get('/activities?q=2.2')->assertSee('ID2.0002')->assertDontSee('ID2.0001');
+        $this->actingAs($this->gerente)->get('/activities?q=ID2')->assertSee('ID2.0001')->assertSee('ID2.0002');
+        $this->actingAs($this->gerente)->get('/activities?q=mirador')->assertSee('ID2.0001')->assertDontSee('ID2.0002');
+        $this->actingAs($this->gerente)->get('/activities?community_id='.$uno->community_id)->assertSee('ID2.0001')->assertDontSee('ID2.0002');
     }
 
     public function test_managers_administer_catalogs(): void
@@ -148,57 +148,27 @@ class ActivityFormTest extends TestCase
         $this->actingAs($this->gerente)->get('/catalogos')->assertOk()->assertSee('La Joya');
     }
 
-    public function test_each_team_has_its_own_folio_sequence(): void
+    public function test_each_encargado_has_his_own_number_and_folio_sequence(): void
     {
-        $leaderSur = User::factory()->role('encargado')->create();
-        $sur = Team::create(['name' => 'Sur', 'leader_id' => $leaderSur->id]);
-        $leaderSur->update(['team_id' => $sur->id]);
-        $empSur = User::factory()->create(['team_id' => $sur->id]);
-        $sinEquipo = User::factory()->create();
+        // Cada encargado nuevo recibe el siguiente número; los gerentes no tienen número
+        $this->assertSame(1, $this->encargado->folio_number);
+        $this->assertSame(2, $this->empleado->folio_number);
+        $tercero = User::factory()->role('encargado')->create();
+        $this->assertSame(3, $tercero->folio_number);
+        $this->assertNull($this->gerente->folio_number);
 
-        $this->assertSame(2, $sur->number);
+        // El folio va por encargado: ID{número}.{secuencia}
+        $this->actingAs($this->encargado)->post('/activities', $this->payload())->assertRedirect();
+        $this->actingAs($this->gerente)->post('/activities', $this->payload(['assigned_to' => $tercero->id]))->assertRedirect();
+        $this->actingAs($this->encargado)->post('/activities', $this->payload())->assertRedirect();
+        $this->actingAs($this->gerente)->post('/activities', $this->payload(['assigned_to' => $tercero->id]))->assertRedirect();
+        $this->assertSame(['ID1.0001', 'ID3.0001', 'ID1.0002', 'ID3.0002'], Activity::orderBy('id')->pluck('folio')->all());
 
-        $folios = [];
-        foreach ([$this->empleado, $empSur, $this->empleado, $empSur, $empSur] as $person) {
-            $this->actingAs($this->gerente)->post('/activities', $this->payload(['assigned_to' => $person->id]))->assertRedirect();
-            $folios[] = Activity::latest('id')->first()->code;
-        }
-        $this->assertSame(['ID1.0001', 'ID2.0001', 'ID1.0002', 'ID2.0002', 'ID2.0003'], $folios);
+        // El formulario del gerente muestra el siguiente folio de cada persona
+        $this->actingAs($tercero)->get('/activities/create')->assertSee('ID3.0003');
 
-        $this->actingAs($this->gerente)->post('/activities', $this->payload(['assigned_to' => $sinEquipo->id]))->assertRedirect();
-        $this->assertSame('ID0.0001', Activity::latest('id')->first()->code);
-
-        // El folio no cambia si después se reasigna a otro equipo
-        $a = Activity::where('folio', 'ID1.0001')->first();
-        $this->actingAs($this->gerente)->put("/activities/{$a->id}", $this->payload(['assigned_to' => $empSur->id]))->assertRedirect();
-        $this->assertSame('ID1.0001', $a->fresh()->code);
-        $this->assertSame($sur->id, $a->fresh()->team_id);
-
-        // El empleado ve el folio de su equipo al cargar
-        $this->actingAs($empSur)->get('/activities/create')->assertSee('ID2.0004');
-    }
-
-    public function test_maximum_of_thirty_teams(): void
-    {
-        foreach (range(2, 30) as $n) {
-            Team::create(['name' => "Equipo {$n}"]);
-        }
-        $this->assertSame(30, (int) Team::query()->max('number'));
-
-        $admin = User::factory()->role('admin')->create();
-        $this->actingAs($admin)->get('/teams')->assertSee('Límite de 30 equipos');
-        $this->actingAs($admin)->get('/teams/create')->assertRedirect(route('teams.index'));
-        $this->actingAs($admin)->post('/teams', ['name' => 'Equipo 31'])->assertSessionHasErrors('name');
-        $this->assertSame(30, Team::count());
-
-        // Al borrar uno se libera su número y el nuevo continúa la secuencia de folios
-        $this->makeActivity(['assigned_to' => $this->empleado->id, 'created_by' => $this->encargado->id, 'team_id' => Team::where('number', 5)->value('id')]);
-        Team::where('number', 5)->first()->delete();
-        $this->actingAs($admin)->post('/teams', ['name' => 'Nuevo 5'])->assertRedirect(route('teams.index'));
-        $nuevo = Team::where('name', 'Nuevo 5')->first();
-        $this->assertSame(5, $nuevo->number);
-        $b = $this->makeActivity(['assigned_to' => $this->empleado->id, 'created_by' => $this->encargado->id, 'team_id' => $nuevo->id]);
-        $this->assertSame('ID5.0002', $b->code);
+        // Equipos ya no aparecen en el menú
+        $this->actingAs(User::factory()->role('admin')->create())->get('/dashboard')->assertDontSee('>Equipos<', false);
     }
 
     public function test_type_and_community_can_be_typed_manually(): void

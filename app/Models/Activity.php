@@ -69,13 +69,14 @@ class Activity extends Model
 
     protected static function booted(): void
     {
-        // Folio por equipo, en secuencia: ID{número de equipo}.{0001…}. Una vez asignado no cambia.
+        // Folio por encargado, en secuencia: ID{número del encargado}.{0001…}. Una vez asignado no cambia.
+        // (Las actividades anteriores conservan su folio por equipo.)
         static::creating(function (Activity $activity) {
             if ($activity->folio) {
                 return;
             }
 
-            $group = $activity->team_id ? (int) Team::whereKey($activity->team_id)->value('number') : 0;
+            $group = $activity->assigned_to ? (int) User::whereKey($activity->assigned_to)->value('folio_number') : 0;
             $seq = self::nextSeq($group);
 
             $activity->folio_group = $group;
@@ -84,7 +85,7 @@ class Activity extends Model
         });
     }
 
-    /** Folio visible: ID1.0001 (equipo 1, actividad 1). Equipo 0 = sin equipo. */
+    /** Folio visible: ID7.0001 (encargado 7, actividad 1). 0 = asignada a alguien sin número (gerente o admin). */
     public static function formatCode(int $group, int $seq): string
     {
         return 'ID'.$group.'.'.str_pad((string) $seq, 4, '0', STR_PAD_LEFT);
@@ -95,12 +96,37 @@ class Activity extends Model
         return ((int) self::where('folio_group', $group)->max('folio_seq')) + 1;
     }
 
-    /** Folio que tendrá la siguiente actividad del equipo (solo para mostrarlo en el formulario). */
+    /** Folio que tendrá la siguiente actividad del encargado (solo para mostrarlo en el formulario). */
     public static function nextCode(?int $group): string
     {
         $group ??= 0;
 
         return self::formatCode($group, self::nextSeq($group));
+    }
+
+    /**
+     * Quién la asignó, como lo debe ver $viewer: el encargado ve el área («Técnica te encomendó
+     * esta actividad»); gerentes y admin ven el nombre. Null si se la cargó la misma persona.
+     */
+    public function assignedByText(User $viewer): ?string
+    {
+        if (! $this->creator || $this->created_by === $this->assigned_to) {
+            return null;
+        }
+
+        return $viewer->selfAssignOnly()
+            ? $this->creator->areaLabel().' te encomendó esta actividad'
+            : 'Asignada por '.$this->creator->name.($this->creator->area ? ' ('.$this->creator->area.')' : '');
+    }
+
+    /** Quién la marcó, como lo debe ver $viewer (el encargado ve el área, no el nombre). */
+    public function markedByText(User $viewer): ?string
+    {
+        if (! $this->marker) {
+            return null;
+        }
+
+        return $viewer->selfAssignOnly() && $this->marked_by !== $viewer->id ? $this->marker->areaLabel() : $this->marker->name;
     }
 
     public function getCodeAttribute(): string

@@ -51,7 +51,7 @@ class ActivityMarkingTest extends TestCase
 
         $this->assertSame($this->encargado->id, $a->assigned_to);
         $this->assertSame($this->encargado->id, $a->created_by);
-        $this->assertSame($this->encargado->team_id, $a->team_id);
+        $this->assertSame('ID'.$this->encargado->folio_number.'.0001', $a->code);   // folio por encargado
         $this->assertSame(ActivityStatus::NoIniciado, $a->status);
 
         // La puede editar mientras no esté marcada, pero no ponerla en rojo
